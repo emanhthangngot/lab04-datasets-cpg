@@ -66,3 +66,10 @@ def make_edge_id(source_id: str, target_id: str, edge_type: str) -> str:
     """Create a stable edge ID from endpoints and type."""
 
     return short_hash(f"{source_id}:{target_id}:{edge_type}")
+
+
+def make_external_target_id(target_name: str) -> str:
+    """Create a deterministic target ID for unresolved external calls."""
+
+    normalized = ".".join(part for part in target_name.strip().split(".") if part)
+    return f"external:{normalized or 'unknown'}"

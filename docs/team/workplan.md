@@ -39,7 +39,11 @@ source code, notebooks, screenshots, and meaningful commit history.
 ### Stage 1
 
 - [ ] Confirm GitHub public repo and `dev` branch.
-- [ ] Write baseline spec for parser, Kafka topics, store contracts, replay, and evidence.
+- [ ] Lock schema v1.0 before writing specs.
+- [ ] Document JSON Schema contract for `cpg.nodes`, `cpg.edges`, `cpg.metadata`, and `cpg.errors`.
+- [ ] Standardize error events on `status = "failed"`.
+- [ ] Standardize `CALL_UNRESOLVED` as a deterministic external placeholder target.
+- [ ] Write baseline spec for parser, Kafka topics, store contracts, replay, and evidence after schema lock.
 - [ ] Verify `bash scripts/run_checks.sh` passes.
 - [ ] Assign initial tasks to Truc, Thanh, and Tuan.
 

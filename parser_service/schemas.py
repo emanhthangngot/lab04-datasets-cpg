@@ -125,5 +125,5 @@ def build_metadata_event(
 
 def build_error_event(*, context: Any, file_id: str, file_path: str, error: Exception) -> dict:
     event = common_fields(context, file_id, file_path)
-    event.update({"status": "error", "error_type": type(error).__name__, "message": str(error)})
+    event.update({"status": "failed", "error_type": type(error).__name__, "message": str(error)})
     return event
