@@ -1,0 +1,63 @@
+# Local config and secrets
+.env
+.env.*
+!.env.example
+secrets/
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Lab data and generated outputs
+data/
+checkpoints/
+spark-warehouse/
+book/_build/
+screenshots/**/*.tmp
+
+# Shared spec kit vs personal agent setup
+#
+# Keep only the project spec context/templates/SDD prompts in Git. The rest of
+# .codex is personal agent runtime configuration for this workstation.
+.codex/*
+!.codex/constitution.md
+!.codex/context/
+!.codex/context/lab04-cpg.md
+!.codex/commands/
+.codex/commands/*
+!.codex/commands/README.md
+!.codex/commands/sdd/
+!.codex/commands/sdd/*.md
+!.codex/templates/
+!.codex/templates/*.md
+
+# Personal agent setup and installers
+AGENTS.md
+scripts/create-agent-worktree.sh
+scripts/doctor-agent-config.sh
+scripts/enable-codex-skill-discovery.sh
+scripts/install-codex-mcp-examples.sh
+scripts/install-codex-prompts.sh
+scripts/install-to-project.sh
+scripts/run-agent-checks.sh
+
+# Codex local overrides
+.codex/config.local.toml
+.codex/*.local.toml
+.codex/**/*.local.toml
+.codex/**/*.secret.*
+.agents/
+
+# OS/editor
+.DS_Store
+.idea/
+.vscode/
+*.swp
+*.swo

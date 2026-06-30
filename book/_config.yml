@@ -1,0 +1,13 @@
+title: "Lab04 CPG Streaming"
+author: "Lab04 Team"
+logo: ""
+execute:
+  execute_notebooks: "off"
+repository:
+  url: ""
+  path_to_book: "book"
+html:
+  use_repository_button: false
+  use_issues_button: false
+
+# TODO: Fill repository.url before publishing to GitHub Pages.

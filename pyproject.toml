@@ -1,0 +1,14 @@
+[project]
+name = "lab04-datasets-cpg"
+version = "0.1.0"
+description = "Lab04 incremental CPG streaming scaffold for huggingface/datasets"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
