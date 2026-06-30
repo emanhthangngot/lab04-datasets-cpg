@@ -1,13 +1,13 @@
 title: "Lab04 CPG Streaming"
-author: "Lab04 Team"
+author: "23120099 Le Xuan Tri, 23120180 Tran Le Trung Truc, 23120166 Tran Huu Kim Thanh, 23120185 Nguyen Ho Anh Tuan"
 logo: ""
 execute:
   execute_notebooks: "off"
 repository:
-  url: ""
+  url: "https://github.com/emanhthangngot/lab04-datasets-cpg"
   path_to_book: "book"
+  branch: "main"
 html:
-  use_repository_button: false
+  use_repository_button: true
   use_issues_button: false
-
-# TODO: Fill repository.url before publishing to GitHub Pages.
+  use_edit_page_button: false

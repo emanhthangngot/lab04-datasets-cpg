@@ -3,10 +3,16 @@ set -euo pipefail
 
 # Lightweight checks for scaffold and local Python logic.
 
-echo "==> Codex config"
-bash .codex/scripts/doctor.sh
+if [[ -x ".codex/scripts/doctor.sh" ]]; then
+  echo "==> Codex config"
+  bash .codex/scripts/doctor.sh
+  echo
+else
+  echo "==> Codex config"
+  echo "Skipping .codex doctor; agent-local files are not required in public clones."
+  echo
+fi
 
-echo
 echo "==> Python tests"
 python -m pytest
 

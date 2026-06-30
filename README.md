@@ -79,6 +79,24 @@ jupyter-book build book/
 - Task 6: idempotent replay evidence.
 - Architecture diagram: full parser -> Kafka -> Neo4j/Spark/MongoDB flow.
 
+## Team Workflow
+
+Team workflow, branch rules, commit rules, and evidence requirements are in
+`docs/CONTRIBUTING.md`.
+
+Progress is tracked in:
+
+- `docs/team/workplan.md` for lead/spec ownership and overall status.
+- `docs/team/kafka-spark.md` for Kafka/Spark runtime work.
+- `docs/team/graph-stores.md` for Neo4j/MongoDB store work.
+- `docs/team/evidence-book.md` for notebooks, screenshots, and Jupyter Book work.
+
+The final Moodle submission is the GitHub Pages root URL:
+
+```text
+https://emanhthangngot.github.io/lab04-datasets-cpg/
+```
+
 ## Limitations To State In The Report
 
 - Parser is lab-level, not Joern-equivalent.
