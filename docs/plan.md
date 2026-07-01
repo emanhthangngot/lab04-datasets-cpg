@@ -397,6 +397,28 @@ Never emit properties: null.
 }
 ```
 
+## 5.6 Error event schema
+
+```json
+{
+  "schema_version": "1.0",
+  "event_time": "2026-06-24T10:00:00.000Z",
+  "repo": "huggingface/datasets",
+  "commit_sha": "...",
+  "run_id": "...",
+  "file_id": "...",
+  "file_path": "src/datasets/broken.py",
+  "status": "failed",
+  "error_type": "SyntaxError",
+  "message": "invalid syntax",
+  "lineno": 42,
+  "col_offset": 7
+}
+```
+
+`col_offset` is zero-based. If Python does not expose parser location data,
+emit `null` for `lineno` and `col_offset`.
+
 ---
 
 # 6. Event builders and schema guards
@@ -935,11 +957,11 @@ def write_batch(batch_df, batch_id):
         batch_df.write
         .format("mongodb")
         .mode("append")
-        .option("database", "cpg")
-        .option("collection", "file_metadata")
-        .option("operationType", "replace")
-        .option("idFieldList", "file_id")
-        .option("upsertDocument", "true")
+        .option("spark.mongodb.write.database", "cpg")
+        .option("spark.mongodb.write.collection", "file_metadata")
+        .option("spark.mongodb.write.operationType", "replace")
+        .option("spark.mongodb.write.idFieldList", "file_id")
+        .option("spark.mongodb.write.upsertDocument", "true")
         .save()
     )
 
@@ -1292,6 +1314,7 @@ Submit root URL
 | Spark Kafka source package missing | Critical | Add `org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0` |
 | Producer messages lost | Critical | Use `producer.flush()` after each file |
 | Wrong Neo4j connector class | Critical | Check `/connector-plugins` |
+| Kafka KRaft broker missing cluster ID | Critical | Set `CLUSTER_ID` in Compose |
 | Relationship constraint unsupported | Moderate | Only create node uniqueness constraint |
 | `event.properties` is null | Moderate | Emit `{}` and use `coalesce(event.properties, {})` |
 | `num_total_edges` inconsistent | Moderate | Compute explicitly in `process_file` |

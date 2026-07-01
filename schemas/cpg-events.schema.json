@@ -235,7 +235,9 @@
             "file_path",
             "status",
             "error_type",
-            "message"
+            "message",
+            "lineno",
+            "col_offset"
           ],
           "properties": {
             "schema_version": { "type": "string", "const": "1.0" },
@@ -247,7 +249,9 @@
             "file_path": { "type": "string" },
             "status": { "type": "string", "const": "failed" },
             "error_type": { "type": "string", "minLength": 1 },
-            "message": { "type": "string" }
+            "message": { "type": "string" },
+            "lineno": { "type": ["integer", "null"], "minimum": 1 },
+            "col_offset": { "type": ["integer", "null"], "minimum": 0 }
           }
         }
       ]

@@ -130,7 +130,7 @@ def test_event_builders_match_json_schema_contract(tmp_path: Path) -> None:
         context=context,
         file_id="file",
         file_path="src/datasets/broken.py",
-        error=SyntaxError("bad syntax"),
+        error=SyntaxError("bad syntax", ("broken.py", 3, 5, "x =\n")),
     )
 
     validate_event(contract, "nodeEvent", node)
@@ -151,6 +151,20 @@ def test_error_event_status_is_failed(tmp_path: Path) -> None:
     assert error["status"] == "failed"
 
 
+def test_error_event_includes_zero_based_location(tmp_path: Path) -> None:
+    context = DummyContext(repo_root=tmp_path)
+    error = build_error_event(
+        context=context,
+        file_id="file",
+        file_path="src/datasets/broken.py",
+        error=SyntaxError("bad syntax", ("broken.py", 7, 4, "bad\n")),
+    )
+
+    validate_event(load_contract(), "errorEvent", error)
+    assert error["lineno"] == 7
+    assert error["col_offset"] == 3
+
+
 def test_spark_metadata_schema_matches_json_schema_contract() -> None:
     contract = load_contract()
     metadata_fields = set(event_schema(contract, "metadataEvent")["properties"])
@@ -160,6 +174,17 @@ def test_spark_metadata_schema_matches_json_schema_contract() -> None:
     spark_fields = set(re.findall(r'\.add\("([^"]+)"', spark_source))
 
     assert spark_fields == metadata_fields
+
+
+def test_mongodb_writer_uses_connector_10_replace_options() -> None:
+    spark_source = (ROOT / "spark_jobs" / "metadata_stream_to_mongo.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert 'option("spark.mongodb.write.operationType", "replace")' in spark_source
+    assert 'option("spark.mongodb.write.idFieldList", "file_id")' in spark_source
+    assert 'option("operationType", "replace")' not in spark_source
+    assert 'option("idFieldList", "file_id")' not in spark_source
 
 
 def test_neo4j_connector_references_only_schema_fields() -> None:
@@ -179,6 +204,26 @@ def test_neo4j_connector_references_only_schema_fields() -> None:
 
     assert node_refs <= node_fields
     assert edge_refs <= edge_fields
+
+
+def test_neo4j_connector_uses_verified_sink_class() -> None:
+    connector = json.loads((ROOT / "neo4j" / "sink_connector.json").read_text(encoding="utf-8"))
+
+    assert (
+        connector["config"]["connector.class"]
+        == "org.neo4j.connectors.kafka.sink.Neo4jConnector"
+    )
+
+
+def test_runtime_config_locks_kraft_cluster_id_and_plugin_gate() -> None:
+    compose = (ROOT / "docker-compose.yml").read_text(encoding="utf-8")
+    plugin_script = (ROOT / "scripts" / "check_connect_plugins.sh").read_text(
+        encoding="utf-8"
+    )
+
+    assert "CLUSTER_ID:" in compose
+    assert "org.neo4j.connectors.kafka.sink.Neo4jConnector" in plugin_script
+    assert 'plugin.get("type") == "sink"' in plugin_script
 
 
 def test_unresolved_call_edges_use_external_placeholder_targets(tmp_path: Path) -> None:

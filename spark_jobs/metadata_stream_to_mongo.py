@@ -55,16 +55,14 @@ metadata_df = raw.select(from_json(col("value").cast("string"), schema).alias("d
 def write_batch(batch_df, batch_id):
     """Write each micro-batch with replace/upsert semantics by file_id."""
 
-    # TODO: Verify connector option names against the installed MongoDB Spark
-    # Connector version in the lab container.
     (
         batch_df.write.format("mongodb")
         .mode("append")
-        .option("database", "cpg")
-        .option("collection", "file_metadata")
-        .option("operationType", "replace")
-        .option("idFieldList", "file_id")
-        .option("upsertDocument", "true")
+        .option("spark.mongodb.write.database", "cpg")
+        .option("spark.mongodb.write.collection", "file_metadata")
+        .option("spark.mongodb.write.operationType", "replace")
+        .option("spark.mongodb.write.idFieldList", "file_id")
+        .option("spark.mongodb.write.upsertDocument", "true")
         .save()
     )
 
