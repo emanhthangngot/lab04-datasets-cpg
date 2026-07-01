@@ -19,11 +19,13 @@ source code, notebooks, screenshots, and meaningful commit history.
 
 1. Tri writes or updates the spec for the stage.
 2. Tri assigns tasks in this workplan.
-3. Each member branches from `dev`, implements only assigned work, and updates
+3. Each member reads the matching `openspec/specs/**/spec.md` and
+   `openspec/changes/stage2-team-handoff/tasks.md`.
+4. Each member branches from `dev`, implements only assigned work, and updates
    their progress file.
-4. Each member opens a PR back to `dev`.
-5. Tri reviews implementation, evidence, and progress tracker before merge.
-6. Final stage merges `dev` into `main`, which publishes the Jupyter Book.
+5. Each member opens a PR back to `dev`.
+6. Tri reviews implementation, evidence, and progress tracker before merge.
+7. Final stage merges `dev` into `main`, which publishes the Jupyter Book.
 
 ## Stage Timeline
 
@@ -38,10 +40,25 @@ source code, notebooks, screenshots, and meaningful commit history.
 
 ### Stage 1
 
-- [ ] Confirm GitHub public repo and `dev` branch.
-- [ ] Write baseline spec for parser, Kafka topics, store contracts, replay, and evidence.
-- [ ] Verify `bash scripts/run_checks.sh` passes.
-- [ ] Assign initial tasks to Truc, Thanh, and Tuan.
+- [x] Confirm GitHub public repo and `dev` branch.
+- [x] Lock schema v1.0 before writing specs.
+- [x] Document JSON Schema contract for `cpg.nodes`, `cpg.edges`, `cpg.metadata`, and `cpg.errors`.
+- [x] Standardize error events on `status = "failed"`.
+- [x] Include parser error `lineno` and zero-based `col_offset` in the schema.
+- [x] Standardize `CALL_UNRESOLVED` as a deterministic external placeholder target.
+- [x] Verify `/connector-plugins` reports `org.neo4j.connectors.kafka.sink.Neo4jConnector`.
+- [x] Lock Spark MongoDB replace/upsert by `file_id`.
+- [x] Write baseline spec for parser, Kafka topics, store contracts, replay, and evidence after schema lock.
+- [x] Verify `bash scripts/run_checks.sh` passes.
+- [x] Assign initial tasks to Truc, Thanh, and Tuan.
+
+### Stage 2 Initial Assignments
+
+| Owner | Spec | Task Checklist | Tracker |
+|---|---|---|---|
+| Truc | `openspec/specs/kafka-spark/spec.md` | `openspec/changes/stage2-team-handoff/tasks.md` section 1 | `docs/team/kafka-spark.md` |
+| Thanh | `openspec/specs/graph-stores/spec.md` | `openspec/changes/stage2-team-handoff/tasks.md` section 2 | `docs/team/graph-stores.md` |
+| Tuan | `openspec/specs/evidence-book/spec.md` | `openspec/changes/stage2-team-handoff/tasks.md` section 3 | `docs/team/evidence-book.md` |
 
 ### Stage 2
 
@@ -69,10 +86,10 @@ source code, notebooks, screenshots, and meaningful commit history.
 
 | Area | Owner | Status | Next Checkpoint |
 |---|---|---|---|
-| Parser/schema/specs | Tri | Not started | Stage 1 baseline spec |
-| Kafka/Spark | Truc | Not started | Stage 1 infra readiness |
-| Neo4j/MongoDB | Thanh | Not started | Stage 1 store readiness |
-| Evidence/Jupyter Book | Tuan | Not started | Stage 1 book skeleton review |
+| Parser/schema/specs | Tri | Schema v1.0 locked; Stage 2 handoff assigned | Review Stage 2 PRs |
+| Kafka/Spark | Truc | Assigned from OpenSpec handoff | Topic and Spark readiness evidence |
+| Neo4j/MongoDB | Thanh | Assigned from OpenSpec handoff | Neo4j/MongoDB validation evidence |
+| Evidence/Jupyter Book | Tuan | Assigned from OpenSpec handoff | Stage 1 book skeleton review |
 
 ## Blocker Policy
 

@@ -1,0 +1,260 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/emanhthangngot/lab04-datasets-cpg/schemas/cpg-events.schema.json",
+  "title": "Lab04 CPG Streaming Events",
+  "description": "Canonical schema contract for Lab04 Kafka event payloads.",
+  "oneOf": [
+    { "$ref": "#/$defs/nodeEvent" },
+    { "$ref": "#/$defs/edgeEvent" },
+    { "$ref": "#/$defs/metadataEvent" },
+    { "$ref": "#/$defs/errorEvent" }
+  ],
+  "$defs": {
+    "commonFields": {
+      "type": "object",
+      "required": [
+        "schema_version",
+        "event_time",
+        "repo",
+        "commit_sha",
+        "run_id",
+        "file_id",
+        "file_path"
+      ],
+      "properties": {
+        "schema_version": { "type": "string", "const": "1.0" },
+        "event_time": {
+          "type": "string",
+          "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}Z$"
+        },
+        "repo": { "type": "string", "minLength": 1 },
+        "commit_sha": { "type": "string" },
+        "run_id": { "type": "string", "minLength": 1 },
+        "file_id": { "type": "string", "minLength": 1 },
+        "file_path": { "type": "string", "minLength": 1 }
+      }
+    },
+    "sourceLocation": {
+      "type": "object",
+      "required": [
+        "lineno",
+        "col_offset",
+        "end_lineno",
+        "end_col_offset"
+      ],
+      "properties": {
+        "lineno": { "type": ["integer", "null"], "minimum": 1 },
+        "col_offset": { "type": ["integer", "null"], "minimum": 0 },
+        "end_lineno": { "type": ["integer", "null"], "minimum": 1 },
+        "end_col_offset": { "type": ["integer", "null"], "minimum": 0 }
+      }
+    },
+    "nodeType": {
+      "type": "string",
+      "enum": [
+        "Module",
+        "Import",
+        "ImportFrom",
+        "ClassDef",
+        "FunctionDef",
+        "AsyncFunctionDef",
+        "Assign",
+        "AnnAssign",
+        "AugAssign",
+        "Return",
+        "If",
+        "For",
+        "While",
+        "Try",
+        "With",
+        "Call",
+        "Name",
+        "Attribute",
+        "Constant",
+        "BinOp",
+        "Compare"
+      ]
+    },
+    "edgeType": {
+      "type": "string",
+      "enum": [
+        "CFG_NEXT",
+        "CFG_TRUE",
+        "CFG_FALSE",
+        "CFG_LOOP_BODY",
+        "CFG_LOOP_BACK",
+        "CFG_RETURN",
+        "DFG_DEF_USE",
+        "CALL_RESOLVED",
+        "CALL_UNRESOLVED"
+      ]
+    },
+    "nodeEvent": {
+      "allOf": [
+        { "$ref": "#/$defs/commonFields" },
+        { "$ref": "#/$defs/sourceLocation" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema_version",
+            "event_time",
+            "repo",
+            "commit_sha",
+            "run_id",
+            "file_id",
+            "file_path",
+            "op",
+            "id",
+            "node_type",
+            "scope_path",
+            "lineno",
+            "col_offset",
+            "end_lineno",
+            "end_col_offset",
+            "properties"
+          ],
+          "properties": {
+            "schema_version": { "type": "string", "const": "1.0" },
+            "event_time": { "type": "string" },
+            "repo": { "type": "string" },
+            "commit_sha": { "type": "string" },
+            "run_id": { "type": "string" },
+            "file_id": { "type": "string" },
+            "file_path": { "type": "string" },
+            "op": { "type": "string", "const": "upsert" },
+            "id": { "type": "string", "minLength": 1 },
+            "node_type": { "$ref": "#/$defs/nodeType" },
+            "scope_path": { "type": "string" },
+            "lineno": { "type": ["integer", "null"] },
+            "col_offset": { "type": ["integer", "null"] },
+            "end_lineno": { "type": ["integer", "null"] },
+            "end_col_offset": { "type": ["integer", "null"] },
+            "properties": { "type": "object" }
+          }
+        }
+      ]
+    },
+    "edgeEvent": {
+      "allOf": [
+        { "$ref": "#/$defs/commonFields" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema_version",
+            "event_time",
+            "repo",
+            "commit_sha",
+            "run_id",
+            "file_id",
+            "file_path",
+            "op",
+            "id",
+            "source_id",
+            "target_id",
+            "edge_type",
+            "properties"
+          ],
+          "properties": {
+            "schema_version": { "type": "string", "const": "1.0" },
+            "event_time": { "type": "string" },
+            "repo": { "type": "string" },
+            "commit_sha": { "type": "string" },
+            "run_id": { "type": "string" },
+            "file_id": { "type": "string" },
+            "file_path": { "type": "string" },
+            "op": { "type": "string", "const": "upsert" },
+            "id": { "type": "string", "minLength": 1 },
+            "source_id": { "type": "string", "minLength": 1 },
+            "target_id": { "type": "string", "minLength": 1 },
+            "edge_type": { "$ref": "#/$defs/edgeType" },
+            "properties": { "type": "object" }
+          }
+        }
+      ]
+    },
+    "metadataEvent": {
+      "allOf": [
+        { "$ref": "#/$defs/commonFields" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema_version",
+            "event_time",
+            "repo",
+            "commit_sha",
+            "run_id",
+            "file_id",
+            "file_path",
+            "file_size",
+            "content_hash",
+            "num_ast_nodes",
+            "num_cfg_edges",
+            "num_dfg_edges",
+            "num_call_edges",
+            "num_total_edges",
+            "parse_duration_ms",
+            "status"
+          ],
+          "properties": {
+            "schema_version": { "type": "string", "const": "1.0" },
+            "event_time": { "type": "string" },
+            "repo": { "type": "string" },
+            "commit_sha": { "type": "string" },
+            "run_id": { "type": "string" },
+            "file_id": { "type": "string" },
+            "file_path": { "type": "string" },
+            "file_size": { "type": "integer", "minimum": 0 },
+            "content_hash": { "type": "string", "minLength": 64, "maxLength": 64 },
+            "num_ast_nodes": { "type": "integer", "minimum": 0 },
+            "num_cfg_edges": { "type": "integer", "minimum": 0 },
+            "num_dfg_edges": { "type": "integer", "minimum": 0 },
+            "num_call_edges": { "type": "integer", "minimum": 0 },
+            "num_total_edges": { "type": "integer", "minimum": 0 },
+            "parse_duration_ms": { "type": "integer", "minimum": 0 },
+            "status": { "type": "string", "const": "success" }
+          }
+        }
+      ]
+    },
+    "errorEvent": {
+      "allOf": [
+        { "$ref": "#/$defs/commonFields" },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "schema_version",
+            "event_time",
+            "repo",
+            "commit_sha",
+            "run_id",
+            "file_id",
+            "file_path",
+            "status",
+            "error_type",
+            "message",
+            "lineno",
+            "col_offset"
+          ],
+          "properties": {
+            "schema_version": { "type": "string", "const": "1.0" },
+            "event_time": { "type": "string" },
+            "repo": { "type": "string" },
+            "commit_sha": { "type": "string" },
+            "run_id": { "type": "string" },
+            "file_id": { "type": "string" },
+            "file_path": { "type": "string" },
+            "status": { "type": "string", "const": "failed" },
+            "error_type": { "type": "string", "minLength": 1 },
+            "message": { "type": "string" },
+            "lineno": { "type": ["integer", "null"], "minimum": 1 },
+            "col_offset": { "type": ["integer", "null"], "minimum": 0 }
+          }
+        }
+      ]
+    }
+  }
+}

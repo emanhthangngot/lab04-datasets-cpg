@@ -93,9 +93,10 @@ Done when:
 
 ## Latest Update
 
-Status: Not started
+Status: Assigned from OpenSpec handoff
 
-Next action: Wait for Stage 1 task assignment from Tri.
+Next action: Read `openspec/specs/graph-stores/spec.md` and
+`openspec/changes/stage2-team-handoff/tasks.md` section 2 before editing.
 
 Evidence links: None yet.
 
