@@ -797,6 +797,9 @@ FOR (n:CPGNode) REQUIRE n.id IS UNIQUE;
 
 Do not create by default:
 
+The example below is intentionally not included in `neo4j/constraints.cypher`
+because relationship uniqueness may not be supported in the lab setup.
+
 ```cypher
 CREATE CONSTRAINT cpg_edge_id IF NOT EXISTS
 FOR ()-[r:CPG_EDGE]-() REQUIRE r.id IS UNIQUE;
