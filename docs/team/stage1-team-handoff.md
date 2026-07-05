@@ -1,30 +1,30 @@
-# Stage 1 Team Handoff Messages
+# Tin Nhắn Giao Việc Stage 1 Cho Team
 
-Use this file to copy small messages to Truc, Thanh, and Tuan. These messages
-follow the current repository layout and the lightweight OpenSpec-style SDD
-workflow. The OpenSpec CLI is not required.
+File này dùng để copy từng tin nhắn nhỏ gửi cho Trực, Thành và Tuấn. Nội dung
+đã được rà theo layout hiện tại của repo và workflow SDD/OpenSpec-style nhẹ.
+Không cần cài OpenSpec CLI.
 
-## Message 1 - General Announcement
+## Tin 1 - Thông Báo Chung
 
 ````md
-Team oi, bat dau Stage 1 foundation cho 3 mang con lai theo workflow
+Team ơi, bắt đầu Stage 1 foundation cho 3 mảng còn lại theo workflow
 SDD/OpenSpec-style.
 
-Luu y: minh KHONG can cai OpenSpec CLI. Chi dung folder `openspec/` trong repo
-de doc spec/task truoc khi code.
+Lưu ý: mình KHÔNG cần cài OpenSpec CLI. Chỉ dùng folder `openspec/` trong repo
+để đọc spec/task trước khi code.
 
-Nguyen tac chung:
-- Tri da khoa schema contract v1.0.
-- Khong tu doi schema, field name, topic name, connector class, ID semantics,
+Nguyên tắc chung:
+- Trí đã khóa schema contract v1.0.
+- Không tự đổi schema, field name, topic name, connector class, ID semantics,
   unresolved-call behavior.
-- Truoc khi code phai doc spec, chay check, roi moi lam.
-- Neu co blocker thi ghi vao tracker cua minh trong `docs/team/`.
+- Trước khi code phải đọc spec, chạy check, rồi mới làm.
+- Nếu có blocker thì ghi vào tracker của mình trong `docs/team/`.
 ````
 
-## Message 2 - Baseline Commands
+## Tin 2 - Lệnh Chung Trước Khi Làm
 
 ````md
-Truoc khi bat dau, ai cung chay:
+Trước khi bắt đầu, ai cũng chạy:
 
 ```bash
 git switch dev
@@ -34,18 +34,18 @@ bash scripts/run_checks.sh
 docker compose config
 ```
 
-Neu check fail thi dung lai, copy output loi va bao vao tracker/domain cua minh
-truoc khi sua tiep.
+Nếu check fail thì dừng lại, copy output lỗi và báo vào tracker/domain của mình
+trước khi sửa tiếp.
 ````
 
-## Message 3 - How To Read OpenSpec
+## Tin 3 - Cách Đọc OpenSpec
 
 ````md
-Cach dung OpenSpec trong repo nay:
+Cách dùng OpenSpec trong repo này:
 
-Khong can chay lenh `openspec`.
+Không cần chạy lệnh `openspec`.
 
-Doc cac file workflow chung:
+Đọc các file workflow chung:
 
 ```bash
 cat openspec/README.md
@@ -54,15 +54,15 @@ cat openspec/changes/stage2-team-handoff/design.md
 cat openspec/changes/stage2-team-handoff/tasks.md
 ```
 
-Sau do doc tiep spec theo phan minh phu trach trong `openspec/specs/`.
+Sau đó đọc tiếp spec theo phần mình phụ trách trong `openspec/specs/`.
 ````
 
-## Message 4 - Truc: Kafka/Spark
+## Tin 4 - Trực: Kafka/Spark
 
 ````md
-@Truc phu trach Kafka/Spark Stage 1.
+@Trực phụ trách Kafka/Spark Stage 1.
 
-Doc cac file nay:
+Đọc các file này:
 
 ```bash
 cat openspec/specs/kafka-spark/spec.md
@@ -76,15 +76,15 @@ Branch:
 git switch -c feature/truc/kafka-spark-stage1
 ```
 
-Muc tieu:
+Mục tiêu:
 - Verify 4 Kafka topics: `cpg.nodes`, `cpg.edges`, `cpg.metadata`, `cpg.errors`
-- Verify Kafka Connect plugin dung class:
+- Verify Kafka Connect plugin đúng class:
   `org.neo4j.connectors.kafka.sink.Neo4jConnector`
-- Verify Spark chi consume `cpg.metadata`
-- Verify Spark submit command chay trong Docker Compose
-- Neu co blocker thi ghi vao `docs/team/kafka-spark.md`
+- Verify Spark chỉ consume `cpg.metadata`
+- Verify Spark submit command chạy trong Docker Compose
+- Nếu có blocker thì ghi vào `docs/team/kafka-spark.md`
 
-Lenh rieng can chay:
+Lệnh riêng cần chạy:
 
 ```bash
 docker compose up -d
@@ -92,11 +92,11 @@ bash scripts/init_kafka_topics.sh
 bash scripts/check_connect_plugins.sh
 ```
 
-`bash scripts/check_connect_plugins.sh` chi pass khi Kafka Connect dang reachable
-o `http://localhost:8083`. Output can cho evidence la class:
+`bash scripts/check_connect_plugins.sh` chỉ pass khi Kafka Connect đang reachable
+ở `http://localhost:8083`. Output cần cho evidence là class:
 `org.neo4j.connectors.kafka.sink.Neo4jConnector`.
 
-Spark command dung la:
+Spark command đúng là:
 
 ```bash
 docker compose exec spark spark-submit \
@@ -104,15 +104,15 @@ docker compose exec spark spark-submit \
   /app/spark_jobs/metadata_stream_to_mongo.py
 ```
 
-Khong dung path noi bo cua Bitnami image. Repo duoc mount vao `/app`.
+Không dùng path nội bộ của Bitnami image. Repo được mount vào `/app`.
 ````
 
-## Message 5 - Thanh: Neo4j/MongoDB
+## Tin 5 - Thành: Neo4j/MongoDB
 
 ````md
-@Thanh phu trach Neo4j/MongoDB Stage 1.
+@Thành phụ trách Neo4j/MongoDB Stage 1.
 
-Doc cac file nay:
+Đọc các file này:
 
 ```bash
 cat openspec/specs/graph-stores/spec.md
@@ -128,16 +128,16 @@ Branch:
 git switch -c feature/thanh/graph-stores-stage1
 ```
 
-Muc tieu:
-- Verify Neo4j nhan graph topology truc tiep tu Kafka Connect
-- Verify Cypher chi dung field co trong JSON Schema
-- Verify edge MERGE tao duoc placeholder endpoint node
-- Verify node upsert that set `placeholder = false`
-- Verify Cypher dung `coalesce(event.properties,{})`
+Mục tiêu:
+- Verify Neo4j nhận graph topology trực tiếp từ Kafka Connect
+- Verify Cypher chỉ dùng field có trong JSON Schema
+- Verify edge MERGE tạo được placeholder endpoint node
+- Verify node upsert thật set `placeholder = false`
+- Verify Cypher dùng `coalesce(event.properties,{})`
 - Verify MongoDB metadata replace/upsert theo `file_id`
-- Chuan bi duplicate-check queries cho replay
+- Chuẩn bị duplicate-check queries cho replay
 
-Lenh rieng can chay:
+Lệnh riêng cần chạy:
 
 ```bash
 docker compose up -d
@@ -145,13 +145,13 @@ bash scripts/check_connect_plugins.sh
 docker compose exec -T neo4j cypher-shell -u neo4j -p password < neo4j/constraints.cypher
 ```
 
-Neu co blocker thi ghi vao `docs/team/graph-stores.md`.
+Nếu có blocker thì ghi vào `docs/team/graph-stores.md`.
 ````
 
-## Message 6 - Thanh: Duplicate-Check Queries
+## Tin 6 - Thành: Duplicate-Check Queries
 
 ````md
-@Thanh chuan bi them cac duplicate-check query nay cho replay evidence.
+@Thành chuẩn bị thêm các duplicate-check query này cho replay evidence.
 
 Neo4j node duplicate:
 
@@ -186,16 +186,16 @@ db.file_metadata.aggregate([
 ])
 ```
 
-Luu y: MongoDB collection dung la `file_metadata`. `/mnt/checkpoints/cpg_metadata`
-la Spark checkpoint path, khong phai collection.
+Lưu ý: MongoDB collection đúng là `file_metadata`. `/mnt/checkpoints/cpg_metadata`
+là Spark checkpoint path, không phải collection.
 ````
 
-## Message 7 - Tuan: Evidence Book
+## Tin 7 - Tuấn: Evidence Book
 
 ````md
-@Tuan phu trach Evidence Book Stage 1.
+@Tuấn phụ trách Evidence Book Stage 1.
 
-Doc cac file nay:
+Đọc các file này:
 
 ```bash
 cat openspec/specs/evidence-book/spec.md
@@ -210,74 +210,74 @@ Branch:
 git switch -c feature/tuan/evidence-book-stage1
 ```
 
-Muc tieu:
-- Verify notebook skeleton du cho cac task
-- Verify screenshot folders du cho evidence Kafka, Neo4j, MongoDB, Spark, replay
-- Verify Jupyter Book structure build duoc khi dependency co san
-- Khong commit secret/token/private key/local credential
-- Chuan hoa evidence rule: screenshot/log phai co task, command, ngay chay, ket qua
+Mục tiêu:
+- Verify notebook skeleton đủ cho các task
+- Verify screenshot folders đủ cho evidence Kafka, Neo4j, MongoDB, Spark, replay
+- Verify Jupyter Book structure build được khi dependency có sẵn
+- Không commit secret/token/private key/local credential
+- Chuẩn hóa evidence rule: screenshot/log phải có task, command, ngày chạy, kết quả
 
-Lenh rieng neu may co Jupyter Book:
+Lệnh riêng nếu máy có Jupyter Book:
 
 ```bash
 jupyter-book build book/
 ```
 
-Luu y: repo hien dung `book/index.md` lam root page theo `book/_toc.yml`.
-Neu thieu `jupyter-book`, ghi blocker vao `docs/team/evidence-book.md`, khong tu
-y bo qua.
+Lưu ý: repo hiện dùng `book/index.md` làm root page theo `book/_toc.yml`.
+Nếu thiếu `jupyter-book`, ghi blocker vào `docs/team/evidence-book.md`, không tự
+ý bỏ qua.
 ````
 
-## Message 8 - PR Rules
+## Tin 8 - Quy Định PR
 
 ````md
-Quy dinh PR:
+Quy định PR:
 
-- PR vao branch `dev`
-- Khong merge thang vao `dev`
-- PR phai ghi ro:
-  - Da doc spec nao
-  - Da chay command nao
-  - Command nao pass/fail
-  - Evidence attach o dau
-  - Blocker con lai neu co
+- PR vào branch `dev`
+- Không merge thẳng vào `dev`
+- PR phải ghi rõ:
+  - Đã đọc spec nào
+  - Đã chạy command nào
+  - Command nào pass/fail
+  - Evidence attach ở đâu
+  - Blocker còn lại nếu có
 
-Reviewer/approval schema contract van la Tri.
-Neu can doi schema/field/topic/connector behavior thi phai bao truoc, khong tu sua.
+Reviewer/approval schema contract vẫn là Trí.
+Nếu cần đổi schema/field/topic/connector behavior thì phải báo trước, không tự sửa.
 ````
 
-## Message 9 - If Using AI/Codex
+## Tin 9 - Nếu Dùng AI/Codex
 
 ````md
-Neu dung AI/Codex, prompt dau tien nen la:
+Nếu dùng AI/Codex, prompt đầu tiên nên là:
 
-"Ban dang lam trong repo Lab04 CPG Streaming. Truoc khi sua file, hay doc
-`.codex/constitution.md`, `.codex/context/lab04-cpg.md`, `README.md` muc
-SDD Task Intake, `openspec/README.md`, spec mang cua toi trong
+"Bạn đang làm trong repo Lab04 CPG Streaming. Trước khi sửa file, hãy đọc
+`.codex/constitution.md`, `.codex/context/lab04-cpg.md`, `README.md` mục
+SDD Task Intake, `openspec/README.md`, spec mảng của tôi trong
 `openspec/specs/.../spec.md`, task checklist trong
-`openspec/changes/stage2-team-handoff/tasks.md`, va tracker cua toi trong
+`openspec/changes/stage2-team-handoff/tasks.md`, và tracker của tôi trong
 `docs/team/...`.
 
-Sau do kiem tra `git status --short`, chay baseline checks, roi moi implement
-thay doi nho nhat. Khong doi schema contract neu chua co Tri approve."
+Sau đó kiểm tra `git status --short`, chạy baseline checks, rồi mới implement
+thay đổi nhỏ nhất. Không đổi schema contract nếu chưa có Trí approve."
 
-Sau khi AI lam xong, bat AI bao lai:
-- File da sua
-- Command da chay
+Sau khi AI làm xong, bắt AI báo lại:
+- File đã sửa
+- Command đã chạy
 - Pass/fail
-- Evidence da co
-- Blocker con lai
+- Evidence đã có
+- Blocker còn lại
 ````
 
-## Message 10 - Done Criteria
+## Tin 10 - Điều Kiện Tick Done
 
 ````md
-Mot task chi duoc tick done khi co du:
+Một task chỉ được tick done khi có đủ:
 
-1. Da doc dung OpenSpec/spec/task file.
-2. Da chay baseline checks.
-3. Da attach evidence hoac ghi blocker ro rang.
-4. PR vao `dev` khong doi schema contract ngoai pham vi duoc giao.
+1. Đã đọc đúng OpenSpec/spec/task file.
+2. Đã chạy baseline checks.
+3. Đã attach evidence hoặc ghi blocker rõ ràng.
+4. PR vào `dev` không đổi schema contract ngoài phạm vi được giao.
 
-Neu thieu evidence thi chua tick done.
+Nếu thiếu evidence thì chưa tick done.
 ````
