@@ -22,6 +22,10 @@ spark-warehouse/
 book/_build/
 screenshots/**/*.tmp
 
+# Local converted lab documents
+docs/\[BigData\] Lab04 - StreamingV0.md
+docs/instructions.md
+
 # Shared spec kit vs personal agent setup
 #
 # Keep only the project spec context/templates/SDD prompts in Git. The rest of
