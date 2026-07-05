@@ -48,8 +48,8 @@ Stage 1 review result on 2026-07-05:
 Spec input to Tri:
 
 - Runtime evidence is still pending for Stage 2 and Stage 3.
-- `jupyter-book` is not installed in the current Python environment, so the
-  local book build is blocked until dependencies are installed.
+- A local `.venv` with `jupyter-book==1.0.3` can build the current Stage 1
+  book skeleton successfully.
 
 ## Stage 2: Core Evidence Capture
 
@@ -105,12 +105,11 @@ Done when:
 
 ## Latest Update
 
-Status: Stage 1 book foundation completed as far as the current environment
-allows; runtime evidence remains pending for later stages.
+Status: Stage 1 book foundation completed and local Jupyter Book build passes;
+runtime evidence remains pending for later stages.
 
-Next action: Install project dependencies, then run `jupyter-book build book/`.
-After teammates provide runtime outputs, replace pending slots with real
-command, notebook, query, or screenshot evidence only.
+Next action: After teammates provide runtime outputs, replace pending slots
+with real command, notebook, query, or screenshot evidence only.
 
 Evidence links:
 
@@ -130,11 +129,11 @@ Commands run on 2026-07-05:
 | `$env:TMP=(Resolve-Path -LiteralPath .).Path; $env:TEMP=$env:TMP; $env:TMPDIR=$env:TMP; python -m pytest -q` | Pass: 17 tests passed |
 | `docker compose config` | Pass with warning: Docker could not read the local Docker client config because access is denied |
 | `python -m json.tool neo4j\sink_connector.json` | Pass |
-| `python -m jupyter_book --version` | Blocked: `No module named jupyter_book` |
+| `.venv\Scripts\jupyter-book.exe --version` | Pass: Jupyter Book 1.0.3 |
+| `$env:TMP=(Resolve-Path -LiteralPath .).Path; $env:TEMP=$env:TMP; $env:TMPDIR=$env:TMP; .venv\Scripts\python.exe -m pytest -q` | Pass: 17 tests passed |
+| `$env:TMP=(Resolve-Path -LiteralPath .).Path; $env:TEMP=$env:TMP; $env:TMPDIR=$env:TMP; .venv\Scripts\jupyter-book.exe build book` | Pass: build succeeded, HTML generated under `book/_build/html` |
 
 Blockers:
 
-- Install or activate an environment containing `jupyter-book==1.0.3` before
-  running `jupyter-book build book/`.
 - Run `bash scripts/run_checks.sh` from a shell that can execute Bash scripts,
   or add a Windows-compatible wrapper if the team wants Windows-native checks.
