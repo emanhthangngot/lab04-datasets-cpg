@@ -124,8 +124,8 @@ Commands run on 2026-07-05:
 
 | Command | Result |
 |---|---|
-| `git status --short --branch` | Pass: on `feature/tuan/evidence-book-stage1`, ahead of `origin/dev` |
-| `bash scripts/run_checks.sh` | Blocked: Windows `bash.exe` requires a WSL distro, and no distro is installed |
+| `git status --short --branch` | Pass: on `feature/tuan/evidence-book-stage1`, ahead of `origin/dev` with no behind commits |
+| `bash scripts/run_checks.sh` | Blocked before script execution: Windows `bash.exe` points to WSL, and no WSL distro is installed. Script was hardened for public clones and Python command fallback. |
 | `.\scripts\run_checks.ps1` | Pass: Codex doctor skipped as optional, 17 tests passed, Docker Compose syntax valid, JSON connector config valid |
 | `$env:TMP=(Resolve-Path -LiteralPath .).Path; $env:TEMP=$env:TMP; $env:TMPDIR=$env:TMP; python -m pytest -q` | Pass: 17 tests passed |
 | `docker compose config` | Pass with warning: Docker could not read the local Docker client config because access is denied |
@@ -137,3 +137,6 @@ Commands run on 2026-07-05:
 Blockers:
 
 - Runtime evidence is still pending for Stage 2 and Stage 3.
+- `bash scripts/run_checks.sh` still requires a working Bash runtime on this
+  Windows machine; use `.\scripts\run_checks.ps1` for local Windows scaffold
+  validation until WSL or another Bash runtime is installed.
