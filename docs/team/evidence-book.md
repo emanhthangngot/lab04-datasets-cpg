@@ -24,20 +24,32 @@ docs/tuan/final-book-review
 
 Tasks:
 
-- [ ] Verify Jupyter Book chapter structure matches the six lab tasks.
-- [ ] Confirm each task has a matching notebook.
-- [ ] Confirm screenshot folders exist for Kafka, Neo4j, MongoDB, Spark, and replay.
-- [ ] Record any missing evidence slot for Tri.
+- [x] Verify Jupyter Book chapter structure matches the six lab tasks.
+- [x] Confirm each task has a matching notebook.
+- [x] Confirm screenshot folders exist for Kafka, Neo4j, MongoDB, Spark, and replay.
+- [x] Record any missing evidence slot for Tri.
 
 Done when:
 
 - Book skeleton has Overview, Architecture, Task 1-6, and Reflection.
 - Notebook and screenshot evidence slots are mapped to chapters.
 
+Stage 1 review result on 2026-07-05:
+
+- `book/_toc.yml` maps Overview, Architecture, Task 1-6, and Reflection.
+- `notebooks/01_repository_discovery.ipynb` through
+  `notebooks/06_idempotent_replay.ipynb` exist and contain pending evidence
+  metadata slots.
+- `screenshots/kafka`, `screenshots/neo4j`, `screenshots/mongodb`,
+  `screenshots/spark`, and `screenshots/replay` exist.
+- `screenshots/README.md` defines the capture rule for task, command, run date,
+  result, and source.
+
 Spec input to Tri:
 
-- Any missing chapter or evidence type.
-- Any wording needed to align the book with the grading rubric.
+- Runtime evidence is still pending for Stage 2 and Stage 3.
+- `jupyter-book` is not installed in the current Python environment, so the
+  local book build is blocked until dependencies are installed.
 
 ## Stage 2: Core Evidence Capture
 
@@ -93,11 +105,36 @@ Done when:
 
 ## Latest Update
 
-Status: Assigned from OpenSpec handoff
+Status: Stage 1 book foundation completed as far as the current environment
+allows; runtime evidence remains pending for later stages.
 
-Next action: Read `openspec/specs/evidence-book/spec.md` and
-`openspec/changes/stage2-team-handoff/tasks.md` section 3 before editing.
+Next action: Install project dependencies, then run `jupyter-book build book/`.
+After teammates provide runtime outputs, replace pending slots with real
+command, notebook, query, or screenshot evidence only.
 
-Evidence links: None yet.
+Evidence links:
 
-Blockers: None reported.
+- `book/_toc.yml`
+- `book/index.md`
+- `book/task1_repository.md` through `book/task6_replay.md`
+- `notebooks/01_repository_discovery.ipynb` through
+  `notebooks/06_idempotent_replay.ipynb`
+- `screenshots/README.md`
+
+Commands run on 2026-07-05:
+
+| Command | Result |
+|---|---|
+| `git status --short --branch` | Pass: on `feature/tuan/evidence-book-stage1`, ahead of `origin/dev` |
+| `bash scripts/run_checks.sh` | Blocked: Windows `bash.exe` requires a WSL distro, and no distro is installed |
+| `$env:TMP=(Resolve-Path -LiteralPath .).Path; $env:TEMP=$env:TMP; $env:TMPDIR=$env:TMP; python -m pytest -q` | Pass: 17 tests passed |
+| `docker compose config` | Pass with warning: Docker could not read the local Docker client config because access is denied |
+| `python -m json.tool neo4j\sink_connector.json` | Pass |
+| `python -m jupyter_book --version` | Blocked: `No module named jupyter_book` |
+
+Blockers:
+
+- Install or activate an environment containing `jupyter-book==1.0.3` before
+  running `jupyter-book build book/`.
+- Run `bash scripts/run_checks.sh` from a shell that can execute Bash scripts,
+  or add a Windows-compatible wrapper if the team wants Windows-native checks.
