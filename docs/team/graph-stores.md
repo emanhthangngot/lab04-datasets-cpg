@@ -112,6 +112,8 @@ Commands run:
 - `docker compose exec -T neo4j cypher-shell -u neo4j -p password "SHOW CONSTRAINTS;"`
 - `docker compose exec -T neo4j printenv NEO4J_server_memory_heap_initial__size NEO4J_server_memory_heap_max__size`
 - `docker compose exec -T mongo mongosh --quiet --eval "db.runCommand({ ping: 1 })"`
+- Opened Neo4j Browser at `http://localhost:7474` and connected with
+  `neo4j://localhost:7687`, username `neo4j`, password from Compose config.
 
 Evidence:
 
@@ -127,6 +129,7 @@ Evidence:
 - Neo4j heap env inside the container returned `1G` and `2G`.
 - Neo4j `SHOW CONSTRAINTS` returned `cpg_node_id`, type `UNIQUENESS`,
   entity `NODE`, label `CPGNode`, property `id`.
+- Neo4j Browser UI login succeeded and displayed the connected `neo4j$` prompt.
 - MongoDB ping returned `{ ok: 1 }`.
 
 Next action: Wait for Stage 2 sample ingestion, then capture Neo4j node/edge
