@@ -46,7 +46,7 @@ source code, notebooks, screenshots, and meaningful commit history.
 - [x] Standardize error events on `status = "failed"`.
 - [x] Include parser error `lineno` and zero-based `col_offset` in the schema.
 - [x] Standardize `CALL_UNRESOLVED` as a deterministic external placeholder target.
-- [ ] Runtime recheck pending: `/connector-plugins` must report
+- [x] Runtime recheck pending: `/connector-plugins` must report
   `org.neo4j.connectors.kafka.sink.Neo4jConnector` before registering the sink.
 - [x] Lock Spark MongoDB replace/upsert by `file_id`.
 - [x] Write baseline spec for parser, Kafka topics, store contracts, replay, and evidence after schema lock.
