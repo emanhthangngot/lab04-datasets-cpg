@@ -24,10 +24,10 @@ fix/truc/connect-registration
 
 Tasks:
 
-- [ ] Verify Kafka broker and topic scripts run inside Docker Compose.
-- [ ] Verify Kafka Connect service exposes the Neo4j connector plugin.
-- [ ] Verify Spark container can run `spark-submit`.
-- [ ] Record any runtime blocker for Tri.
+- [x] Verify Kafka broker and topic scripts run inside Docker Compose.
+- [x] Verify Kafka Connect service exposes the Neo4j connector plugin (Verified Neo4j Connector 5.1.0 plugin is available).
+- [ ] Verify Spark container can run `spark-submit` (Blocked: image bitnami/spark:3.5.0 missing on Docker Hub).
+- [x] Record any runtime blocker for Tri.
 
 Done when:
 
@@ -94,11 +94,46 @@ Done when:
 
 ## Latest Update
 
-Status: Assigned from OpenSpec handoff
+Status: Stage 1 Foundation Verification Complete.
 
-Next action: Read `openspec/specs/kafka-spark/spec.md` and
-`openspec/changes/stage2-team-handoff/tasks.md` section 1 before editing.
+Date: 2026-07-06
 
-Evidence links: None yet.
+Completed in Stage 1:
 
-Blockers: None reported.
+- [x] Verified Kafka broker starts and is healthy under Docker Compose.
+- [x] Resolved CRLF line endings on scripts, and verified `scripts/init_kafka_topics.sh` successfully creates topics `cpg.nodes`, `cpg.edges`, `cpg.metadata`, `cpg.errors` inside the broker.
+- [x] Verified Kafka Connect starts successfully and exposes `org.neo4j.connectors.kafka.sink.Neo4jConnector` (version 5.1.0).
+- [x] Documented Spark Structured Streaming submit command syntax and package dependencies.
+- [x] Recorded runtime blockers regarding Spark image availability.
+
+Commands run & Verification:
+
+| Command | Result |
+|---|---|
+| `git status --short` | Pass: clean working tree on `feature/truc/kafka-spark-stage1` |
+| `python -m pytest -q --override-ini="addopts=" -p no:langsmith` | Pass: 17 tests passed |
+| `docker compose up -d broker neo4j mongo connect` | Pass: containers started and are healthy |
+| `bash scripts/init_kafka_topics.sh` | Pass: successfully created all four topics inside broker |
+| `docker compose exec broker kafka-topics --bootstrap-server broker:9092 --list` | Pass: returned `cpg.edges`, `cpg.errors`, `cpg.metadata`, `cpg.nodes` |
+| `bash scripts/check_connect_plugins.sh` | Pass: verified Neo4j sink connector class `org.neo4j.connectors.kafka.sink.Neo4jConnector` (5.1.0) |
+
+### Spark Command Syntax & Package Requirements
+The Structured Streaming metadata ingestion job will be submitted using:
+```bash
+docker compose exec spark spark-submit \
+  --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,org.mongodb.spark:mongo-spark-connector_2.12:10.3.0 \
+  /app/spark_jobs/metadata_stream_to_mongo.py
+```
+- **Spark Kafka integration**: `org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0` (matching Spark 3.5.0 and Scala 2.12).
+- **MongoDB connector**: `org.mongodb.spark:mongo-spark-connector_2.12:10.3.0` (matching Spark 3.5.0 and Scala 2.12).
+- **Upsert policy**: Uses `replace` operation on `file_id` (not `_id`) to ensure replay updates existing metadata rather than duplicating.
+- **Checkpointing**: Checkpoint path is `/mnt/checkpoints/cpg_metadata` to guarantee replay durability.
+
+Blockers recorded:
+
+1. **Spark image missing**: Image `bitnami/spark:3.5.0` does not exist on Docker Hub. `docker compose up -d spark` fails.
+   - *Proposal*: Tri should update `docker-compose.yml` to use `docker.io/bitnamilegacy/spark:3.5.0` or `apache/spark:3.5.0`.
+2. **Line endings issue**: Script line endings were CRLF on Windows cloning, causing option errors in bash (e.g. `set: pipefail`).
+   - *Fix applied*: Converted all `scripts/*.sh` to LF line endings.
+
+Next action: Ask Tri for decision/approval on Spark docker image tag replacement. Once approved, complete Stage 2 streaming path.
