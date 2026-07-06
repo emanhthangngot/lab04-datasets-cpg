@@ -6,23 +6,15 @@ set -euo pipefail
 
 CONNECT_URL="${CONNECT_URL:-http://localhost:8083}"
 
-if [[ -x ".venv/Scripts/python.exe" ]]; then
-  PYTHON=".venv/Scripts/python.exe"
-elif command -v python3 >/dev/null 2>&1; then
-  PYTHON="python3"
-else
-  PYTHON="python"
-fi
-
 echo "Available Kafka Connect plugins:"
 PLUGINS_JSON="$(curl -fsS "$CONNECT_URL/connector-plugins")"
-printf '%s\n' "$PLUGINS_JSON" | "$PYTHON" -m json.tool
+printf '%s\n' "$PLUGINS_JSON" | python3 -m json.tool
 
 echo
 echo "Neo4j connector classes:"
-printf '%s\n' "$PLUGINS_JSON" | "$PYTHON" -m json.tool | grep -i neo4j
+printf '%s\n' "$PLUGINS_JSON" | python3 -m json.tool | grep -i neo4j
 
-"$PYTHON" -c '
+python3 -c '
 import json
 import sys
 
