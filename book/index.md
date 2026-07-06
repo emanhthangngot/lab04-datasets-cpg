@@ -25,11 +25,25 @@ https://github.com/emanhthangngot/lab04-datasets-cpg
 
 ## Deliverable Checklist
 
+- [x] Task 1-6 chapters exist in the Jupyter Book table of contents.
+- [x] Task 1-6 chapters map to matching notebook evidence slots.
+- [x] Kafka, Neo4j, MongoDB, Spark, and replay screenshot folders exist.
 - [ ] Task 1-6 chapters contain real executed notebook outputs.
-- [ ] Kafka, Neo4j, MongoDB, Spark, and replay evidence is captured.
 - [ ] Database UI or query screenshots are linked from the relevant chapters.
 - [ ] Reflection sections state what worked, what failed, and what was fixed.
 - [ ] The GitHub Pages build shows the latest content from `main`.
 
 This page must not contain secrets, local credentials, or local-only paths in the
 final submission.
+
+## Evidence Rule
+
+Every screenshot, log, command output, notebook output, or query output linked
+from this book must record:
+
+- Task.
+- Command or query.
+- Run date.
+- Result.
+
+Missing evidence remains marked as pending until real output is captured.

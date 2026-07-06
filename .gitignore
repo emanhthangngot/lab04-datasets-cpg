@@ -10,6 +10,7 @@ secrets/
 __pycache__/
 *.py[cod]
 .pytest_cache/
+pytest-of-*/
 .mypy_cache/
 .ruff_cache/
 .venv/
@@ -21,6 +22,10 @@ checkpoints/
 spark-warehouse/
 book/_build/
 screenshots/**/*.tmp
+
+# Local converted lab documents
+docs/\[BigData\] Lab04 - StreamingV0.md
+docs/instructions.md
 
 # Shared spec kit vs personal agent setup
 #

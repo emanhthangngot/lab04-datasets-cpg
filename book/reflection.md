@@ -1,6 +1,15 @@
 # Reflection
 
-TODO:
+## Evidence Slot Map
+
+| Evidence | Status | Target |
+|---|---|---|
+| What worked | Pending | This chapter |
+| Runtime failures and fixes | Pending | This chapter |
+| CFG/DFG/CALL limitations | Pending | This chapter |
+| Production CPG improvements | Pending | This chapter |
+
+## Pending Work
 
 - Summarize what worked.
 - Summarize runtime failures and fixes.
