@@ -24,10 +24,10 @@ fix/thanh/stale-cleanup
 
 Tasks:
 
-- [ ] Verify Neo4j service starts with configured credentials and heap settings.
-- [ ] Verify node uniqueness constraint can be applied.
-- [ ] Verify MongoDB service is reachable.
-- [ ] Record any credential, plugin, or Docker blocker for Tri.
+- [x] Verify Neo4j service starts with configured credentials and heap settings.
+- [x] Verify node uniqueness constraint can be applied.
+- [x] Verify MongoDB service is reachable.
+- [x] Record any credential, plugin, or Docker blocker for Tri.
 
 Done when:
 
@@ -93,11 +93,58 @@ Done when:
 
 ## Latest Update
 
-Status: Assigned from OpenSpec handoff
+Status: Stage 1 store foundation verified on 2026-07-06.
 
-Next action: Read `openspec/specs/graph-stores/spec.md` and
-`openspec/changes/stage2-team-handoff/tasks.md` section 2 before editing.
+Commands run:
 
-Evidence links: None yet.
+- `git switch dev`
+- `git pull --ff-only origin dev`
+- `git switch -c feature/thanh/graph-stores-stage1`
+- `git status --short --branch`
+- `C:\Program Files\Git\bin\bash.exe scripts/run_checks.sh`
+- `docker compose config`
+- `docker compose up -d`
+- `docker compose up -d broker neo4j mongo connect`
+- `docker compose ps`
+- `C:\Program Files\Git\bin\bash.exe scripts/check_connect_plugins.sh`
+- `docker compose exec -T neo4j cypher-shell -u neo4j -p password "RETURN 1 AS ok;"`
+- `docker compose exec -T neo4j cypher-shell -u neo4j -p password "CREATE CONSTRAINT cpg_node_id IF NOT EXISTS FOR (n:CPGNode) REQUIRE n.id IS UNIQUE;"`
+- `docker compose exec -T neo4j cypher-shell -u neo4j -p password "SHOW CONSTRAINTS;"`
+- `docker compose exec -T neo4j printenv NEO4J_server_memory_heap_initial__size NEO4J_server_memory_heap_max__size`
+- `docker compose exec -T mongo mongosh --quiet --eval "db.runCommand({ ping: 1 })"`
+- Opened Neo4j Browser at `http://localhost:7474` and connected with
+  `neo4j://localhost:7687`, username `neo4j`, password from Compose config.
 
-Blockers: None reported.
+Evidence:
+
+- Baseline checks passed: Python tests `17 passed`, Docker Compose syntax passed,
+  and Neo4j connector JSON config parsed successfully.
+- Docker Compose config confirms Neo4j credentials `neo4j/password` and heap
+  settings `1G` initial, `2G` max.
+- Running services for Stage 1: `broker`, `connect`, `mongo`, and `neo4j` are
+  healthy.
+- Kafka Connect exposes Neo4j sink class
+  `org.neo4j.connectors.kafka.sink.Neo4jConnector` version `5.1.0`.
+- Neo4j credential check returned `ok = 1`.
+- Neo4j heap env inside the container returned `1G` and `2G`.
+- Neo4j `SHOW CONSTRAINTS` returned `cpg_node_id`, type `UNIQUENESS`,
+  entity `NODE`, label `CPGNode`, property `id`.
+- Neo4j Browser UI login succeeded and displayed the connected `neo4j$` prompt.
+- MongoDB ping returned `{ ok: 1 }`.
+
+Next action: Wait for Stage 2 sample ingestion, then capture Neo4j node/edge
+counts and MongoDB metadata evidence.
+
+Evidence links: Command outputs captured in the local terminal session.
+
+Blockers:
+
+- Full `docker compose up -d` currently fails because Docker cannot resolve
+  `docker.io/bitnami/spark:3.5.0`. Stage 1 store checks were completed by
+  starting only the relevant services: `broker neo4j mongo connect`.
+- On this workstation, PowerShell resolves plain `bash` to the WSL launcher,
+  but WSL has no installed distribution. Git Bash was used explicitly from
+  `C:\Program Files\Git\bin\bash.exe`.
+- Initial `scripts/check_connect_plugins.sh` execution under Git Bash resolved
+  `python3` to the WindowsApps shim and failed with permission denied. The
+  script now follows the same Python selection pattern as `run_checks.sh`.
