@@ -1,9 +1,19 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Publish Jupyter Book to GitHub Pages.
-# TODO: Replace this placeholder with the team's chosen GitHub Pages workflow.
-# Before publishing, check notebooks/screenshots for credentials or local secrets.
+# Build the Jupyter Book locally before merging final evidence to main.
+# GitHub Pages publication is handled by .github/workflows/publish-book.yml
+# on push to main when book/notebooks/screenshots change.
 
-echo "TODO: configure GitHub Pages publication."
-echo "Recommended flow: jupyter-book build book/; publish book/_build/html to gh-pages."
+if ! command -v jupyter-book >/dev/null 2>&1; then
+  echo "jupyter-book is not installed. Install dependencies first:"
+  echo "  pip install -r requirements.txt"
+  exit 1
+fi
+
+echo "Building Jupyter Book..."
+jupyter-book build book/
+
+echo
+echo "Local build complete: book/_build/html/index.html"
+echo "Final publication happens automatically after merging to main and pushing."

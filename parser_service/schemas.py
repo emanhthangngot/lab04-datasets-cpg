@@ -125,5 +125,16 @@ def build_metadata_event(
 
 def build_error_event(*, context: Any, file_id: str, file_path: str, error: Exception) -> dict:
     event = common_fields(context, file_id, file_path)
-    event.update({"status": "error", "error_type": type(error).__name__, "message": str(error)})
+    lineno = getattr(error, "lineno", None)
+    offset = getattr(error, "offset", None)
+    col_offset = offset - 1 if isinstance(offset, int) and offset > 0 else None
+    event.update(
+        {
+            "status": "failed",
+            "error_type": type(error).__name__,
+            "message": str(error),
+            "lineno": lineno,
+            "col_offset": col_offset,
+        }
+    )
     return event

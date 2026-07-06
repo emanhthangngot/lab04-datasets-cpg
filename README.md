@@ -79,6 +79,95 @@ jupyter-book build book/
 - Task 6: idempotent replay evidence.
 - Architecture diagram: full parser -> Kafka -> Neo4j/Spark/MongoDB flow.
 
+## Team Workflow
+
+Team workflow, branch rules, commit rules, and evidence requirements are in
+`docs/CONTRIBUTING.md`.
+
+## SDD Task Intake
+
+Stage 2 work follows a lightweight OpenSpec-style SDD workflow. The OpenSpec
+CLI is not required; use the files under `openspec/` as the source of truth.
+
+Before starting any assigned task:
+
+```bash
+git status --short
+bash scripts/run_checks.sh
+docker compose config
+```
+
+Then read the assigned spec and task checklist:
+
+```bash
+# Truc: Kafka/Spark
+sed -n '1,220p' openspec/specs/kafka-spark/spec.md
+sed -n '1,120p' openspec/changes/stage2-team-handoff/tasks.md
+
+# Thanh: Neo4j/MongoDB
+sed -n '1,220p' openspec/specs/graph-stores/spec.md
+sed -n '1,180p' openspec/changes/stage2-team-handoff/tasks.md
+
+# Tuan: Evidence/Jupyter Book
+sed -n '1,220p' openspec/specs/evidence-book/spec.md
+sed -n '1,220p' openspec/changes/stage2-team-handoff/tasks.md
+```
+
+Use a short-lived branch from `dev`:
+
+```bash
+git switch dev
+git pull --ff-only
+git switch -c feature/<owner>/<task-name>
+```
+
+Domain checks before PR:
+
+```bash
+# Kafka/Spark owner
+bash scripts/init_kafka_topics.sh
+bash scripts/check_connect_plugins.sh
+docker compose exec spark spark-submit \
+  --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,org.mongodb.spark:mongo-spark-connector_2.12:10.3.0 \
+  /app/spark_jobs/metadata_stream_to_mongo.py
+
+# Neo4j/MongoDB owner
+export NEO4J_USER=neo4j
+export NEO4J_PASSWORD=<local-lab-password>
+docker compose exec -T neo4j cypher-shell -u "$NEO4J_USER" -p "$NEO4J_PASSWORD" < neo4j/constraints.cypher
+bash scripts/wait_neo4j_connector_idle.sh
+
+# Evidence owner
+jupyter-book build book/
+```
+
+If a domain check needs local credentials or a running service, use the local
+lab configuration and record the exact command and output in the matching
+tracker. Do not commit credentials, local machine details, or screenshots that
+show private information.
+
+PR flow:
+
+1. Read the spec and tasks before coding.
+2. Implement only the assigned task slice.
+3. Run baseline and domain checks.
+4. Update the matching tracker in `docs/team/`.
+5. Attach command output, query output, notebook output, or screenshot paths.
+6. Open a PR to `dev` for Tri review.
+
+Progress is tracked in:
+
+- `docs/team/workplan.md` for lead/spec ownership and overall status.
+- `docs/team/kafka-spark.md` for Kafka/Spark runtime work.
+- `docs/team/graph-stores.md` for Neo4j/MongoDB store work.
+- `docs/team/evidence-book.md` for notebooks, screenshots, and Jupyter Book work.
+
+The final Moodle submission is the GitHub Pages root URL:
+
+```text
+https://emanhthangngot.github.io/lab04-datasets-cpg/
+```
+
 ## Limitations To State In The Report
 
 - Parser is lab-level, not Joern-equivalent.

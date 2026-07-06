@@ -7,8 +7,26 @@ set -euo pipefail
 CONNECT_URL="${CONNECT_URL:-http://localhost:8083}"
 
 echo "Available Kafka Connect plugins:"
-curl -fsS "$CONNECT_URL/connector-plugins" | python3 -m json.tool
+PLUGINS_JSON="$(curl -fsS "$CONNECT_URL/connector-plugins")"
+printf '%s\n' "$PLUGINS_JSON" | python3 -m json.tool
 
 echo
 echo "Neo4j connector classes:"
-curl -fsS "$CONNECT_URL/connector-plugins" | python3 -m json.tool | grep -i neo4j || true
+printf '%s\n' "$PLUGINS_JSON" | python3 -m json.tool | grep -i neo4j
+
+python3 -c '
+import json
+import sys
+
+expected = "org.neo4j.connectors.kafka.sink.Neo4jConnector"
+plugins = json.loads(sys.argv[1])
+matches = [
+    plugin for plugin in plugins
+    if plugin.get("class") == expected and plugin.get("type") == "sink"
+]
+if not matches:
+    print(f"Missing required Neo4j sink connector class: {expected}", file=sys.stderr)
+    sys.exit(1)
+version = matches[0].get("version", "unknown")
+print(f"Verified Neo4j sink connector class: {expected} ({version})")
+' "$PLUGINS_JSON"
