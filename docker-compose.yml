@@ -91,8 +91,9 @@ services:
       retries: 12
 
   spark:
-    image: bitnami/spark:3.5.0
+    image: bitnamilegacy/spark:3.5.0
     container_name: lab04-spark
+    entrypoint: ["/bin/bash", "-lc", "sleep infinity"]
     depends_on:
       broker:
         condition: service_healthy
@@ -102,8 +103,6 @@ services:
       - ./:/app
       - spark-checkpoints:/mnt/checkpoints
     working_dir: /app
-    environment:
-      SPARK_MODE: client
 
   parser:
     build:

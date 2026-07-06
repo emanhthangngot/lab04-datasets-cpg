@@ -26,7 +26,7 @@ Tasks:
 
 - [x] Verify Kafka broker and topic scripts run inside Docker Compose.
 - [x] Verify Kafka Connect service exposes the Neo4j connector plugin (Verified Neo4j Connector 5.1.0 plugin is available).
-- [x] Verify Spark container can run `spark-submit` (Verified: image `bitnami/spark:3.5.0` missing on Docker Hub — blocker documented below, awaiting Tri's decision).
+- [x] Verify Spark container can run `spark-submit` (Resolved by replacing missing `bitnami/spark:3.5.0` with `bitnamilegacy/spark:3.5.0` and running Spark as a client container).
 - [x] Record any runtime blocker for Tri.
 
 Done when:
@@ -94,7 +94,7 @@ Done when:
 
 ## Latest Update
 
-Status: Stage 1 Foundation Verification Complete.
+Status: Stage 1 foundation complete; Spark image blocker resolved on `fix/truc/spark-image-runtime`.
 
 Date: 2026-07-06
 
@@ -104,15 +104,19 @@ Completed in Stage 1:
 - [x] Resolved CRLF line endings on scripts, and verified `scripts/init_kafka_topics.sh` successfully creates topics `cpg.nodes`, `cpg.edges`, `cpg.metadata`, `cpg.errors` inside the broker.
 - [x] Verified Kafka Connect starts successfully and exposes `org.neo4j.connectors.kafka.sink.Neo4jConnector` (version 5.1.0).
 - [x] Documented Spark Structured Streaming submit command syntax and package dependencies.
-- [x] Recorded runtime blockers regarding Spark image availability.
+- [x] Resolved runtime blocker regarding Spark image availability.
 
 Commands run & Verification:
 
 | Command | Result |
 |---|---|
-| `git status --short` | Pass: clean working tree on `feature/truc/kafka-spark-stage1` |
+| `git status --short --branch` | Pass: on `fix/truc/spark-image-runtime` with Spark runtime fixes only |
 | `python -m pytest -q --override-ini="addopts=" -p no:langsmith` | Pass: 17 tests passed |
 | `docker compose up -d broker neo4j mongo connect` | Pass: containers started and are healthy |
+| `docker compose up -d spark` | Pass: pulled `bitnamilegacy/spark:3.5.0` and started `lab04-spark` |
+| `docker compose exec -T spark which spark-submit` | Pass: returned `/opt/bitnami/spark/bin/spark-submit` |
+| `docker compose exec -T spark spark-submit --version` | Pass: Spark 3.5.0, Scala 2.12.18, OpenJDK 17.0.10 |
+| `docker compose up -d` | Pass: full Docker Compose command completes after Spark image replacement |
 | `bash scripts/init_kafka_topics.sh` | Pass: successfully created all four topics inside broker |
 | `docker compose exec broker kafka-topics --bootstrap-server broker:9092 --list` | Pass: returned `cpg.edges`, `cpg.errors`, `cpg.metadata`, `cpg.nodes` |
 | `bash scripts/check_connect_plugins.sh` | Pass: verified Neo4j sink connector class `org.neo4j.connectors.kafka.sink.Neo4jConnector` (5.1.0) |
@@ -131,7 +135,7 @@ docker compose exec spark spark-submit \
 
 Blockers recorded:
 
-### Blocker 1: Spark Docker Image Missing (Stage 2 blocked)
+### Blocker 1: Spark Docker Image Missing (Resolved)
 
 Per Blocker Policy (`docs/team/workplan.md`):
 
@@ -146,14 +150,16 @@ Per Blocker Policy (`docs/team/workplan.md`):
   failed to resolve reference "docker.io/bitnami/spark:3.5.0":
   docker.io/bitnami/spark:3.5.0: not found
   ```
-- **Files affected:** `docker-compose.yml` line 94 (`image: bitnami/spark:3.5.0`).
+- **Files affected:** `docker-compose.yml` line 94 now uses `image: bitnamilegacy/spark:3.5.0`.
 - **What was tried:**
   1. `docker compose pull spark` — fails because `bitnami/spark:3.5.0` no longer exists on Docker Hub.
   2. Verified `docker.io/bitnamilegacy/spark:3.5.0` exists on Docker Hub (manifest confirmed).
   3. Verified `apache/spark:3.5.0` exists on Docker Hub (manifest confirmed).
-- **What decision is needed:** Tri must decide which replacement image to use in `docker-compose.yml`:
-  - Option A: `docker.io/bitnamilegacy/spark:3.5.0` (closest drop-in replacement, same Bitnami layout).
-  - Option B: `apache/spark:3.5.0` (official Apache image, different directory layout may need `working_dir` and volume adjustments).
+- **Resolution:** Replaced the missing image with `docker.io/bitnamilegacy/spark:3.5.0`,
+  the closest drop-in replacement for the existing Bitnami Spark layout. The
+  Spark service now overrides the Bitnami entrypoint with `sleep infinity` so
+  the container can be used as a client shell for
+  `docker compose exec spark spark-submit ...`.
 
 ### Blocker 2: CRLF Line Endings (Resolved locally)
 
@@ -170,6 +176,6 @@ Per Blocker Policy (`docs/team/workplan.md`):
 | `scripts/init_kafka_topics.sh` can create all required topics | ✅ Verified |
 | `scripts/check_connect_plugins.sh` proves Neo4j connector available | ✅ Verified |
 | Spark command syntax and package requirements documented | ✅ Documented (see above) |
-| Spark Docker runtime functional | ⚠️ Blocked (awaiting Tri's image decision) |
+| Spark Docker runtime functional | Verified with `docker compose up -d spark` and `docker compose exec -T spark spark-submit --version` |
 
-Next action: Tri to approve Spark Docker image replacement in `docker-compose.yml`. Once resolved, proceed to Stage 2 streaming path.
+Next action: Proceed to Stage 2 streaming path.
