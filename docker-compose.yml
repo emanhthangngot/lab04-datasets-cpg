@@ -91,7 +91,7 @@ services:
       retries: 12
 
   spark:
-    image: bitnami/spark:3.5.0
+    image: docker.io/bitnamilegacy/spark:3.5.0
     container_name: lab04-spark
     depends_on:
       broker:
@@ -103,7 +103,7 @@ services:
       - spark-checkpoints:/mnt/checkpoints
     working_dir: /app
     environment:
-      SPARK_MODE: client
+      SPARK_MODE: master
 
   parser:
     build:

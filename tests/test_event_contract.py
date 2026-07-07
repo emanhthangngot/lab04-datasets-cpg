@@ -220,10 +220,17 @@ def test_runtime_config_locks_kraft_cluster_id_and_plugin_gate() -> None:
     plugin_script = (ROOT / "scripts" / "check_connect_plugins.sh").read_text(
         encoding="utf-8"
     )
+    register_script = (ROOT / "scripts" / "register_neo4j_sink.sh").read_text(
+        encoding="utf-8"
+    )
 
     assert "CLUSTER_ID:" in compose
+    assert "docker.io/bitnamilegacy/spark:3.5.0" in compose
+    assert "SPARK_MODE: master" in compose
     assert "org.neo4j.connectors.kafka.sink.Neo4jConnector" in plugin_script
     assert 'plugin.get("type") == "sink"' in plugin_script
+    assert "$CONNECT_URL/connector-plugins" in register_script
+    assert 'config["connector.class"] = selected["class"]' in register_script
 
 
 def test_unresolved_call_edges_use_external_placeholder_targets(tmp_path: Path) -> None:

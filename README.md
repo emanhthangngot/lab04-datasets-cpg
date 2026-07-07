@@ -27,8 +27,14 @@ task at a time without losing required evidence.
 Key required fixes are encoded in the scaffold:
 
 - Kafka Connect uses `kafka-connect/Dockerfile` to install the Neo4j connector.
+- Spark uses `docker.io/bitnamilegacy/spark:3.5.0` because
+  `bitnami/spark:3.5.0` no longer resolves from Docker Hub.
+- The Spark Compose service uses `SPARK_MODE=master`; the legacy image rejects
+  the old `client` mode.
 - The parser runs inside Docker Compose as `parser`, using `broker:9092`.
 - `register_neo4j_sink.sh` uses idempotent `PUT /connectors/{name}/config`.
+- Connector registration checks `/connector-plugins` and submits the exact
+  reported Neo4j sink connector class.
 - Schema tests require `properties` to be `{}` instead of `null`.
 - Metadata tests require `num_total_edges = cfg + dfg + call`.
 - Discovery tests keep `src/datasets/utils` in scope.
@@ -86,8 +92,9 @@ Team workflow, branch rules, commit rules, and evidence requirements are in
 
 ## SDD Task Intake
 
-Stage 2 work follows a lightweight OpenSpec-style SDD workflow. The OpenSpec
-CLI is not required; use the files under `openspec/` as the source of truth.
+Stage 2 work follows the repo-local SDD/OpenSpec workflow. Use the project
+commands `/sdd/specify`, `/sdd/plan`, and `/sdd/tasks` to draft specs, plans,
+and tasks, then store accepted artifacts under `openspec/`.
 
 Before starting any assigned task:
 
@@ -100,17 +107,21 @@ docker compose config
 Then read the assigned spec and task checklist:
 
 ```bash
+# Tri: Parser core
+sed -n '1,220p' openspec/specs/parser-core/spec.md
+sed -n '1,120p' openspec/changes/stage2-core-sample-pipeline/tasks.md
+
 # Truc: Kafka/Spark
 sed -n '1,220p' openspec/specs/kafka-spark/spec.md
-sed -n '1,120p' openspec/changes/stage2-team-handoff/tasks.md
+sed -n '1,120p' openspec/changes/stage2-core-sample-pipeline/tasks.md
 
 # Thanh: Neo4j/MongoDB
 sed -n '1,220p' openspec/specs/graph-stores/spec.md
-sed -n '1,180p' openspec/changes/stage2-team-handoff/tasks.md
+sed -n '1,180p' openspec/changes/stage2-core-sample-pipeline/tasks.md
 
 # Tuan: Evidence/Jupyter Book
 sed -n '1,220p' openspec/specs/evidence-book/spec.md
-sed -n '1,220p' openspec/changes/stage2-team-handoff/tasks.md
+sed -n '1,220p' openspec/changes/stage2-core-sample-pipeline/tasks.md
 ```
 
 Use a short-lived branch from `dev`:
@@ -127,6 +138,7 @@ Domain checks before PR:
 # Kafka/Spark owner
 bash scripts/init_kafka_topics.sh
 bash scripts/check_connect_plugins.sh
+bash scripts/register_neo4j_sink.sh
 docker compose exec spark spark-submit \
   --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,org.mongodb.spark:mongo-spark-connector_2.12:10.3.0 \
   /app/spark_jobs/metadata_stream_to_mongo.py

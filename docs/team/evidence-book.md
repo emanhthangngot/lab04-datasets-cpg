@@ -57,13 +57,16 @@ Tasks:
 
 - [ ] Add executed outputs for repository discovery.
 - [ ] Add parser output samples.
+- [ ] Add parser CFG/DFG/CALL edge count evidence from Tri.
 - [ ] Add Kafka message samples.
 - [ ] Add initial Neo4j/MongoDB evidence references from Truc and Thanh.
+- [ ] Keep replay slots pending unless the full replay workflow actually runs.
 
 Done when:
 
 - Task 1-5 chapters have real command/notebook output placeholders replaced.
 - Screenshot references point to actual files when available.
+- Task 6 replay evidence is either real or explicitly still pending.
 
 Spec input to Tri:
 

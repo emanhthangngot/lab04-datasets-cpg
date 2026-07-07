@@ -46,14 +46,17 @@ Tasks:
 
 - [ ] Verify Neo4j receives `cpg.nodes` and `cpg.edges` through Kafka Connect.
 - [ ] Capture Neo4j node and edge counts.
+- [ ] Capture Neo4j duplicate node ID, duplicate edge ID, and placeholder counts.
 - [ ] Verify MongoDB receives file metadata from Spark.
 - [ ] Capture MongoDB document count and sample document.
+- [ ] Capture MongoDB duplicate `file_id` aggregation.
 
 Done when:
 
 - Neo4j graph topology exists for sample parser output.
 - MongoDB metadata exists for sample parser output.
 - Counts and sample query outputs are ready for book evidence.
+- Duplicate-check query outputs are ready for Stage 2 review.
 
 Spec input to Tri:
 
@@ -139,9 +142,10 @@ Evidence links: Command outputs captured in the local terminal session.
 
 Blockers:
 
-- Full `docker compose up -d` currently fails because Docker cannot resolve
-  `docker.io/bitnami/spark:3.5.0`. Stage 1 store checks were completed by
-  starting only the relevant services: `broker neo4j mongo connect`.
+- The previous full Compose blocker was the unavailable
+  `docker.io/bitnami/spark:3.5.0` image. Stage 2 now uses
+  `docker.io/bitnamilegacy/spark:3.5.0` with `SPARK_MODE=master`; local Spark
+  service start and `spark-submit --version` passed.
 - On this workstation, PowerShell resolves plain `bash` to the WSL launcher,
   but WSL has no installed distribution. Git Bash was used explicitly from
   `C:\Program Files\Git\bin\bash.exe`.

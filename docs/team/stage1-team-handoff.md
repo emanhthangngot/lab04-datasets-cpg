@@ -1,8 +1,9 @@
 # Tin Nhắn Giao Việc Stage 1 Cho Team
 
 File này dùng để copy từng tin nhắn nhỏ gửi cho Trực, Thành và Tuấn. Nội dung
-đã được rà theo layout hiện tại của repo và workflow SDD/OpenSpec-style nhẹ.
-Không cần cài OpenSpec CLI.
+đã được rà theo layout hiện tại của repo và workflow SDD/OpenSpec-style trong
+repo. Dùng các lệnh `/sdd/specify`, `/sdd/plan`, `/sdd/tasks`; artifact đã duyệt
+được lưu trong `openspec/`.
 
 ## Tin 1 - Thông Báo Chung
 
@@ -10,8 +11,8 @@ Không cần cài OpenSpec CLI.
 Team ơi, bắt đầu Stage 1 foundation cho 3 mảng còn lại theo workflow
 SDD/OpenSpec-style.
 
-Lưu ý: mình KHÔNG cần cài OpenSpec CLI. Chỉ dùng folder `openspec/` trong repo
-để đọc spec/task trước khi code.
+Lưu ý: workflow OpenSpec của repo đi qua lệnh `/sdd/*` và folder `openspec/`.
+Đọc spec/task trước khi code.
 
 Nguyên tắc chung:
 - Trí đã khóa schema contract v1.0.
@@ -43,7 +44,8 @@ trước khi sửa tiếp.
 ````md
 Cách dùng OpenSpec trong repo này:
 
-Không cần chạy lệnh `openspec`.
+Dùng lệnh repo-local `/sdd/specify`, `/sdd/plan`, `/sdd/tasks` khi cần tạo hoặc
+cập nhật spec; sau đó đọc artifact trong `openspec/`.
 
 Đọc các file workflow chung:
 

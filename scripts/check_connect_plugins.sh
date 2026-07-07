@@ -5,6 +5,7 @@ set -euo pipefail
 # TODO: If no Neo4j class is printed, rebuild `connect` from kafka-connect/Dockerfile.
 
 CONNECT_URL="${CONNECT_URL:-http://localhost:8083}"
+EXPECTED_NEO4J_CLASS="${EXPECTED_NEO4J_CLASS:-org.neo4j.connectors.kafka.sink.Neo4jConnector}"
 
 if [[ -x ".venv/Scripts/python.exe" ]]; then
   PYTHON=".venv/Scripts/python.exe"
@@ -26,15 +27,17 @@ printf '%s\n' "$PLUGINS_JSON" | "$PYTHON" -m json.tool | grep -i neo4j
 import json
 import sys
 
-expected = "org.neo4j.connectors.kafka.sink.Neo4jConnector"
+expected = sys.argv[2]
 plugins = json.loads(sys.argv[1])
 matches = [
     plugin for plugin in plugins
-    if plugin.get("class") == expected and plugin.get("type") == "sink"
+    if plugin.get("type") == "sink" and "neo4j" in plugin.get("class", "").lower()
 ]
 if not matches:
-    print(f"Missing required Neo4j sink connector class: {expected}", file=sys.stderr)
+    print("Missing required Neo4j sink connector class from /connector-plugins", file=sys.stderr)
     sys.exit(1)
-version = matches[0].get("version", "unknown")
-print(f"Verified Neo4j sink connector class: {expected} ({version})")
-' "$PLUGINS_JSON"
+selected = next((plugin for plugin in matches if plugin.get("class") == expected), matches[0])
+klass = selected.get("class")
+version = selected.get("version", "unknown")
+print(f"Verified Neo4j sink connector class: {klass} ({version})")
+' "$PLUGINS_JSON" "$EXPECTED_NEO4J_CLASS"

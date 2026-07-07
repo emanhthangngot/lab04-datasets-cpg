@@ -32,7 +32,7 @@ source code, notebooks, screenshots, and meaningful commit history.
 | Stage | Dates | Goal | Exit Condition |
 |---|---:|---|---|
 | Stage 1 | 2026-07-01 to 2026-07-07 | Public repo, workflow docs, baseline specs, infra scaffold, parser discovery/schema baseline | Repo public, `dev` ready, team trackers ready, scaffold checks pass |
-| Stage 2 | 2026-07-08 to 2026-07-14 | Core sample pipeline: parser -> Kafka -> Neo4j/MongoDB | Node counts, Kafka samples, Neo4j and MongoDB query outputs exist |
+| Stage 2 | 2026-07-08 to 2026-07-14 | Core sample pipeline: parser -> Kafka -> Neo4j/MongoDB | Parser edge counts, Kafka samples, Neo4j and MongoDB query outputs exist |
 | Stage 3 | 2026-07-15 to 2026-07-22 | Replay and evidence hardening | Six task chapters have executed outputs, screenshots, and reflection notes |
 | Stage 4 | 2026-07-23 to 2026-07-25 | Final review, merge `dev` to `main`, publish Pages | GitHub Pages URL opens the latest final Jupyter Book |
 
@@ -53,17 +53,19 @@ source code, notebooks, screenshots, and meaningful commit history.
 - [x] Verify `bash scripts/run_checks.sh` passes.
 - [x] Assign initial tasks to Truc, Thanh, and Tuan.
 
-### Stage 2 Initial Assignments
+### Stage 2 Assignments
 
 | Owner | Spec | Task Checklist | Tracker |
 |---|---|---|---|
-| Truc | `openspec/specs/kafka-spark/spec.md` | `openspec/changes/stage2-team-handoff/tasks.md` section 1 | `docs/team/kafka-spark.md` |
-| Thanh | `openspec/specs/graph-stores/spec.md` | `openspec/changes/stage2-team-handoff/tasks.md` section 2 | `docs/team/graph-stores.md` |
-| Tuan | `openspec/specs/evidence-book/spec.md` | `openspec/changes/stage2-team-handoff/tasks.md` section 3 | `docs/team/evidence-book.md` |
+| Tri | `openspec/specs/parser-core/spec.md` | `openspec/changes/stage2-team-handoff/tasks.md` section 1 | `docs/team/workplan.md` |
+| Truc | `openspec/specs/kafka-spark/spec.md` | `openspec/changes/stage2-team-handoff/tasks.md` section 2 | `docs/team/kafka-spark.md` |
+| Thanh | `openspec/specs/graph-stores/spec.md` | `openspec/changes/stage2-team-handoff/tasks.md` section 3 | `docs/team/graph-stores.md` |
+| Tuan | `openspec/specs/evidence-book/spec.md` | `openspec/changes/stage2-team-handoff/tasks.md` section 4 | `docs/team/evidence-book.md` |
 
 ### Stage 2
 
 - [ ] Review parser/schema output before downstream ingestion.
+- [ ] Confirm parser sample emits CFG, DFG, and CALL edges when constructs exist.
 - [ ] Review Kafka/Spark sample evidence.
 - [ ] Review Neo4j/MongoDB sample evidence.
 - [ ] Ensure sample outputs are captured in notebooks.
@@ -87,8 +89,8 @@ source code, notebooks, screenshots, and meaningful commit history.
 
 | Area | Owner | Status | Next Checkpoint |
 |---|---|---|---|
-| Parser/schema/specs | Tri | Schema v1.0 locked; Stage 2 handoff assigned | Review Stage 2 PRs |
-| Kafka/Spark | Truc | Assigned from OpenSpec handoff | Topic and Spark readiness evidence |
+| Parser/schema/specs | Tri | Schema v1.0 locked; Stage 2 parser-core spec added | Parser sample edge evidence |
+| Kafka/Spark | Truc | Assigned from OpenSpec handoff; Spark image decision recorded | Topic, plugin, connector, and Spark evidence |
 | Neo4j/MongoDB | Thanh | Assigned from OpenSpec handoff | Neo4j/MongoDB validation evidence |
 | Evidence/Jupyter Book | Tuan | Assigned from OpenSpec handoff | Stage 1 book skeleton review |
 
