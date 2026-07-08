@@ -5,16 +5,12 @@ from __future__ import annotations
 import ast
 from typing import Iterable
 
-from .ids import make_edge_id, make_node_id
+from .ids import get_scope_path, make_edge_id, make_node_id
 from .schemas import build_edge_event
 
 
-def _node_scope(node: ast.AST) -> str:
-    return getattr(node, "name", "<module>") if not isinstance(node, ast.Module) else "<module>"
-
-
 def _node_id(file_id: str, node: ast.AST) -> str:
-    return make_node_id(file_id, node, _node_scope(node))
+    return make_node_id(file_id, node, get_scope_path(node))
 
 
 def _edge(

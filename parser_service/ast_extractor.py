@@ -5,7 +5,7 @@ from __future__ import annotations
 import ast
 from typing import Iterable
 
-from .ids import make_node_id
+from .ids import get_scope_path, make_node_id
 from .schemas import build_node_event
 
 
@@ -44,7 +44,7 @@ def extract_ast_nodes_gen(*, tree: ast.AST, file_id: str, file_path: str, contex
     for node in ast.walk(tree):
         if not isinstance(node, SUPPORTED_NODE_TYPES):
             continue
-        scope_path = getattr(node, "name", "<module>") if not isinstance(node, ast.Module) else "<module>"
+        scope_path = get_scope_path(node)
         node_id = make_node_id(file_id, node, scope_path)
         yield build_node_event(
             context=context,

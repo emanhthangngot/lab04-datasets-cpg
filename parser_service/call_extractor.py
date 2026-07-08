@@ -5,16 +5,12 @@ from __future__ import annotations
 import ast
 from typing import Iterable
 
-from .ids import make_edge_id, make_external_target_id, make_node_id
+from .ids import assign_parents, get_scope_path, make_edge_id, make_external_target_id, make_node_id
 from .schemas import build_edge_event
 
 
-def _node_scope(node: ast.AST) -> str:
-    return getattr(node, "name", "<module>") if not isinstance(node, ast.Module) else "<module>"
-
-
 def _node_id(file_id: str, node: ast.AST) -> str:
-    return make_node_id(file_id, node, _node_scope(node))
+    return make_node_id(file_id, node, get_scope_path(node))
 
 
 def collect_local_defs(tree: ast.AST, file_id: str | None = None) -> dict[str, str] | set[str]:
@@ -26,15 +22,13 @@ def collect_local_defs(tree: ast.AST, file_id: str | None = None) -> dict[str, s
     """
 
     # Populate parent pointers for lexical scoping lookup
-    for parent in ast.walk(tree):
-        for child in ast.iter_child_nodes(parent):
-            child.parent = parent
+    assign_parents(tree)
 
     defs = {}
     for node in ast.walk(tree):
         if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
             name = node.name
-            node_id = make_node_id(file_id, node, name) if file_id else name
+            node_id = make_node_id(file_id, node, get_scope_path(node)) if file_id else name
             if name not in defs:
                 defs[name] = node_id
     return defs if file_id else set(defs)
@@ -51,33 +45,64 @@ def get_callee_name(func: ast.AST) -> str | None:
     return None
 
 
+def is_local_variable(name: str, scope: ast.AST) -> bool:
+    """Check if the given name is defined as a parameter or assigned variable inside this scope.
+
+    This does not recurse into nested function/class definitions to respect lexical boundaries.
+    """
+
+    if isinstance(scope, (ast.FunctionDef, ast.AsyncFunctionDef)):
+        args = scope.args
+        all_args = list(args.args) + list(args.kwonlyargs)
+        if args.vararg:
+            all_args.append(args.vararg)
+        if args.kwarg:
+            all_args.append(args.kwarg)
+        if any(arg.arg == name for arg in all_args if arg is not None):
+            return True
+
+    body = getattr(scope, "body", None)
+    if isinstance(body, list):
+        for node in body:
+            # Skip checking inside nested function/class definitions
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+                continue
+            if isinstance(node, (ast.Assign, ast.AnnAssign, ast.AugAssign)):
+                targets = node.targets if isinstance(node, ast.Assign) else [node.target]
+                for t in targets:
+                    for child in ast.walk(t):
+                        if isinstance(child, ast.Name) and child.id == name:
+                            return True
+    return False
+
+
 def resolve_call_target(
     node: ast.Call,
     local_defs: dict[str, str],
     tree: ast.AST,
     file_id: str,
 ) -> str | None:
-    """Resolve call target using scope-aware lexical lookup."""
+    """Resolve call target using scope-aware lexical lookup walking up parents."""
 
     callee_name = get_callee_name(node.func) or "unknown"
     simple_name = callee_name.rsplit(".", 1)[-1]
 
-    # 1. Class scope resolution: check if call is inside a class method
-    curr = getattr(node, "parent", None)
+    # Walk up parent scopes
+    curr = getattr(node, "_parent", None)
     while curr:
-        if isinstance(curr, ast.ClassDef):
-            # Check if this class defines the target as a method
-            for body_node in curr.body:
-                if isinstance(body_node, (ast.FunctionDef, ast.AsyncFunctionDef)) and body_node.name == simple_name:
-                    return make_node_id(file_id, body_node, body_node.name)
-        curr = getattr(curr, "parent", None)
+        if isinstance(curr, (ast.ClassDef, ast.FunctionDef, ast.AsyncFunctionDef, ast.Module)):
+            # If the name is masked as a local variable or parameter, the call is unresolved
+            if is_local_variable(simple_name, curr):
+                return None
 
-    # 2. Module level scope resolution (global functions/classes)
-    for body_node in tree.body:
-        if isinstance(body_node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and body_node.name == simple_name:
-            return make_node_id(file_id, body_node, body_node.name)
+            body = getattr(curr, "body", None)
+            if isinstance(body, list):
+                for body_node in body:
+                    if isinstance(body_node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)) and body_node.name == simple_name:
+                        return make_node_id(file_id, body_node, get_scope_path(body_node))
+        curr = getattr(curr, "_parent", None)
 
-    # 3. Fallback to flat local_defs
+    # Fallback to flat local_defs
     if simple_name in local_defs:
         return local_defs[simple_name]
 
