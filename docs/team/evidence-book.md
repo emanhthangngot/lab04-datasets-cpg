@@ -14,7 +14,7 @@ docs/tuan/final-book-review
 
 ## Working Rules
 
-- Receive tasks only from `docs/team/workplan.md`.
+- Receive tasks only from [workplan.md](workplan.md).
 - Implement from specs written by Le Xuan Tri.
 - Do not create or edit spec files.
 - Update this tracker before asking for PR review.
@@ -116,12 +116,11 @@ with real command, notebook, query, or screenshot evidence only.
 
 Evidence links:
 
-- `book/_toc.yml`
-- `book/index.md`
-- `book/task1_repository.md` through `book/task6_replay.md`
-- `notebooks/01_repository_discovery.ipynb` through
-  `notebooks/06_idempotent_replay.ipynb`
-- `screenshots/README.md`
+- [_toc.yml](../../book/_toc.yml)
+- [index.md](../../book/index.md)
+- [task1_repository.md](../../book/task1_repository.md) through [task6_replay.md](../../book/task6_replay.md)
+- [01_repository_discovery.ipynb](../../notebooks/01_repository_discovery.ipynb) through [06_idempotent_replay.ipynb](../../notebooks/06_idempotent_replay.ipynb)
+- [README.md](../../screenshots/README.md)
 
 Commands run on 2026-07-05:
 

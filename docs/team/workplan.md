@@ -10,17 +10,17 @@ source code, notebooks, screenshots, and meaningful commit history.
 
 | Student | Role | Progress File | Responsibility |
 |---|---|---|---|
-| 23120099 - Le Xuan Tri | Lead + Spec Owner + Parser/Schema Owner | `docs/team/workplan.md` | Write all specs, assign tasks, review PRs, control merges, own parser/schema/test gates |
-| 23120180 - Tran Le Trung Truc | Kafka/Spark Runtime | `docs/team/kafka-spark.md` | Kafka topics, Kafka samples, Kafka Connect operations, Spark metadata stream |
-| 23120166 - Tran Huu Kim Thanh | Graph Stores | `docs/team/graph-stores.md` | Neo4j sink, Cypher checks, MongoDB metadata verification |
-| 23120185 - Nguyen Ho Anh Tuan | Evidence/Jupyter Book | `docs/team/evidence-book.md` | Notebooks, screenshots, Jupyter Book chapters, final evidence |
+| 23120099 - Le Xuan Tri | Lead + Spec Owner + Parser/Schema Owner | [workplan.md](workplan.md) | Write all specs, assign tasks, review PRs, control merges, own parser/schema/test gates |
+| 23120180 - Tran Le Trung Truc | Kafka/Spark Runtime | [kafka-spark.md](kafka-spark.md) | Kafka topics, Kafka samples, Kafka Connect operations, Spark metadata stream |
+| 23120166 - Tran Huu Kim Thanh | Graph Stores | [graph-stores.md](graph-stores.md) | Neo4j sink, Cypher checks, MongoDB metadata verification |
+| 23120185 - Nguyen Ho Anh Tuan | Evidence/Jupyter Book | [evidence-book.md](evidence-book.md) | Notebooks, screenshots, Jupyter Book chapters, final evidence |
 
 ## Task Intake
 
 1. Tri writes or updates the spec for the stage.
 2. Tri assigns tasks in this workplan.
-3. Each member reads the matching `openspec/specs/**/spec.md` and
-   `openspec/changes/stage2-team-handoff/tasks.md`.
+3. Each member reads the matching [specs](../../openspec/specs) and
+   [tasks.md](../../openspec/changes/archive/stage2-team-handoff/tasks.md).
 4. Each member branches from `dev`, implements only assigned work, and updates
    their progress file.
 5. Each member opens a PR back to `dev`.
@@ -57,10 +57,10 @@ source code, notebooks, screenshots, and meaningful commit history.
 
 | Owner | Spec | Task Checklist | Tracker |
 |---|---|---|---|
-| Tri | `openspec/specs/parser-core/spec.md` | `openspec/changes/archive/stage2-team-handoff/tasks.md` section 4 | `docs/team/workplan.md` |
-| Truc | `openspec/specs/kafka-spark/spec.md` | `openspec/changes/archive/stage2-team-handoff/tasks.md` section 2 | `docs/team/kafka-spark.md` |
-| Thanh | `openspec/specs/graph-stores/spec.md` | `openspec/changes/archive/stage2-team-handoff/tasks.md` section 3 | `docs/team/graph-stores.md` |
-| Tuan | `openspec/specs/evidence-book/spec.md` | `openspec/changes/archive/stage2-team-handoff/tasks.md` section 4 | `docs/team/evidence-book.md` |
+| Tri | [parser-core/spec.md](../../openspec/specs/parser-core/spec.md) | [tasks.md](../../openspec/changes/archive/stage2-team-handoff/tasks.md) section 4 | [workplan.md](workplan.md) |
+| Truc | [kafka-spark/spec.md](../../openspec/specs/kafka-spark/spec.md) | [tasks.md](../../openspec/changes/archive/stage2-team-handoff/tasks.md) section 1 | [kafka-spark.md](kafka-spark.md) |
+| Thanh | [graph-stores/spec.md](../../openspec/specs/graph-stores/spec.md) | [tasks.md](../../openspec/changes/archive/stage2-team-handoff/tasks.md) section 2 | [graph-stores.md](graph-stores.md) |
+| Tuan | [evidence-book/spec.md](../../openspec/specs/evidence-book/spec.md) | [tasks.md](../../openspec/changes/archive/stage2-team-handoff/tasks.md) section 3 | [evidence-book.md](evidence-book.md) |
 
 ### Stage 2
 

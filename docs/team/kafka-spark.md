@@ -14,7 +14,7 @@ fix/truc/connect-registration
 
 ## Working Rules
 
-- Receive tasks only from `docs/team/workplan.md`.
+- Receive tasks only from [workplan.md](workplan.md).
 - Implement from specs written by Le Xuan Tri.
 - Do not create or edit spec files.
 - Update this tracker before asking for PR review.
@@ -138,7 +138,7 @@ Blockers recorded:
 
 ### Blocker 1: Spark Docker Image Missing (Resolved locally)
 
-Per Blocker Policy (`docs/team/workplan.md`):
+Per Blocker Policy ([workplan.md](workplan.md)):
 
 - **Command run:**
   ```bash

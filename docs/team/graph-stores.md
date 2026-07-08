@@ -14,7 +14,7 @@ fix/thanh/stale-cleanup
 
 ## Working Rules
 
-- Receive tasks only from `docs/team/workplan.md`.
+- Receive tasks only from [workplan.md](workplan.md).
 - Implement from specs written by Le Xuan Tri.
 - Do not create or edit spec files.
 - Update this tracker before asking for PR review.
