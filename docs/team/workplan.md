@@ -64,8 +64,8 @@ source code, notebooks, screenshots, and meaningful commit history.
 
 ### Stage 2
 
-- [ ] Review parser/schema output before downstream ingestion.
-- [ ] Confirm parser sample emits CFG, DFG, and CALL edges when constructs exist.
+- [x] Review parser/schema output before downstream ingestion.
+- [x] Confirm parser sample emits CFG, DFG, and CALL edges when constructs exist.
 - [ ] Review Kafka/Spark sample evidence.
 - [ ] Review Neo4j/MongoDB sample evidence.
 - [ ] Ensure sample outputs are captured in notebooks.
