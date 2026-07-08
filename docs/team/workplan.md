@@ -57,10 +57,10 @@ source code, notebooks, screenshots, and meaningful commit history.
 
 | Owner | Spec | Task Checklist | Tracker |
 |---|---|---|---|
-| Tri | `openspec/specs/parser-core/spec.md` | `openspec/changes/stage2-team-handoff/tasks.md` section 1 | `docs/team/workplan.md` |
-| Truc | `openspec/specs/kafka-spark/spec.md` | `openspec/changes/stage2-team-handoff/tasks.md` section 2 | `docs/team/kafka-spark.md` |
-| Thanh | `openspec/specs/graph-stores/spec.md` | `openspec/changes/stage2-team-handoff/tasks.md` section 3 | `docs/team/graph-stores.md` |
-| Tuan | `openspec/specs/evidence-book/spec.md` | `openspec/changes/stage2-team-handoff/tasks.md` section 4 | `docs/team/evidence-book.md` |
+| Tri | `openspec/specs/parser-core/spec.md` | `openspec/changes/archive/stage2-team-handoff/tasks.md` section 4 | `docs/team/workplan.md` |
+| Truc | `openspec/specs/kafka-spark/spec.md` | `openspec/changes/archive/stage2-team-handoff/tasks.md` section 2 | `docs/team/kafka-spark.md` |
+| Thanh | `openspec/specs/graph-stores/spec.md` | `openspec/changes/archive/stage2-team-handoff/tasks.md` section 3 | `docs/team/graph-stores.md` |
+| Tuan | `openspec/specs/evidence-book/spec.md` | `openspec/changes/archive/stage2-team-handoff/tasks.md` section 4 | `docs/team/evidence-book.md` |
 
 ### Stage 2
 

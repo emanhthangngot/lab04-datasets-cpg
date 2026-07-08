@@ -55,6 +55,8 @@ def extract_cfg_edges_gen(*, tree: ast.AST, file_id: str, file_path: str, contex
 
     for statements in _statement_lists(tree):
         for current, following in zip(statements, statements[1:]):
+            if isinstance(current, (ast.Return, ast.Break, ast.Continue)):
+                break
             yield _edge(
                 source=current,
                 target=following,
@@ -93,14 +95,15 @@ def extract_cfg_edges_gen(*, tree: ast.AST, file_id: str, file_path: str, contex
                 file_path=file_path,
                 context=context,
             )
-            yield _edge(
-                source=node.body[-1],
-                target=node,
-                edge_type="CFG_LOOP_BACK",
-                file_id=file_id,
-                file_path=file_path,
-                context=context,
-            )
+            if not isinstance(node.body[-1], (ast.Return, ast.Break, ast.Continue)):
+                yield _edge(
+                    source=node.body[-1],
+                    target=node,
+                    edge_type="CFG_LOOP_BACK",
+                    file_id=file_id,
+                    file_path=file_path,
+                    context=context,
+                )
         elif isinstance(node, ast.Return):
             source_id = _node_id(file_id, node)
             target_id = f"{file_id}:function_exit"
@@ -114,3 +117,4 @@ def extract_cfg_edges_gen(*, tree: ast.AST, file_id: str, file_path: str, contex
                 edge_type="CFG_RETURN",
                 properties={"extractor": "cfg", "target": "function_exit"},
             )
+

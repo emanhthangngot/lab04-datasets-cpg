@@ -57,28 +57,77 @@ def _statement_scopes(tree: ast.AST) -> Iterable[list[ast.stmt]]:
             yield node.body
 
 
+def _traverse_dfg(
+    node: ast.AST,
+    latest_defs: dict[str, str],
+    context,
+    file_id: str,
+    file_path: str,
+) -> Iterable[dict]:
+    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+        return
+
+    if isinstance(node, ast.Assign):
+        if node.value:
+            yield from _traverse_dfg(node.value, latest_defs, context, file_id, file_path)
+        assignment_id = _node_id(file_id, node)
+        for name in _assignment_targets(node):
+            latest_defs[name] = assignment_id
+        return
+
+    if isinstance(node, ast.AnnAssign):
+        if node.value:
+            yield from _traverse_dfg(node.value, latest_defs, context, file_id, file_path)
+        assignment_id = _node_id(file_id, node)
+        for name in _assignment_targets(node):
+            latest_defs[name] = assignment_id
+        return
+
+    if isinstance(node, ast.AugAssign):
+        if isinstance(node.target, ast.Name) and node.target.id in latest_defs:
+            source_id = latest_defs[node.target.id]
+            target_id = _node_id(file_id, node.target)
+            yield build_edge_event(
+                context=context,
+                file_id=file_id,
+                file_path=file_path,
+                edge_id=make_edge_id(source_id, target_id, "DFG_DEF_USE"),
+                source_id=source_id,
+                target_id=target_id,
+                edge_type="DFG_DEF_USE",
+                properties={"extractor": "dfg", "variable": node.target.id},
+            )
+        if node.value:
+            yield from _traverse_dfg(node.value, latest_defs, context, file_id, file_path)
+        assignment_id = _node_id(file_id, node)
+        for name in _assignment_targets(node):
+            latest_defs[name] = assignment_id
+        return
+
+    if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Load) and node.id in latest_defs:
+        source_id = latest_defs[node.id]
+        target_id = _node_id(file_id, node)
+        yield build_edge_event(
+            context=context,
+            file_id=file_id,
+            file_path=file_path,
+            edge_id=make_edge_id(source_id, target_id, "DFG_DEF_USE"),
+            source_id=source_id,
+            target_id=target_id,
+            edge_type="DFG_DEF_USE",
+            properties={"extractor": "dfg", "variable": node.id},
+        )
+        return
+
+    for child in ast.iter_child_nodes(node):
+        yield from _traverse_dfg(child, latest_defs, context, file_id, file_path)
+
+
 def extract_dfg_edges_gen(*, tree: ast.AST, file_id: str, file_path: str, context) -> Iterable[dict]:
     """Yield intra-scope DFG_DEF_USE edges from assignments to later name loads."""
 
     for statements in _statement_scopes(tree):
         latest_defs: dict[str, str] = {}
-        for node in _walk_body(statements):
-            if isinstance(node, ast.Name) and isinstance(node.ctx, ast.Load) and node.id in latest_defs:
-                source_id = latest_defs[node.id]
-                target_id = _node_id(file_id, node)
-                yield build_edge_event(
-                    context=context,
-                    file_id=file_id,
-                    file_path=file_path,
-                    edge_id=make_edge_id(source_id, target_id, "DFG_DEF_USE"),
-                    source_id=source_id,
-                    target_id=target_id,
-                    edge_type="DFG_DEF_USE",
-                    properties={"extractor": "dfg", "variable": node.id},
-                )
+        for stmt in statements:
+            yield from _traverse_dfg(stmt, latest_defs, context, file_id, file_path)
 
-            targets = _assignment_targets(node)
-            if targets:
-                assignment_id = _node_id(file_id, node)
-                for name in targets:
-                    latest_defs[name] = assignment_id
