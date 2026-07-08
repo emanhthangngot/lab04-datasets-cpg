@@ -55,3 +55,16 @@ metadata `file_id` duplicate checks.
 - THEN Neo4j returns no duplicate node IDs
 - AND Neo4j returns no duplicate edge IDs
 - AND MongoDB returns no duplicate `file_id` groups
+
+### Requirement: Stage 2 Sample Store Evidence Is Captured
+
+Stage 2 store evidence SHALL prove that sample parser output reached Neo4j and
+MongoDB.
+
+#### Scenario: Sample ingestion verification
+
+- GIVEN Stage 2 parser output has been produced to Kafka
+- WHEN Thanh verifies the stores
+- THEN Neo4j node and relationship counts are captured
+- AND MongoDB metadata count and one sample document are captured
+- AND placeholder node count is recorded so unresolved-call behavior is visible

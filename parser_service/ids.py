@@ -19,6 +19,42 @@ def normalize_relative_path(path: Path, repo_root: Path) -> str:
     return path.relative_to(repo_root).as_posix()
 
 
+def assign_parents(tree: ast.AST) -> None:
+    """Walk the AST and set a ``_parent`` attribute on every child node.
+
+    This enables scope-aware lookups without modifying the public ``parent``
+    attribute that ``call_extractor`` already sets.  The helper is idempotent
+    — calling it twice on the same tree is harmless.
+    """
+
+    for parent in ast.walk(tree):
+        for child in ast.iter_child_nodes(parent):
+            child._parent = parent  # type: ignore[attr-defined]
+
+
+def get_scope_path(node: ast.AST) -> str:
+    """Return a fully-qualified scope path such as ``<module>.A.foo``.
+
+    Walks ``_parent`` pointers (set by :func:`assign_parents`) upward,
+    collecting class / function names.  Falls back to the node's own name
+    when parent pointers are absent.
+    """
+
+    parts: list[str] = []
+    curr = node
+    while curr is not None:
+        if isinstance(curr, ast.Module):
+            parts.append("<module>")
+            break
+        if isinstance(curr, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            parts.append(curr.name)
+        curr = getattr(curr, "_parent", None)
+    if not parts:
+        # Fallback when parent pointers were not assigned
+        return getattr(node, "name", "<module>")
+    return ".".join(reversed(parts))
+
+
 def make_file_id(repo_name: str, relative_path: str) -> str:
     """Stable file ID used as Kafka key and replay cleanup selector."""
 

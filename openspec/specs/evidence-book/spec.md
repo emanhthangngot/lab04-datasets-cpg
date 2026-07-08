@@ -46,7 +46,7 @@ details, or irrelevant personal data.
 
 ### Requirement: Book Build Is Verified
 
-The final book SHOULD build locally before publication.
+The final book SHALL build locally before publication.
 
 #### Scenario: Build check
 
@@ -54,3 +54,16 @@ The final book SHOULD build locally before publication.
 - WHEN Tuan runs `jupyter-book build book/`
 - THEN the build completes successfully
 - AND broken links or missing assets are fixed before final review
+
+### Requirement: Stage 2 Evidence Distinguishes Captured From Pending
+
+The evidence book SHALL only replace pending slots with real Stage 2 output.
+
+#### Scenario: Stage 2 evidence update
+
+- GIVEN parser, Kafka, Neo4j, MongoDB, or Spark output has been captured
+- WHEN Tuan updates notebooks or book chapters
+- THEN Task 1-5 slots use exact command/query/notebook output or screenshot
+  references
+- AND Task 6 replay evidence remains pending unless the full replay workflow
+  has actually run

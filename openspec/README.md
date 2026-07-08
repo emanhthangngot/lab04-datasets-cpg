@@ -1,49 +1,51 @@
-# Lab04 OpenSpec Workflow
+# Hướng Dẫn OpenSpec Cho Lab04
 
-This folder applies the lightweight OpenSpec style to the Lab04 CPG Streaming
-project. It does not require the OpenSpec CLI. The goal is to keep specs,
-design notes, and implementation tasks reviewable before team members start
-coding.
+Thư mục này dùng format chuẩn của OpenSpec CLI với schema `spec-driven`.
 
-## Structure
+## Cấu Trúc
 
 ```text
 openspec/
-├── specs/                 # Source of truth for current behavior
-│   ├── kafka-spark/
-│   ├── graph-stores/
-│   └── evidence-book/
-└── changes/               # Active proposed work
-    └── stage2-team-handoff/
-        ├── proposal.md
-        ├── design.md
-        ├── tasks.md
-        └── specs/
+├── config.yaml
+├── specs/                  # Current accepted specs
+└── changes/                # Change proposals theo từng stage
+    ├── archive/
+    ├── stage1-foundation/
+    └── stage2-core-sample-pipeline/
 ```
 
-## Rules
+## Cách Hiểu
 
-- Tri owns spec approval and can update source-of-truth specs.
-- Truc, Thanh, and Tuan implement from assigned specs and tasks.
-- Team members must not redefine schema fields, connector classes, topic names,
-  or replay semantics in implementation PRs.
-- If implementation reveals a spec gap, record the blocker in the owner tracker
-  under `docs/team/` and ask Tri for a spec update before continuing.
-- Evidence must come from real commands, notebook outputs, query outputs, or
-  screenshots. Do not invent evidence.
-- Do not publish credentials, local machine details, or irrelevant personal data
-  in notebooks, screenshots, or book pages.
+- `openspec/specs/` là spec hiện tại đã được chấp nhận. Lệnh
+  `openspec list --specs` đọc từ đây.
+- `openspec/changes/<change-name>/` là change proposal hoặc stage work. Lệnh
+  `openspec list` đọc các change đang nằm trực tiếp trong `changes/`.
+- `openspec/changes/archive/` dành cho change đã archive theo workflow
+  OpenSpec.
 
-## Work Loop
+## Stage Hiện Có
 
-1. Read the relevant base spec in `openspec/specs/`.
-2. Read the active change in `openspec/changes/stage2-team-handoff/`.
-3. Create a short-lived branch from `dev`.
-4. Run baseline checks before editing.
-5. Implement only the assigned task slice.
-6. Run relevant checks and capture evidence.
-7. Update the matching `docs/team/*.md` tracker.
-8. Open a PR to `dev` and list checks, evidence, and blockers.
+- `stage1-foundation`: lưu lịch sử Stage 1, gồm schema/spec foundation và team
+  handoff đã hoàn thành.
+- `stage2-core-sample-pipeline`: Stage 2 hiện tại, gồm parser edge extraction,
+  Kafka/Spark runtime, Neo4j/MongoDB sample ingestion, và evidence ban đầu.
 
-This mirrors OpenSpec's proposal -> specs -> design -> tasks -> implementation
-flow while keeping the Lab04 repository simple and self-contained.
+## Lệnh Kiểm Tra
+
+```bash
+openspec doctor
+openspec list
+openspec list --specs
+openspec validate --all --strict
+```
+
+## Quy Tắc Làm Việc
+
+- Không sửa `schemas/cpg-events.schema.json` nếu chưa có approval của Tri.
+- Nếu thay đổi requirement đã chấp nhận, tạo hoặc cập nhật change trong
+  `openspec/changes/<change-name>/specs/<capability>/spec.md`.
+- Khi change được chấp nhận, cập nhật current spec tương ứng trong
+  `openspec/specs/`.
+- Evidence phải là output thật từ command, query, notebook, hoặc screenshot.
+  Không publish secret, token, thông tin máy cá nhân không liên quan, hoặc dữ
+  liệu nhạy cảm.

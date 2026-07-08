@@ -26,7 +26,8 @@ Tasks:
 
 - [x] Verify Kafka broker and topic scripts run inside Docker Compose.
 - [x] Verify Kafka Connect service exposes the Neo4j connector plugin (Verified Neo4j Connector 5.1.0 plugin is available).
-- [x] Verify Spark container can run `spark-submit` (Verified: image `bitnami/spark:3.5.0` missing on Docker Hub — blocker documented below, awaiting Tri's decision).
+- [x] Verify Spark container can run `spark-submit` (Verified after switching
+  Compose to `docker.io/bitnamilegacy/spark:3.5.0` with `SPARK_MODE=master`).
 - [x] Record any runtime blocker for Tri.
 
 Done when:
@@ -47,12 +48,16 @@ Tasks:
 
 - [ ] Capture Kafka topic list evidence.
 - [ ] Capture sample messages from `cpg.nodes`, `cpg.edges`, `cpg.metadata`, and `cpg.errors`.
+- [ ] Verify `/connector-plugins` and record the exact Neo4j sink connector class.
+- [ ] Register or update `cpg-neo4j-sink` only after plugin verification.
 - [ ] Run Spark metadata stream on sample parser output.
 - [ ] Capture Spark checkpoint evidence.
 
 Done when:
 
 - Kafka sample messages are available for the Jupyter Book.
+- Connector registration evidence shows the same Neo4j sink class reported by
+  Kafka Connect.
 - Spark can read `cpg.metadata` from Kafka and write metadata path evidence.
 - Progress and evidence links are updated in this file.
 
@@ -131,7 +136,7 @@ docker compose exec spark spark-submit \
 
 Blockers recorded:
 
-### Blocker 1: Spark Docker Image Missing (Stage 2 blocked)
+### Blocker 1: Spark Docker Image Missing (Resolved locally)
 
 Per Blocker Policy (`docs/team/workplan.md`):
 
@@ -151,9 +156,12 @@ Per Blocker Policy (`docs/team/workplan.md`):
   1. `docker compose pull spark` — fails because `bitnami/spark:3.5.0` no longer exists on Docker Hub.
   2. Verified `docker.io/bitnamilegacy/spark:3.5.0` exists on Docker Hub (manifest confirmed).
   3. Verified `apache/spark:3.5.0` exists on Docker Hub (manifest confirmed).
-- **What decision is needed:** Tri must decide which replacement image to use in `docker-compose.yml`:
-  - Option A: `docker.io/bitnamilegacy/spark:3.5.0` (closest drop-in replacement, same Bitnami layout).
-  - Option B: `apache/spark:3.5.0` (official Apache image, different directory layout may need `working_dir` and volume adjustments).
+- **Decision:** Stage 2 uses `docker.io/bitnamilegacy/spark:3.5.0`, the
+  closest drop-in replacement for the existing Bitnami layout.
+- **Follow-up fix:** The legacy image rejects `SPARK_MODE=client`, so Compose now
+  uses `SPARK_MODE=master`.
+- **Local verification:** `docker compose up -d spark` succeeded and
+  `docker compose exec spark spark-submit --version` returned Spark `3.5.0`.
 
 ### Blocker 2: CRLF Line Endings (Resolved locally)
 
@@ -172,4 +180,5 @@ Per Blocker Policy (`docs/team/workplan.md`):
 | Spark command syntax and package requirements documented | ✅ Documented (see above) |
 | Spark Docker runtime functional | ⚠️ Blocked (awaiting Tri's image decision) |
 
-Next action: Tri to approve Spark Docker image replacement in `docker-compose.yml`. Once resolved, proceed to Stage 2 streaming path.
+Next action: Run the metadata streaming job with real parser output, then
+capture topic, connector, Spark stream, and checkpoint evidence.
