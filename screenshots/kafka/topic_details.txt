@@ -1,0 +1,111 @@
+Topic: cpg.nodes	TopicId: B6SvekM5Q-WYdoz8bBZN1Q	PartitionCount: 4	ReplicationFactor: 1	Configs: retention.ms=86400000
+	Topic: cpg.nodes	Partition: 0	Leader: 1	Replicas: 1	Isr: 1
+	Topic: cpg.nodes	Partition: 1	Leader: 1	Replicas: 1	Isr: 1
+	Topic: cpg.nodes	Partition: 2	Leader: 1	Replicas: 1	Isr: 1
+	Topic: cpg.nodes	Partition: 3	Leader: 1	Replicas: 1	Isr: 1
+Topic: test-cypher	TopicId: wuLqHkBzSCGM_3hYp4zmFg	PartitionCount: 1	ReplicationFactor: 1	Configs: 
+	Topic: test-cypher	Partition: 0	Leader: 1	Replicas: 1	Isr: 1
+Topic: cpgedges	TopicId: 3rjZQ9QKRYSKSiZ2I-EdGQ	PartitionCount: 4	ReplicationFactor: 1	Configs: 
+	Topic: cpgedges	Partition: 0	Leader: 1	Replicas: 1	Isr: 1
+	Topic: cpgedges	Partition: 1	Leader: 1	Replicas: 1	Isr: 1
+	Topic: cpgedges	Partition: 2	Leader: 1	Replicas: 1	Isr: 1
+	Topic: cpgedges	Partition: 3	Leader: 1	Replicas: 1	Isr: 1
+Topic: cpg.metadata	TopicId: TPUiRGk5RLq1Iwz5oEAuPw	PartitionCount: 1	ReplicationFactor: 1	Configs: retention.ms=86400000
+	Topic: cpg.metadata	Partition: 0	Leader: 1	Replicas: 1	Isr: 1
+Topic: cpgnodes	TopicId: yN-YyQoHSae2umRJapyeOw	PartitionCount: 4	ReplicationFactor: 1	Configs: 
+	Topic: cpgnodes	Partition: 0	Leader: 1	Replicas: 1	Isr: 1
+	Topic: cpgnodes	Partition: 1	Leader: 1	Replicas: 1	Isr: 1
+	Topic: cpgnodes	Partition: 2	Leader: 1	Replicas: 1	Isr: 1
+	Topic: cpgnodes	Partition: 3	Leader: 1	Replicas: 1	Isr: 1
+Topic: _connect-offsets	TopicId: xpOxMfygTXSiCo3a7MTdSw	PartitionCount: 25	ReplicationFactor: 1	Configs: cleanup.policy=compact
+	Topic: _connect-offsets	Partition: 0	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-offsets	Partition: 1	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-offsets	Partition: 2	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-offsets	Partition: 3	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-offsets	Partition: 4	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-offsets	Partition: 5	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-offsets	Partition: 6	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-offsets	Partition: 7	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-offsets	Partition: 8	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-offsets	Partition: 9	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-offsets	Partition: 10	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-offsets	Partition: 11	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-offsets	Partition: 12	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-offsets	Partition: 13	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-offsets	Partition: 14	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-offsets	Partition: 15	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-offsets	Partition: 16	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-offsets	Partition: 17	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-offsets	Partition: 18	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-offsets	Partition: 19	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-offsets	Partition: 20	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-offsets	Partition: 21	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-offsets	Partition: 22	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-offsets	Partition: 23	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-offsets	Partition: 24	Leader: 1	Replicas: 1	Isr: 1
+Topic: cpg.edges	TopicId: DjxJxCLKSz2X03JXiKN5uw	PartitionCount: 4	ReplicationFactor: 1	Configs: retention.ms=86400000
+	Topic: cpg.edges	Partition: 0	Leader: 1	Replicas: 1	Isr: 1
+	Topic: cpg.edges	Partition: 1	Leader: 1	Replicas: 1	Isr: 1
+	Topic: cpg.edges	Partition: 2	Leader: 1	Replicas: 1	Isr: 1
+	Topic: cpg.edges	Partition: 3	Leader: 1	Replicas: 1	Isr: 1
+Topic: cpg.errors	TopicId: 7_QHTSKYSh-WuUnZBDKfww	PartitionCount: 1	ReplicationFactor: 1	Configs: retention.ms=86400000
+	Topic: cpg.errors	Partition: 0	Leader: 1	Replicas: 1	Isr: 1
+Topic: __consumer_offsets	TopicId: QJDM20FnSEObkdbJ2UHcKw	PartitionCount: 50	ReplicationFactor: 1	Configs: compression.type=producer,cleanup.policy=compact,segment.bytes=104857600
+	Topic: __consumer_offsets	Partition: 0	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 1	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 2	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 3	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 4	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 5	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 6	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 7	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 8	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 9	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 10	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 11	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 12	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 13	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 14	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 15	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 16	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 17	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 18	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 19	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 20	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 21	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 22	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 23	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 24	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 25	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 26	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 27	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 28	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 29	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 30	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 31	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 32	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 33	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 34	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 35	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 36	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 37	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 38	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 39	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 40	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 41	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 42	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 43	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 44	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 45	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 46	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 47	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 48	Leader: 1	Replicas: 1	Isr: 1
+	Topic: __consumer_offsets	Partition: 49	Leader: 1	Replicas: 1	Isr: 1
+Topic: _connect-configs	TopicId: svduMEo3TWqokTtaQzRuxQ	PartitionCount: 1	ReplicationFactor: 1	Configs: cleanup.policy=compact
+	Topic: _connect-configs	Partition: 0	Leader: 1	Replicas: 1	Isr: 1
+Topic: _connect-status	TopicId: 8jiYtsN7QweKg01UVhFkpg	PartitionCount: 5	ReplicationFactor: 1	Configs: cleanup.policy=compact
+	Topic: _connect-status	Partition: 0	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-status	Partition: 1	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-status	Partition: 2	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-status	Partition: 3	Leader: 1	Replicas: 1	Isr: 1
+	Topic: _connect-status	Partition: 4	Leader: 1	Replicas: 1	Isr: 1
