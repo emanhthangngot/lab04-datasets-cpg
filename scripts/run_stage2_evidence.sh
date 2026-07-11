@@ -11,7 +11,7 @@ set -euo pipefail
 #   bash scripts/run_stage2_evidence.sh
 
 echo "============================================================"
-echo " Lab04 Stage 2: Core Streaming Path â€” Full Evidence Capture"
+echo " Lab04 Stage 2: Core Streaming Path - Full Evidence Capture"
 echo "============================================================"
 echo ""
 
@@ -70,8 +70,7 @@ SPARK_PID=$!
 # --------------------------------------------------------------------------
 # Step 7: Run parser in sample mode
 # --------------------------------------------------------------------------
-echo ""
-echo ">>> Step 7: Run parser (sample mode â€” 5 files)"
+echo ">>> Step 7: Run parser (sample mode - 5 files)"
 docker compose run --rm parser \
   python -m parser_service.main --repo data/datasets --mode sample
 
@@ -106,6 +105,22 @@ docker compose exec -T neo4j cypher-shell -u neo4j -p password \
   "MATCH (n:CPGNode {placeholder: true}) RETURN count(n) AS placeholder_count;" \
   | tee screenshots/neo4j/placeholder_count.txt
 
+echo ">>> Neo4j duplicate node check"
+docker compose exec -T neo4j cypher-shell -u neo4j -p password \
+  "MATCH (n:CPGNode) WITH n.id AS id, count(*) AS c WHERE c > 1 RETURN id, c;" \
+  | tee screenshots/neo4j/duplicate_nodes.txt
+if [ ! -s screenshots/neo4j/duplicate_nodes.txt ]; then
+  echo "No duplicate nodes found" > screenshots/neo4j/duplicate_nodes.txt
+fi
+
+echo ">>> Neo4j duplicate edge check"
+docker compose exec -T neo4j cypher-shell -u neo4j -p password \
+  "MATCH ()-[r:CPG_EDGE]->() WITH r.id AS id, count(*) AS c WHERE c > 1 RETURN id, c;" \
+  | tee screenshots/neo4j/duplicate_edges.txt
+if [ ! -s screenshots/neo4j/duplicate_edges.txt ]; then
+  echo "No duplicate edges found" > screenshots/neo4j/duplicate_edges.txt
+fi
+
 echo ""
 echo ">>> MongoDB store verification"
 docker compose exec -T mongo mongosh --quiet --eval '
@@ -132,10 +147,10 @@ echo " Stage 2 evidence capture complete!"
 echo "============================================================"
 echo ""
 echo "Evidence files:"
-echo "  screenshots/kafka/    â€” topic list, sample messages, connector evidence"
-echo "  screenshots/spark/    â€” checkpoint, MongoDB metadata check"
-echo "  screenshots/neo4j/    â€” node/edge/placeholder counts"
-echo "  screenshots/mongodb/  â€” metadata count, sample doc, duplicate check"
+echo "  screenshots/kafka/    - topic list, sample messages, connector evidence"
+echo "  screenshots/spark/    - checkpoint, MongoDB metadata check"
+echo "  screenshots/neo4j/    - node/edge/placeholder counts and duplicate checks"
+echo "  screenshots/mongodb/  - metadata count, sample doc, duplicate check"
 echo ""
 echo "Next steps:"
 echo "  1. Review evidence files"

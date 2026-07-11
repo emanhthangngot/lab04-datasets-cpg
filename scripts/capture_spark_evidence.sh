@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Capture Spark Structured Streaming evidence for Stage 2.
 # Owner: 23120180 - Tran Le Trung Truc
-# Spec: openspec/specs/kafka-spark/spec.md â€” "Spark Consumes Metadata Only"
+# Spec: openspec/specs/kafka-spark/spec.md - "Spark Consumes Metadata Only"
 #
 # Usage:
 #   bash scripts/capture_spark_evidence.sh
@@ -32,7 +32,6 @@ mkdir -p "$EVIDENCE_DIR"
 # --------------------------------------------------------------------------
 echo "=== Spark version ==="
 docker compose exec "$SPARK_SERVICE" spark-submit --version 2>&1 \
-  | head -5 \
   | tee "$EVIDENCE_DIR/spark_version.txt"
 
 # --------------------------------------------------------------------------
@@ -68,7 +67,7 @@ echo "=== Checkpoint evidence ==="
 echo "--- Checkpoint directory listing ---"
 docker compose exec "$SPARK_SERVICE" ls -laR "$CHECKPOINT_PATH" 2>/dev/null \
   | tee "$EVIDENCE_DIR/checkpoint_listing.txt" || {
-  echo "  (checkpoint directory not yet created â€” no metadata messages processed)"
+  echo "  (checkpoint directory not yet created - no metadata messages processed)"
   echo "  (checkpoint directory not yet created)" > "$EVIDENCE_DIR/checkpoint_listing.txt"
 }
 
@@ -93,7 +92,7 @@ docker compose exec -T mongo mongosh --quiet --eval '
   print("sample document:");
   printjson(db.file_metadata.findOne());
 ' 2>/dev/null | tee "$EVIDENCE_DIR/mongodb_metadata_check.txt" || {
-  echo "  (MongoDB check skipped â€” mongo service may not be running)"
+  echo "  (MongoDB check skipped Ã¢â‚¬â€ mongo service may not be running)"
 }
 
 # --------------------------------------------------------------------------

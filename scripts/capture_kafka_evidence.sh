@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Capture Kafka evidence for Stage 2: topic list and sample messages.
 # Owner: 23120180 - Tran Le Trung Truc
-# Spec: openspec/specs/kafka-spark/spec.md â€” "Kafka Evidence Is Reproducible"
+# Spec: openspec/specs/kafka-spark/spec.md - "Kafka Evidence Is Reproducible"
 #
 # Usage:
 #   bash scripts/capture_kafka_evidence.sh
@@ -97,6 +97,7 @@ else:
 ' "$output_file" "$topic"
   else
     echo "  (no messages available in $topic)"
+    echo "[]" > "$output_file"
   fi
 }
 

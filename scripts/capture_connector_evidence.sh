@@ -3,7 +3,7 @@ set -euo pipefail
 
 # Capture connector registration evidence for Stage 2.
 # Owner: 23120180 - Tran Le Trung Truc
-# Spec: openspec/specs/kafka-spark/spec.md ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â "Kafka Connect Plugin Gate"
+# Spec: openspec/specs/kafka-spark/spec.md - "Kafka Connect Plugin Gate"
 #       and "Connector Registration Uses Live Plugin Discovery"
 #
 # Usage:
@@ -62,6 +62,7 @@ bash scripts/register_neo4j_sink.sh 2>&1 \
 # --------------------------------------------------------------------------
 echo ""
 echo "=== Connector status ==="
+sleep 5
 curl -fsS "$CONNECT_URL/connectors/$CONNECTOR_NAME/status" \
   | "$PYTHON" -m json.tool \
   | tee "$EVIDENCE_DIR/connector_status.json"
