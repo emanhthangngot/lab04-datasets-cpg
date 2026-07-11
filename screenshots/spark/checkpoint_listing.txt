@@ -1,0 +1,68 @@
+/mnt/checkpoints/cpg_metadata:
+total 28
+drwxr-xr-x 5 1001 root 4096 Jul 10 12:58 .
+drwxr-xr-x 3 1001 1001 4096 Jul 10 12:58 ..
+-rw-r--r-- 1 1001 root   12 Jul 10 12:58 .metadata.crc
+drwxr-xr-x 2 1001 root 4096 Jul 11 03:25 commits
+-rw-r--r-- 1 1001 root   45 Jul 10 12:58 metadata
+drwxr-xr-x 2 1001 root 4096 Jul 11 03:25 offsets
+drwxr-xr-x 3 1001 root 4096 Jul 10 12:58 sources
+
+/mnt/checkpoints/cpg_metadata/commits:
+total 80
+drwxr-xr-x 2 1001 root 4096 Jul 11 03:25 .
+drwxr-xr-x 5 1001 root 4096 Jul 10 12:58 ..
+-rw-r--r-- 1 1001 root   12 Jul 10 12:58 .0.crc
+-rw-r--r-- 1 1001 root   12 Jul 10 13:09 .1.crc
+-rw-r--r-- 1 1001 root   12 Jul 10 15:04 .2.crc
+-rw-r--r-- 1 1001 root   12 Jul 10 15:05 .3.crc
+-rw-r--r-- 1 1001 root   12 Jul 11 03:02 .4.crc
+-rw-r--r-- 1 1001 root   12 Jul 11 03:06 .5.crc
+-rw-r--r-- 1 1001 root   12 Jul 11 03:10 .6.crc
+-rw-r--r-- 1 1001 root   12 Jul 11 03:19 .7.crc
+-rw-r--r-- 1 1001 root   12 Jul 11 03:25 .8.crc
+-rw-r--r-- 1 1001 root   29 Jul 10 12:58 0
+-rw-r--r-- 1 1001 root   29 Jul 10 13:09 1
+-rw-r--r-- 1 1001 root   29 Jul 10 15:04 2
+-rw-r--r-- 1 1001 root   29 Jul 10 15:05 3
+-rw-r--r-- 1 1001 root   29 Jul 11 03:02 4
+-rw-r--r-- 1 1001 root   29 Jul 11 03:06 5
+-rw-r--r-- 1 1001 root   29 Jul 11 03:10 6
+-rw-r--r-- 1 1001 root   29 Jul 11 03:19 7
+-rw-r--r-- 1 1001 root   29 Jul 11 03:25 8
+
+/mnt/checkpoints/cpg_metadata/offsets:
+total 80
+drwxr-xr-x 2 1001 root 4096 Jul 11 03:25 .
+drwxr-xr-x 5 1001 root 4096 Jul 10 12:58 ..
+-rw-r--r-- 1 1001 root   16 Jul 10 12:58 .0.crc
+-rw-r--r-- 1 1001 root   16 Jul 10 13:09 .1.crc
+-rw-r--r-- 1 1001 root   16 Jul 10 15:04 .2.crc
+-rw-r--r-- 1 1001 root   16 Jul 10 15:05 .3.crc
+-rw-r--r-- 1 1001 root   16 Jul 11 03:02 .4.crc
+-rw-r--r-- 1 1001 root   16 Jul 11 03:06 .5.crc
+-rw-r--r-- 1 1001 root   16 Jul 11 03:10 .6.crc
+-rw-r--r-- 1 1001 root   16 Jul 11 03:19 .7.crc
+-rw-r--r-- 1 1001 root   16 Jul 11 03:25 .8.crc
+-rw-r--r-- 1 1001 root  665 Jul 10 12:58 0
+-rw-r--r-- 1 1001 root  666 Jul 10 13:09 1
+-rw-r--r-- 1 1001 root  666 Jul 10 15:04 2
+-rw-r--r-- 1 1001 root  666 Jul 10 15:05 3
+-rw-r--r-- 1 1001 root  666 Jul 11 03:02 4
+-rw-r--r-- 1 1001 root  666 Jul 11 03:06 5
+-rw-r--r-- 1 1001 root  666 Jul 11 03:10 6
+-rw-r--r-- 1 1001 root  666 Jul 11 03:19 7
+-rw-r--r-- 1 1001 root  666 Jul 11 03:25 8
+
+/mnt/checkpoints/cpg_metadata/sources:
+total 12
+drwxr-xr-x 3 1001 root 4096 Jul 10 12:58 .
+drwxr-xr-x 5 1001 root 4096 Jul 10 12:58 ..
+drwxr-xr-x 2 1001 root 4096 Jul 10 12:58 0
+
+/mnt/checkpoints/cpg_metadata/sources/0:
+total 16
+drwxr-xr-x 2 1001 root 4096 Jul 10 12:58 .
+drwxr-xr-x 3 1001 root 4096 Jul 10 12:58 ..
+-rw-r--r-- 1 1001 root   12 Jul 10 12:58 .0.crc
+-rw-r--r-- 1 1001 root   28 Jul 10 12:58 0

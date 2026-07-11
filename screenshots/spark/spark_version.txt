@@ -3,3 +3,11 @@ Welcome to
      / __/__  ___ _____/ /__
     _\ \/ _ \/ _ `/ __/  '_/
    /___/ .__/\_,_/_/ /_/\_\   version 3.5.0
+      /_/
+                        
+Using Scala version 2.12.18, OpenJDK 64-Bit Server VM, 17.0.10
+Branch HEAD
+Compiled by user ubuntu on 2023-09-09T01:53:20Z
+Revision ce5ddad990373636e94071e7cef2f31021add07b
+Url https://github.com/apache/spark
+Type --help for more information.
