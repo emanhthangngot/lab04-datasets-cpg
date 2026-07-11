@@ -92,7 +92,7 @@ docker compose exec -T mongo mongosh --quiet --eval '
   print("sample document:");
   printjson(db.file_metadata.findOne());
 ' 2>/dev/null | tee "$EVIDENCE_DIR/mongodb_metadata_check.txt" || {
-  echo "  (MongoDB check skipped Ã¢â‚¬â€ mongo service may not be running)"
+  echo "  (MongoDB check skipped -- mongo service may not be running)"
 }
 
 # --------------------------------------------------------------------------

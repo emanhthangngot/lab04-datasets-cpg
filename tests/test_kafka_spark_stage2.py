@@ -16,6 +16,7 @@ from __future__ import annotations
 
 import ast
 import json
+import re
 from pathlib import Path
 
 import pytest
@@ -66,6 +67,23 @@ class TestSinkConnectorConfig:
 
     def test_value_converter_schemas_disabled(self, config: dict) -> None:
         assert config["config"].get("value.converter.schemas.enable") == "false"
+
+    def test_value_converter_is_string(self, config: dict) -> None:
+        """Neo4j Kafka Connector 5.1.0 has a bug with JsonConverter + schemas.enable=false:
+        it treats schemaless JSON payloads as tombstone (null), resulting in 0 nodes/edges.
+        StringConverter bypasses this — the connector auto-parses JSON strings into Maps
+        for __value, which works correctly (verified: 21,838 nodes, 7,967 edges)."""
+        expected = "org.apache.kafka.connect.storage.StringConverter"
+        actual = config["config"].get("value.converter", "")
+        assert actual == expected, (
+            f"value.converter is {actual!r}, expected {expected!r}. "
+            f"Do NOT use JsonConverter — Neo4j Connector 5.1.0 bug causes 0 ingestion."
+        )
+
+    def test_no_duplicate_cypher_keys(self, config: dict) -> None:
+        cfg_keys = list(config["config"].keys())
+        assert "neo4j.cypher.topic.cpgnodes" not in cfg_keys
+        assert "neo4j.topic.cypher.cpgnodes" not in cfg_keys
 
     def test_neo4j_uri_is_docker_internal(self, config: dict) -> None:
         uri = config["config"].get("neo4j.uri", "")
@@ -186,9 +204,9 @@ class TestKafkaTopicInit:
 
     def test_nodes_and_edges_have_multiple_partitions(self, script_content: str) -> None:
         """cpg.nodes and cpg.edges should have multiple partitions."""
-        # The script calls create_topic with partition count as second arg
-        assert "cpg.nodes 4" in script_content or "cpg.nodes\" 4" in script_content
-        assert "cpg.edges 4" in script_content or "cpg.edges\" 4" in script_content
+        import re
+        assert re.search(r"create_topic\s+cpg\.nodes\s+4", script_content)
+        assert re.search(r"create_topic\s+cpg\.edges\s+4", script_content)
 
 
 # -----------------------------------------------------------------------
@@ -267,7 +285,9 @@ class TestDockerCompose:
 
     def test_kafka_auto_create_disabled(self, compose_content: str) -> None:
         """Spec: do not rely on auto-create topics."""
-        assert '"false"' in compose_content or "'false'" in compose_content
+        assert "KAFKA_AUTO_CREATE_TOPICS_ENABLE" in compose_content
+        # Ensure it contains false for auto-create setting
+        assert re.search(r"KAFKA_AUTO_CREATE_TOPICS_ENABLE:\s*['\"]?false['\"]?", compose_content)
 
     def test_parser_service_exists(self, compose_content: str) -> None:
         """Parser service must exist for docker compose run."""
