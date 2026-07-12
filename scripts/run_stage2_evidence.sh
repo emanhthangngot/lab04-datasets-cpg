@@ -42,9 +42,11 @@ bash scripts/init_kafka_topics.sh
 
 # --------------------------------------------------------------------------
 # Step 4: Apply Neo4j constraints
+# NOTE: Neo4j constraints are part of Thanh's scope (task 2.3).
+# Included here for end-to-end runbook completeness with Tri's approval.
 # --------------------------------------------------------------------------
 echo ""
-echo ">>> Step 4: Apply Neo4j constraints"
+echo ">>> Step 4: Apply Neo4j constraints (cross-scope: Thanh task 2.3)"
 docker compose exec -T neo4j cypher-shell -u neo4j -p password \
   < neo4j/constraints.cypher
 echo "Neo4j constraints applied."
@@ -70,9 +72,18 @@ SPARK_PID=$!
 # --------------------------------------------------------------------------
 # Step 7: Run parser in sample mode
 # --------------------------------------------------------------------------
-echo ">>> Step 7: Run parser (sample mode - 5 files)"
+echo ">>> Step 7a: Run parser (sample mode - 5 files)"
 docker compose run --rm parser \
   python -m parser_service.main --repo data/datasets --mode sample
+
+# --------------------------------------------------------------------------
+# Step 7b: Parse intentionally broken file to generate cpg.errors event
+# --------------------------------------------------------------------------
+echo ""
+echo ">>> Step 7b: Parse invalid_syntax.py to generate error event"
+docker compose run --rm parser \
+  python -m parser_service.main --repo data --mode file --file data/invalid_syntax.py \
+  || echo "(Expected: parser emits error event for SyntaxError)"
 
 # --------------------------------------------------------------------------
 # Step 8: Wait for connector to consume all messages
@@ -90,6 +101,9 @@ bash scripts/capture_kafka_evidence.sh
 
 # --------------------------------------------------------------------------
 # Step 10: Capture store verification
+# NOTE: Neo4j counts/duplicate checks are part of Thanh's scope (tasks 2.4-2.5).
+# MongoDB verification is Thanh's scope (task 2.6).
+# Included here for end-to-end runbook completeness with Tri's approval.
 # --------------------------------------------------------------------------
 echo ""
 echo ">>> Step 10: Neo4j store verification"
@@ -151,6 +165,26 @@ echo "  screenshots/kafka/    - topic list, sample messages, connector evidence"
 echo "  screenshots/spark/    - checkpoint, MongoDB metadata check"
 echo "  screenshots/neo4j/    - node/edge/placeholder counts and duplicate checks"
 echo "  screenshots/mongodb/  - metadata count, sample doc, duplicate check"
+echo ""
+# --------------------------------------------------------------------------
+# Step 11: Sanitize credentials from evidence
+# --------------------------------------------------------------------------
+echo ""
+echo ">>> Step 11: Sanitizing credentials from evidence artifacts"
+for dir in screenshots/kafka screenshots/neo4j screenshots/mongodb screenshots/spark; do
+  if [ -d "$dir" ]; then
+    for f in "$dir"/*.json "$dir"/*.txt; do
+      [ -f "$f" ] || continue
+      sed -i \
+        -e 's/"neo4j\.authentication\.basic\.password"[[:space:]]*:[[:space:]]*"[^"]*"/"neo4j.authentication.basic.password": "***REDACTED***"/g' \
+        -e 's/"neo4j\.authentication\.basic\.username"[[:space:]]*:[[:space:]]*"[^"]*"/"neo4j.authentication.basic.username": "***REDACTED***"/g' \
+        -e 's/"password"[[:space:]]*:[[:space:]]*"[^"]*"/"password": "***REDACTED***"/g' \
+        "$f" 2>/dev/null || true
+    done
+  fi
+done
+echo "Credential sanitization complete."
+
 echo ""
 echo "Next steps:"
 echo "  1. Review evidence files"

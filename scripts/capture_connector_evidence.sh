@@ -36,7 +36,7 @@ printf '%s\n' "$PLUGINS_JSON" | "$PYTHON" -m json.tool \
 echo ""
 echo "--- Neo4j connector classes ---"
 printf '%s\n' "$PLUGINS_JSON" | "$PYTHON" -m json.tool | grep -i neo4j \
-  | tee -a "$EVIDENCE_DIR/connector_plugins.json"
+  | tee "$EVIDENCE_DIR/neo4j_connector_classes.txt"
 
 "$PYTHON" -c "
 import json, sys
@@ -55,7 +55,32 @@ for m in matches:
 echo ""
 echo "=== Registering Neo4j sink connector ==="
 bash scripts/register_neo4j_sink.sh 2>&1 \
-  | tee "$EVIDENCE_DIR/connector_registration.json"
+  | tee "$EVIDENCE_DIR/connector_registration.txt"
+
+# Extract only the JSON response from registration output.
+# register_neo4j_sink.sh prints formatted JSON followed by a log line;
+# keep only the valid JSON portion for machine-readable evidence.
+"$PYTHON" -c "
+import json, sys
+lines = open(sys.argv[1]).read()
+# Find the last complete JSON object in the output
+depth = 0
+start = None
+end = None
+for i, ch in enumerate(lines):
+    if ch == '{':
+        if depth == 0:
+            start = i
+        depth += 1
+    elif ch == '}':
+        depth -= 1
+        if depth == 0:
+            end = i + 1
+if start is not None and end is not None:
+    obj = json.loads(lines[start:end])
+    print(json.dumps(obj, indent=4))
+" "$EVIDENCE_DIR/connector_registration.txt" \
+  > "$EVIDENCE_DIR/connector_registration.json"
 
 # --------------------------------------------------------------------------
 # 3. Verify connector status
@@ -68,7 +93,21 @@ curl -fsS "$CONNECT_URL/connectors/$CONNECTOR_NAME/status" \
   | tee "$EVIDENCE_DIR/connector_status.json"
 
 # --------------------------------------------------------------------------
-# 4. Summary
+# 4. Sanitize credentials from evidence artifacts
+# --------------------------------------------------------------------------
+echo ""
+echo "=== Sanitizing credentials from evidence ==="
+for f in "$EVIDENCE_DIR"/*.json "$EVIDENCE_DIR"/*.txt; do
+  [ -f "$f" ] || continue
+  sed -i \
+    -e 's/"neo4j\.authentication\.basic\.password"[[:space:]]*:[[:space:]]*"[^"]*"/"neo4j.authentication.basic.password": "***REDACTED***"/g' \
+    -e 's/"neo4j\.authentication\.basic\.username"[[:space:]]*:[[:space:]]*"[^"]*"/"neo4j.authentication.basic.username": "***REDACTED***"/g' \
+    "$f"
+done
+echo "Credential sanitization complete."
+
+# --------------------------------------------------------------------------
+# 5. Summary
 # --------------------------------------------------------------------------
 echo ""
 echo "=== Connector evidence capture complete ==="

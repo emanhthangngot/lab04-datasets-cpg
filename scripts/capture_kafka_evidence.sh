@@ -97,7 +97,7 @@ else:
 ' "$output_file" "$topic"
   else
     echo "  (no messages available in $topic)"
-    echo "[]" > "$output_file"
+    echo '{"note": "no messages available"}' > "$output_file"
   fi
 }
 
