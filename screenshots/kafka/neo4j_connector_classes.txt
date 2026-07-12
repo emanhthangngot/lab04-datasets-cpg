@@ -1,0 +1,2 @@
+        "class": "org.neo4j.connectors.kafka.sink.Neo4jConnector",
+        "class": "org.neo4j.connectors.kafka.source.Neo4jConnector",
