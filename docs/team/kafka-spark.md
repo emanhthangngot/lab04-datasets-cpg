@@ -121,9 +121,18 @@ Completed in Stage 2:
 |---|---|
 | Kafka sample messages are available for Jupyter Book | ✅ Evidence captured: [screenshots/kafka/](../../screenshots/kafka/) |
 | Connector registration evidence shows correct Neo4j class | ✅ Evidence captured: [connector_plugins.json](../../screenshots/kafka/connector_plugins.json) |
-| Spark reads cpg.metadata and writes metadata path evidence | ✅ Evidence captured: [checkpoint_offsets.txt](../../screenshots/spark/checkpoint_offsets.txt) |
+| Spark reads cpg.metadata and writes metadata path evidence | ⏳ Runbook now fails fast if Spark exits or MongoDB remains empty; runtime recheck required |
 | Progress and evidence links updated in this file | ✅ Updated |
-| All existing tests still pass | ✅ 74 tests passed |
+| All existing tests still pass | ✅ 76 tests passed |
+
+### Latest Runtime Recheck
+
+The local Docker run verified Neo4j ingestion (21,838 nodes, 7,967 edges,
+1,213 placeholders, no duplicate nodes/edges). Spark then exited before creating
+its checkpoint and MongoDB remained at `file_metadata count: 0`. This is now a
+hard failure in `capture_spark_evidence.sh`; resolve it before claiming the
+shared E2E path complete. Do not use generated zero-count artifacts as
+completion evidence; Thanh must recheck Graph Stores after a successful rerun.
 
 ### Baseline Checks (task 1.2)
 
@@ -134,9 +143,9 @@ Completed in Stage 2:
 | Command | Result |
 |---|---|
 | `git status --short` | Clean working tree (all changes committed) |
-| `bash scripts/run_checks.sh` | Pass: pytest 74 tests, Docker Compose syntax valid, JSON connector config valid |
+| `bash scripts/run_checks.sh` | Pass: pytest 76 tests, Docker Compose syntax valid, JSON connector config valid |
 | `docker compose config --quiet` | Pass: no errors |
-| `python -m pytest tests/ -v --override-ini="addopts=" -p no:langsmith` | Pass: 74 tests passed after remediation contracts |
+| `python -m pytest tests/ -v --override-ini="addopts=" -p no:langsmith` | Pass: 76 tests passed after remediation contracts |
 
 ### Scripts Created
 

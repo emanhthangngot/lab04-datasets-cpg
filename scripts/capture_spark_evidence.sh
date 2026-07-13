@@ -57,6 +57,15 @@ echo ""
 echo "=== Waiting ${WAIT_SECONDS}s for Spark to process initial messages ==="
 sleep "$WAIT_SECONDS"
 
+# A detached spark-submit can fail after the exec command itself succeeds.
+# Treat an exited stream as a hard evidence failure instead of publishing
+# empty checkpoint/MongoDB artifacts as if the pipeline had run.
+if ! docker compose exec -T "$SPARK_SERVICE" sh -lc \
+  "pgrep -f 'metadata_stream_to_mongo.py' >/dev/null"; then
+  echo "ERROR: Spark metadata stream is not running after ${WAIT_SECONDS}s" >&2
+  exit 1
+fi
+
 # --------------------------------------------------------------------------
 # 4. Capture checkpoint evidence
 # --------------------------------------------------------------------------
@@ -67,8 +76,8 @@ echo "=== Checkpoint evidence ==="
 echo "--- Checkpoint directory listing ---"
 docker compose exec "$SPARK_SERVICE" ls -laR "$CHECKPOINT_PATH" 2>/dev/null \
   | tee "$EVIDENCE_DIR/checkpoint_listing.txt" || {
-  echo "  (checkpoint directory not yet created - no metadata messages processed)"
-  echo "  (checkpoint directory not yet created)" > "$EVIDENCE_DIR/checkpoint_listing.txt"
+  echo "ERROR: checkpoint directory was not created; no metadata was processed" >&2
+  exit 1
 }
 
 # Show the latest committed offset metadata if available
@@ -92,8 +101,17 @@ docker compose exec -T mongo mongosh --quiet --eval '
   print("sample document:");
   printjson(db.file_metadata.findOne());
 ' 2>/dev/null | tee "$EVIDENCE_DIR/mongodb_metadata_check.txt" || {
-  echo "  (MongoDB check skipped -- mongo service may not be running)"
+  echo "ERROR: MongoDB metadata verification failed" >&2
+  exit 1
 }
+
+MONGO_COUNT="$(docker compose exec -T mongo mongosh --quiet --eval \
+  'db = db.getSiblingDB("cpg"); print(db.file_metadata.countDocuments());' \
+  | tr -d '\r')"
+if ! [[ "$MONGO_COUNT" =~ ^[0-9]+$ ]] || (( MONGO_COUNT == 0 )); then
+  echo "ERROR: MongoDB file_metadata count is ${MONGO_COUNT:-unknown}; expected at least one metadata document" >&2
+  exit 1
+fi
 
 # --------------------------------------------------------------------------
 # 6. Summary

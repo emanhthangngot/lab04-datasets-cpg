@@ -152,7 +152,7 @@ docker compose exec -T mongo mongosh --quiet --eval '
 ' | tee screenshots/mongodb/metadata_evidence.txt
 
 # Wait for the Spark evidence background task
-wait $SPARK_PID 2>/dev/null || true
+wait "$SPARK_PID"
 
 # --------------------------------------------------------------------------
 # Summary

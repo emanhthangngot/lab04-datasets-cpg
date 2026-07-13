@@ -335,3 +335,18 @@ def test_spark_batch_is_persisted_and_released() -> None:
 def test_spark_metadata_test_has_no_unused_ast_assignment() -> None:
     source = (PROJECT_ROOT / "tests" / "test_kafka_spark_stage2.py").read_text()
     assert not re.search(r"^\s*tree = ast\.parse", source, re.MULTILINE)
+
+
+def test_spark_evidence_fails_when_stream_or_metadata_is_missing() -> None:
+    source = (PROJECT_ROOT / "scripts" / "capture_spark_evidence.sh").read_text()
+    assert "metadata_stream_to_mongo.py" in source
+    assert "Spark metadata stream is not running" in source
+    assert "checkpoint directory was not created" in source
+    assert "file_metadata count is" in source
+    assert "MONGO_COUNT" in source
+
+
+def test_runbook_propagates_spark_evidence_failure() -> None:
+    source = (PROJECT_ROOT / "scripts" / "run_stage2_evidence.sh").read_text()
+    assert 'wait "$SPARK_PID"' in source
+    assert "|| true" not in source[source.index("SPARK_PID=$!") : source.index("# --------------------------------------------------------------------------\n# Summary")]
