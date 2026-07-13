@@ -70,6 +70,12 @@ source code, notebooks, screenshots, and meaningful commit history.
 - [ ] Review Neo4j/MongoDB sample evidence.
 - [ ] Ensure sample outputs are captured in notebooks.
 
+### Shared E2E Verification Gate
+
+- Truc may execute the shared end-to-end Neo4j/MongoDB checks from the Kafka/Spark runbook.
+- Thanh rechecks and accepts those Graph Stores outputs against tasks 2.3–2.6.
+- Tri merges only after Thanh records approval or a blocker.
+
 ### Stage 3
 
 - [ ] Review replay strategy and duplicate checks.

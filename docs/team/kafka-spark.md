@@ -123,7 +123,7 @@ Completed in Stage 2:
 | Connector registration evidence shows correct Neo4j class | ✅ Evidence captured: [connector_plugins.json](../../screenshots/kafka/connector_plugins.json) |
 | Spark reads cpg.metadata and writes metadata path evidence | ✅ Evidence captured: [checkpoint_offsets.txt](../../screenshots/spark/checkpoint_offsets.txt) |
 | Progress and evidence links updated in this file | ✅ Updated |
-| All existing tests still pass | ✅ 65 tests passed |
+| All existing tests still pass | ✅ 74 tests passed |
 
 ### Baseline Checks (task 1.2)
 
@@ -134,9 +134,9 @@ Completed in Stage 2:
 | Command | Result |
 |---|---|
 | `git status --short` | Clean working tree (all changes committed) |
-| `bash scripts/run_checks.sh` | Pass: pytest 63 tests, Docker Compose syntax valid, JSON connector config valid |
+| `bash scripts/run_checks.sh` | Pass: pytest 74 tests, Docker Compose syntax valid, JSON connector config valid |
 | `docker compose config --quiet` | Pass: no errors |
-| `python -m pytest tests/ -v --override-ini="addopts=" -p no:langsmith` | Pass: 63 tests passed (24 existing + 39 new) |
+| `python -m pytest tests/ -v --override-ini="addopts=" -p no:langsmith` | Pass: 74 tests passed after remediation contracts |
 
 ### Scripts Created
 
@@ -179,5 +179,6 @@ Completed in Stage 2:
 
 Steps 4 (Neo4j constraints) and 10 (Neo4j/MongoDB store verification) in
 `run_stage2_evidence.sh` overlap with Thanh's scope (tasks 2.3-2.6). They are
-included for end-to-end runbook completeness and require Tri's approval for
-shared ownership. Comments in the runbook mark these as cross-scope.
+included for shared end-to-end runbook completeness. Truc executes the checks;
+Thanh rechecks and accepts the resulting Graph Stores evidence before Tri's
+merge approval. This execution does not transfer Graph Stores ownership.
