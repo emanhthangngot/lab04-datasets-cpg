@@ -85,19 +85,22 @@ with open(output_file) as f:
                 errors.append(f"  Line {i}: missing {field}")
         for field in extra_map_fields:
             val = msg.get(field)
-            if val is not None and not isinstance(val, dict):
+            if not isinstance(val, dict):
                 errors.append(f"  Line {i}: {field} is not a map: {type(val).__name__}")
+        if topic == "cpg.errors" and msg.get("status") != "failed":
+            errors.append(f"  Line {i}: cpg.errors status must be 'failed'")
 
 if errors:
-    print(f"VALIDATION WARNINGS for {topic}:")
+    print(f"VALIDATION FAILED for {topic}:", file=sys.stderr)
     for e in errors:
-        print(e)
+        print(e, file=sys.stderr)
+    sys.exit(1)
 else:
     print(f"VALIDATION OK: all samples from {topic} contain required fields")
 ' "$output_file" "$topic"
   else
-    echo "  (no messages available in $topic)"
-    echo '{"note": "no messages available"}' > "$output_file"
+    echo "No messages available in $topic" >&2
+    return 1
   fi
 }
 

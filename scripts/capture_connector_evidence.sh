@@ -93,18 +93,14 @@ curl -fsS "$CONNECT_URL/connectors/$CONNECTOR_NAME/status" \
   | tee "$EVIDENCE_DIR/connector_status.json"
 
 # --------------------------------------------------------------------------
-# 4. Sanitize credentials from evidence artifacts
+# 4. Sanitize and validate evidence artifacts
 # --------------------------------------------------------------------------
 echo ""
 echo "=== Sanitizing credentials from evidence ==="
-for f in "$EVIDENCE_DIR"/*.json "$EVIDENCE_DIR"/*.txt; do
-  [ -f "$f" ] || continue
-  sed -i \
-    -e 's/"neo4j\.authentication\.basic\.password"[[:space:]]*:[[:space:]]*"[^"]*"/"neo4j.authentication.basic.password": "***REDACTED***"/g' \
-    -e 's/"neo4j\.authentication\.basic\.username"[[:space:]]*:[[:space:]]*"[^"]*"/"neo4j.authentication.basic.username": "***REDACTED***"/g' \
-    "$f"
-done
-echo "Credential sanitization complete."
+bash scripts/sanitize_evidence.sh "$EVIDENCE_DIR"/*.json "$EVIDENCE_DIR"/*.txt
+"$PYTHON" -m json.tool "$EVIDENCE_DIR/connector_plugins.json" >/dev/null
+"$PYTHON" -m json.tool "$EVIDENCE_DIR/connector_registration.json" >/dev/null
+echo "Credential sanitization and JSON validation complete."
 
 # --------------------------------------------------------------------------
 # 5. Summary

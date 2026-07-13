@@ -10,6 +10,7 @@ import signal
 import sys
 
 from pyspark.sql import SparkSession
+from pyspark import StorageLevel
 from pyspark.sql.functions import col, from_json
 from pyspark.sql.types import LongType, StringType, StructType
 
@@ -91,22 +92,26 @@ metadata_df = raw.select(from_json(col("value").cast("string"), schema).alias("d
 def write_batch(batch_df, batch_id):
     """Write each micro-batch with replace/upsert semantics by file_id."""
 
-    row_count = batch_df.count()
-    if row_count == 0:
-        return
+    batch_df = batch_df.persist(StorageLevel.MEMORY_AND_DISK)
+    try:
+        row_count = batch_df.count()
+        if row_count == 0:
+            return
 
-    print(f"[Batch {batch_id}] Writing {row_count} metadata document(s) to MongoDB")
+        print(f"[Batch {batch_id}] Writing {row_count} metadata document(s) to MongoDB")
 
-    (
-        batch_df.write.format("mongodb")
-        .mode("append")
-        .option("spark.mongodb.write.database", MONGO_DATABASE)
-        .option("spark.mongodb.write.collection", MONGO_COLLECTION)
-        .option("spark.mongodb.write.operationType", "replace")
-        .option("spark.mongodb.write.idFieldList", "file_id")
-        .option("spark.mongodb.write.upsertDocument", "true")
-        .save()
-    )
+        (
+            batch_df.write.format("mongodb")
+            .mode("append")
+            .option("spark.mongodb.write.database", MONGO_DATABASE)
+            .option("spark.mongodb.write.collection", MONGO_COLLECTION)
+            .option("spark.mongodb.write.operationType", "replace")
+            .option("spark.mongodb.write.idFieldList", "file_id")
+            .option("spark.mongodb.write.upsertDocument", "true")
+            .save()
+        )
+    finally:
+        batch_df.unpersist()
 
 
 # ---------------------------------------------------------------------------

@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+: "${NEO4J_PASSWORD:?Set NEO4J_PASSWORD before running Stage 2 evidence capture}"
+
 # Unified Stage 2 runbook: end-to-end evidence capture.
 # Owner: 23120180 - Tran Le Trung Truc
 #
@@ -47,11 +49,11 @@ bash scripts/init_kafka_topics.sh
 # --------------------------------------------------------------------------
 echo ""
 echo ">>> Step 4: Apply Neo4j constraints (cross-scope: Thanh task 2.3)"
-docker compose exec -T neo4j cypher-shell -u neo4j -p password \
+docker compose exec -T neo4j cypher-shell -u neo4j -p "$NEO4J_PASSWORD" \
   < neo4j/constraints.cypher
 echo "Neo4j constraints applied."
 
-docker compose exec -T neo4j cypher-shell -u neo4j -p password \
+docker compose exec -T neo4j cypher-shell -u neo4j -p "$NEO4J_PASSWORD" \
   "SHOW CONSTRAINTS;"
 
 # --------------------------------------------------------------------------
@@ -107,20 +109,20 @@ bash scripts/capture_kafka_evidence.sh
 # --------------------------------------------------------------------------
 echo ""
 echo ">>> Step 10: Neo4j store verification"
-docker compose exec -T neo4j cypher-shell -u neo4j -p password \
+docker compose exec -T neo4j cypher-shell -u neo4j -p "$NEO4J_PASSWORD" \
   "MATCH (n:CPGNode) RETURN count(n) AS node_count;" \
   | tee screenshots/neo4j/node_count.txt
 
-docker compose exec -T neo4j cypher-shell -u neo4j -p password \
+docker compose exec -T neo4j cypher-shell -u neo4j -p "$NEO4J_PASSWORD" \
   "MATCH ()-[r:CPG_EDGE]->() RETURN count(r) AS edge_count;" \
   | tee screenshots/neo4j/edge_count.txt
 
-docker compose exec -T neo4j cypher-shell -u neo4j -p password \
+docker compose exec -T neo4j cypher-shell -u neo4j -p "$NEO4J_PASSWORD" \
   "MATCH (n:CPGNode {placeholder: true}) RETURN count(n) AS placeholder_count;" \
   | tee screenshots/neo4j/placeholder_count.txt
 
 echo ">>> Neo4j duplicate node check"
-docker compose exec -T neo4j cypher-shell -u neo4j -p password \
+docker compose exec -T neo4j cypher-shell -u neo4j -p "$NEO4J_PASSWORD" \
   "MATCH (n:CPGNode) WITH n.id AS id, count(*) AS c WHERE c > 1 RETURN id, c;" \
   | tee screenshots/neo4j/duplicate_nodes.txt
 if [ ! -s screenshots/neo4j/duplicate_nodes.txt ]; then
@@ -128,7 +130,7 @@ if [ ! -s screenshots/neo4j/duplicate_nodes.txt ]; then
 fi
 
 echo ">>> Neo4j duplicate edge check"
-docker compose exec -T neo4j cypher-shell -u neo4j -p password \
+docker compose exec -T neo4j cypher-shell -u neo4j -p "$NEO4J_PASSWORD" \
   "MATCH ()-[r:CPG_EDGE]->() WITH r.id AS id, count(*) AS c WHERE c > 1 RETURN id, c;" \
   | tee screenshots/neo4j/duplicate_edges.txt
 if [ ! -s screenshots/neo4j/duplicate_edges.txt ]; then
@@ -167,27 +169,20 @@ echo "  screenshots/neo4j/    - node/edge/placeholder counts and duplicate check
 echo "  screenshots/mongodb/  - metadata count, sample doc, duplicate check"
 echo ""
 # --------------------------------------------------------------------------
-# Step 11: Sanitize credentials from evidence
+# Step 11: Sanitize and validate evidence
 # --------------------------------------------------------------------------
 echo ""
 echo ">>> Step 11: Sanitizing credentials from evidence artifacts"
 for dir in screenshots/kafka screenshots/neo4j screenshots/mongodb screenshots/spark; do
-  if [ -d "$dir" ]; then
-    for f in "$dir"/*.json "$dir"/*.txt; do
-      [ -f "$f" ] || continue
-      sed -i \
-        -e 's/"neo4j\.authentication\.basic\.password"[[:space:]]*:[[:space:]]*"[^"]*"/"neo4j.authentication.basic.password": "***REDACTED***"/g' \
-        -e 's/"neo4j\.authentication\.basic\.username"[[:space:]]*:[[:space:]]*"[^"]*"/"neo4j.authentication.basic.username": "***REDACTED***"/g' \
-        -e 's/"password"[[:space:]]*:[[:space:]]*"[^"]*"/"password": "***REDACTED***"/g' \
-        "$f" 2>/dev/null || true
-    done
-  fi
+  [ -d "$dir" ] || continue
+  bash scripts/sanitize_evidence.sh "$dir"/*.json "$dir"/*.txt
 done
-echo "Credential sanitization complete."
+python3 -m json.tool screenshots/kafka/connector_plugins.json >/dev/null
+python3 -m json.tool screenshots/kafka/connector_registration.json >/dev/null
+echo "Credential sanitization and JSON validation complete."
 
 echo ""
 echo "Next steps:"
 echo "  1. Review evidence files"
-echo "  2. Update docs/team/kafka-spark.md with results"
-echo "  3. Commit and push to feature branch"
-echo "  4. Open PR to dev"
+echo "  2. Ask Thanh to recheck Neo4j/MongoDB evidence"
+echo "  3. Update the Kafka/Spark and Graph Stores trackers"

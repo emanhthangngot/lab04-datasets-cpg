@@ -153,7 +153,7 @@ class TestSparkJobSchema:
         """Spec: Spark consumes only cpg.metadata."""
         assert "cpg.metadata" in spark_source
         # Spark must NOT consume nodes or edges
-        tree = ast.parse(spark_source)
+        ast.parse(spark_source)
         source_text = spark_source
         # Check that cpg.nodes and cpg.edges don't appear in subscribe options
         for line in source_text.splitlines():
@@ -222,6 +222,7 @@ class TestEvidenceScriptsExist:
             "capture_connector_evidence.sh",
             "capture_spark_evidence.sh",
             "run_stage2_evidence.sh",
+            "sanitize_evidence.sh",
         ],
     )
     def test_evidence_script_exists(self, script_name: str) -> None:
@@ -235,6 +236,7 @@ class TestEvidenceScriptsExist:
             "capture_connector_evidence.sh",
             "capture_spark_evidence.sh",
             "run_stage2_evidence.sh",
+            "sanitize_evidence.sh",
         ],
     )
     def test_evidence_script_has_shebang(self, script_name: str) -> None:
@@ -249,6 +251,7 @@ class TestEvidenceScriptsExist:
             "capture_connector_evidence.sh",
             "capture_spark_evidence.sh",
             "run_stage2_evidence.sh",
+            "sanitize_evidence.sh",
         ],
     )
     def test_evidence_script_uses_set_euo(self, script_name: str) -> None:
@@ -292,3 +295,43 @@ class TestDockerCompose:
     def test_parser_service_exists(self, compose_content: str) -> None:
         """Parser service must exist for docker compose run."""
         assert "parser:" in compose_content
+
+
+# -----------------------------------------------------------------------
+# Stage 2 remediation contracts
+# -----------------------------------------------------------------------
+def test_runbook_requires_neo4j_password_without_literal_password() -> None:
+    source = (PROJECT_ROOT / "scripts" / "run_stage2_evidence.sh").read_text()
+    assert "NEO4J_PASSWORD" in source
+    assert "cypher-shell -u neo4j -p password" not in source
+
+
+def test_runbook_keeps_shared_graph_store_checks() -> None:
+    source = (PROJECT_ROOT / "scripts" / "run_stage2_evidence.sh").read_text()
+    for marker in ["node_count", "edge_count", "duplicate_nodes", "duplicate_edges", "file_metadata"]:
+        assert marker in source
+
+
+def test_tracker_has_one_verified_test_count_and_cross_owner_gate() -> None:
+    source = (PROJECT_ROOT / "docs" / "team" / "kafka-spark.md").read_text()
+    assert "65 tests" not in source
+    assert "Final count recorded after remediation tests" in source or "tests passed" in source
+    assert "Thanh" in source and "recheck" in source
+
+
+def test_kafka_capture_has_fail_fast_contract() -> None:
+    source = (PROJECT_ROOT / "scripts" / "capture_kafka_evidence.sh").read_text()
+    assert "sys.exit(1)" in source
+    assert "status" in source and "failed" in source
+    assert "properties" in source
+
+
+def test_spark_batch_is_persisted_and_released() -> None:
+    source = (PROJECT_ROOT / "spark_jobs" / "metadata_stream_to_mongo.py").read_text()
+    assert ".persist(" in source
+    assert ".unpersist(" in source
+
+
+def test_spark_metadata_test_has_no_unused_ast_assignment() -> None:
+    source = (PROJECT_ROOT / "tests" / "test_kafka_spark_stage2.py").read_text()
+    assert not re.search(r"^\s*tree = ast\.parse", source, re.MULTILINE)
