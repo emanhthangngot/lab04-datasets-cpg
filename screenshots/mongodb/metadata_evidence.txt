@@ -1,0 +1,23 @@
+file_metadata count: 5
+--- sample document ---
+{
+  _id: ObjectId('6a54908018db3efb9470fb2d'),
+  schema_version: '1.0',
+  event_time: '2026-07-13T07:16:37.562Z',
+  repo: 'huggingface/datasets',
+  commit_sha: 'unknown',
+  run_id: '61d4d3501d2540fb999fbc0e3831bf49',
+  file_id: '6c39568a6a11c430',
+  file_path: 'src/datasets/__init__.py',
+  file_size: Long('1635'),
+  content_hash: '74ab176247c9ba61e09843280c18cf3a9ac690403a5d35411a75d097db721939',
+  num_ast_nodes: Long('19'),
+  num_cfg_edges: Long('15'),
+  num_dfg_edges: Long('0'),
+  num_call_edges: Long('0'),
+  num_total_edges: Long('15'),
+  parse_duration_ms: Long('2'),
+  status: 'success'
+}
+--- duplicate file_id check ---
+[]

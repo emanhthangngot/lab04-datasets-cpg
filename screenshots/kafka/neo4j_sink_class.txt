@@ -1,0 +1,1 @@
+  Class: org.neo4j.connectors.kafka.sink.Neo4jConnector  Version: 5.1.0

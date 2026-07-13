@@ -58,6 +58,20 @@ Done when:
 - Counts and sample query outputs are ready for book evidence.
 - Duplicate-check query outputs are ready for Stage 2 review.
 
+### Shared E2E Evidence Recheck
+
+Truc's Kafka/Spark runbook may execute the Stage 2 store queries so the whole
+team can reproduce the pipeline. Thanh remains the acceptance owner and must
+recheck the following artifacts before Tri merges Truc's PR:
+
+- `screenshots/neo4j/node_count.txt`, `edge_count.txt`, and `placeholder_count.txt`;
+- `screenshots/neo4j/duplicate_nodes.txt` and `duplicate_edges.txt`;
+- Neo4j constraints output and the Cypher queries that produced it;
+- `screenshots/mongodb/metadata_evidence.txt` and the Spark MongoDB check; and
+- the MongoDB duplicate `file_id` aggregation.
+
+Record either approval or a concrete blocker in this tracker.
+
 Spec input to Tri:
 
 - Any Cypher merge behavior that risks duplicates.

@@ -46,25 +46,27 @@ Spec input to Tri:
 
 Tasks:
 
-- [ ] Capture Kafka topic list evidence.
-- [ ] Capture sample messages from `cpg.nodes`, `cpg.edges`, `cpg.metadata`, and `cpg.errors`.
-- [ ] Verify `/connector-plugins` and record the exact Neo4j sink connector class.
-- [ ] Register or update `cpg-neo4j-sink` only after plugin verification.
-- [ ] Run Spark metadata stream on sample parser output.
-- [ ] Capture Spark checkpoint evidence.
+- [x] Capture Kafka topic list evidence — script `scripts/capture_kafka_evidence.sh` created.
+- [x] Capture sample messages from `cpg.nodes`, `cpg.edges`, `cpg.metadata`, and `cpg.errors` — script validates required fields (`schema_version`, `event_time`, `file_id`, `file_path`) and `properties` as JSON object.
+- [x] Verify `/connector-plugins` and record the exact Neo4j sink connector class — script `scripts/capture_connector_evidence.sh` reads `/connector-plugins` first, then registers connector using live-discovered class.
+- [x] Register or update `cpg-neo4j-sink` only after plugin verification — `scripts/register_neo4j_sink.sh` uses PUT idempotent registration with class from plugin discovery.
+- [x] Run Spark metadata stream on sample parser output — `spark_jobs/metadata_stream_to_mongo.py` updated with trigger config, logging, and graceful shutdown.
+- [x] Capture Spark checkpoint evidence — script `scripts/capture_spark_evidence.sh` captures checkpoint listing, committed offsets, and MongoDB cross-check.
 
 Done when:
 
-- Kafka sample messages are available for the Jupyter Book.
+- Kafka sample messages are available for the Jupyter Book. — ✅ Evidence: [sample_cpg_nodes.json](../../screenshots/kafka/sample_cpg_nodes.json), [sample_cpg_edges.json](../../screenshots/kafka/sample_cpg_edges.json), [sample_cpg_metadata.json](../../screenshots/kafka/sample_cpg_metadata.json), [sample_cpg_errors.json](../../screenshots/kafka/sample_cpg_errors.json).
 - Connector registration evidence shows the same Neo4j sink class reported by
-  Kafka Connect.
-- Spark can read `cpg.metadata` from Kafka and write metadata path evidence.
-- Progress and evidence links are updated in this file.
+  Kafka Connect. — ✅ Evidence: [connector_plugins.json](../../screenshots/kafka/connector_plugins.json), [connector_status.json](../../screenshots/kafka/connector_status.json).
+- Spark can read `cpg.metadata` from Kafka and write metadata path evidence. — ✅ Evidence: [checkpoint_listing.txt](../../screenshots/spark/checkpoint_listing.txt), [checkpoint_offsets.txt](../../screenshots/spark/checkpoint_offsets.txt), [mongodb_metadata_check.txt](../../screenshots/spark/mongodb_metadata_check.txt).
+- Progress and evidence links are updated in this file. — ✅ Updated.
 
 Spec input to Tri:
 
-- Sample message fields that differ from expected schema.
-- Spark failure modes or checkpoint behavior.
+- Sample message fields match expected schema v1.0.
+- Spark job now uses `processingTime="10 seconds"` trigger and logs batch counts.
+- Graceful SIGTERM handling added for clean Docker stop.
+- 39 new unit tests pass covering connector config, Spark schema, topic init, evidence scripts, and Compose config.
 
 ## Stage 3: Replay And Evidence Hardening
 
@@ -99,86 +101,92 @@ Done when:
 
 ## Latest Update
 
-Status: Stage 1 Foundation Verification Complete.
+Status: Stage 2 implementation and shared E2E verification complete; Thanh acceptance pending.
 
-Date: 2026-07-06
+Date: 2026-07-13
 
-Completed in Stage 1:
+Completed in Stage 2:
 
-- [x] Verified Kafka broker starts and is healthy under Docker Compose.
-- [x] Resolved CRLF line endings on scripts, and verified `scripts/init_kafka_topics.sh` successfully creates topics `cpg.nodes`, `cpg.edges`, `cpg.metadata`, `cpg.errors` inside the broker.
-- [x] Verified Kafka Connect starts successfully and exposes `org.neo4j.connectors.kafka.sink.Neo4jConnector` (version 5.1.0).
-- [x] Documented Spark Structured Streaming submit command syntax and package dependencies.
-- [x] Recorded runtime blockers regarding Spark image availability.
+- [x] Created `scripts/capture_kafka_evidence.sh` — captures topic list, topic details, and sample messages from all 4 topics with field validation.
+- [x] Created `scripts/capture_connector_evidence.sh` — captures plugin list, registers connector using live plugin discovery, verifies connector status.
+- [x] Created `scripts/capture_spark_evidence.sh` — records Spark version, starts metadata stream job (detached), captures checkpoint evidence and MongoDB cross-check.
+- [x] Created `scripts/run_stage2_evidence.sh` — unified runbook orchestrating all Stage 2 steps end-to-end.
+- [x] Updated `spark_jobs/metadata_stream_to_mongo.py` — added configuration constants, startup logging, batch count logging, `processingTime` trigger, and SIGTERM graceful shutdown.
+- [x] Created `tests/test_kafka_spark_stage2.py` — 39 new unit tests verifying connector config, Spark schema, topic init script, evidence scripts, and Docker Compose config.
+- [x] Created `data/invalid_syntax.py` — intentional SyntaxError file for generating `cpg.errors` evidence events.
 
-Commands run & Verification:
-
-| Command | Result |
-|---|---|
-| `git status --short` | Pass: clean working tree on `feature/truc/kafka-spark-stage1` |
-| `python -m pytest -q --override-ini="addopts=" -p no:langsmith` | Pass: 17 tests passed |
-| `docker compose up -d broker neo4j mongo connect` | Pass: containers started and are healthy |
-| `bash scripts/init_kafka_topics.sh` | Pass: successfully created all four topics inside broker |
-| `docker compose exec broker kafka-topics --bootstrap-server broker:9092 --list` | Pass: returned `cpg.edges`, `cpg.errors`, `cpg.metadata`, `cpg.nodes` |
-| `bash scripts/check_connect_plugins.sh` | Pass: verified Neo4j sink connector class `org.neo4j.connectors.kafka.sink.Neo4jConnector` (5.1.0) |
-
-### Spark Command Syntax & Package Requirements
-The Structured Streaming metadata ingestion job will be submitted using:
-```bash
-docker compose exec spark spark-submit \
-  --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,org.mongodb.spark:mongo-spark-connector_2.12:10.3.0 \
-  /app/spark_jobs/metadata_stream_to_mongo.py
-```
-- **Spark Kafka integration**: `org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0` (matching Spark 3.5.0 and Scala 2.12).
-- **MongoDB connector**: `org.mongodb.spark:mongo-spark-connector_2.12:10.3.0` (matching Spark 3.5.0 and Scala 2.12).
-- **Upsert policy**: Uses `replace` operation on `file_id` (not `_id`) to ensure replay updates existing metadata rather than duplicating.
-- **Checkpointing**: Checkpoint path is `/mnt/checkpoints/cpg_metadata` to guarantee replay durability.
-
-Blockers recorded:
-
-### Blocker 1: Spark Docker Image Missing (Resolved locally)
-
-Per Blocker Policy ([workplan.md](workplan.md)):
-
-- **Command run:**
-  ```bash
-  docker compose pull spark
-  ```
-- **Error output:**
-  ```text
-  Image bitnami/spark:3.5.0 Pulling
-  Image bitnami/spark:3.5.0 Error
-  failed to resolve reference "docker.io/bitnami/spark:3.5.0":
-  docker.io/bitnami/spark:3.5.0: not found
-  ```
-- **Files affected:** `docker-compose.yml` line 94 (`image: bitnami/spark:3.5.0`).
-- **What was tried:**
-  1. `docker compose pull spark` — fails because `bitnami/spark:3.5.0` no longer exists on Docker Hub.
-  2. Verified `docker.io/bitnamilegacy/spark:3.5.0` exists on Docker Hub (manifest confirmed).
-  3. Verified `apache/spark:3.5.0` exists on Docker Hub (manifest confirmed).
-- **Decision:** Stage 2 uses `docker.io/bitnamilegacy/spark:3.5.0`, the
-  closest drop-in replacement for the existing Bitnami layout.
-- **Follow-up fix:** The legacy image rejects `SPARK_MODE=client`, so Compose now
-  uses `SPARK_MODE=master`.
-- **Local verification:** `docker compose up -d spark` succeeded and
-  `docker compose exec spark spark-submit --version` returned Spark `3.5.0`.
-
-### Blocker 2: CRLF Line Endings (Resolved locally)
-
-- **Command run:** `bash scripts/init_kafka_topics.sh` on Windows-cloned repo.
-- **Error output:** `set: pipefail: invalid option name` (due to CRLF line endings).
-- **Files affected:** All `scripts/*.sh` files (local working copies only).
-- **What was tried:** Converted all `scripts/*.sh` to LF line endings locally.
-- **Resolution:** Scripts already stored as LF in Git index (`git ls-files --eol` confirmed `i/lf`). The CRLF conversion is caused by `core.autocrlf=true` on Windows. No commit needed — local-only fix.
-
-### Stage 1 "Done when" Criteria Status
+### Stage 2 "Done when" Criteria Status
 
 | Criterion | Status |
 |---|---|
-| `scripts/init_kafka_topics.sh` can create all required topics | ✅ Verified |
-| `scripts/check_connect_plugins.sh` proves Neo4j connector available | ✅ Verified |
-| Spark command syntax and package requirements documented | ✅ Documented (see above) |
-| Spark Docker runtime functional | ⚠️ Blocked (awaiting Tri's image decision) |
+| Kafka sample messages are available for Jupyter Book | ✅ Evidence captured: [screenshots/kafka/](../../screenshots/kafka/) |
+| Connector registration evidence shows correct Neo4j class | ✅ Evidence captured: [connector_plugins.json](../../screenshots/kafka/connector_plugins.json) |
+| Spark reads cpg.metadata and writes metadata path evidence | ✅ Checkpoint offset committed and MongoDB contains 5 metadata documents |
+| Progress and evidence links updated in this file | ✅ Updated |
+| All existing tests still pass | ✅ 82 tests passed |
 
-Next action: Run the metadata streaming job with real parser output, then
-capture topic, connector, Spark stream, and checkpoint evidence.
+### Latest Runtime Recheck
+
+The full Docker run verified Kafka sample contracts, a RUNNING Neo4j connector,
+Neo4j ingestion (21,838 nodes, 7,967 edges, 1,213 placeholders, no duplicate
+nodes/edges), a committed Spark checkpoint offset, and 5 MongoDB metadata
+documents with no duplicate `file_id`. Truc's Stage 2 runtime path is verified;
+Thanh must still recheck and accept the Graph Stores evidence before merge.
+
+### Baseline Checks (task 1.2)
+
+> **Note**: `git status --short`, `bash scripts/run_checks.sh`, and
+> `docker compose config` were not captured before initial editing (missed step).
+> They have been re-run below to verify current state passes all checks.
+
+| Command | Result |
+|---|---|
+| `git status --short` | Clean working tree (all changes committed) |
+| `bash scripts/run_checks.sh` | Pass: pytest 82 tests, Docker Compose syntax valid, JSON connector config valid |
+| `docker compose config --quiet` | Pass: no errors |
+| `python -m pytest tests/ -v --override-ini="addopts=" -p no:langsmith` | Pass: 82 tests passed after remediation contracts |
+
+### Scripts Created
+
+| Script | Purpose |
+|---|---|
+| [capture_kafka_evidence.sh](../../scripts/capture_kafka_evidence.sh) | Capture Kafka topic list and sample messages for evidence |
+| [capture_connector_evidence.sh](../../scripts/capture_connector_evidence.sh) | Verify connector plugin and capture registration evidence |
+| [capture_spark_evidence.sh](../../scripts/capture_spark_evidence.sh) | Start Spark job and capture checkpoint evidence |
+| [run_stage2_evidence.sh](../../scripts/run_stage2_evidence.sh) | Unified end-to-end Stage 2 evidence capture runbook |
+
+### Spark Job Improvements
+
+| Change | Rationale |
+|---|---|
+| Configuration constants extracted | Avoid hardcoded values, easier to audit against spec |
+| `processingTime="10 seconds"` trigger | Prevent rapid empty micro-batches |
+| Startup logging with config summary | Observable runtime for evidence capture |
+| Batch count logging in `write_batch` | Shows number of documents written per micro-batch |
+| SIGTERM + KeyboardInterrupt handling | Clean shutdown inside Docker (docker stop) |
+
+### Evidence Artifacts
+
+| Artifact | Location |
+|---|---|
+| Kafka topic list | [topic_list.txt](../../screenshots/kafka/topic_list.txt) |
+| Kafka topic details | [topic_details.txt](../../screenshots/kafka/topic_details.txt) |
+| Sample cpg.nodes | [sample_cpg_nodes.json](../../screenshots/kafka/sample_cpg_nodes.json) |
+| Sample cpg.edges | [sample_cpg_edges.json](../../screenshots/kafka/sample_cpg_edges.json) |
+| Sample cpg.metadata | [sample_cpg_metadata.json](../../screenshots/kafka/sample_cpg_metadata.json) |
+| Sample cpg.errors | [sample_cpg_errors.json](../../screenshots/kafka/sample_cpg_errors.json) |
+| Connector plugins | [connector_plugins.json](../../screenshots/kafka/connector_plugins.json) |
+| Connector status | [connector_status.json](../../screenshots/kafka/connector_status.json) |
+| Neo4j sink class | [neo4j_sink_class.txt](../../screenshots/kafka/neo4j_sink_class.txt) |
+| Spark version | [spark_version.txt](../../screenshots/spark/spark_version.txt) |
+| Spark checkpoint listing | [checkpoint_listing.txt](../../screenshots/spark/checkpoint_listing.txt) |
+| Spark committed offsets | [checkpoint_offsets.txt](../../screenshots/spark/checkpoint_offsets.txt) |
+| MongoDB metadata check | [mongodb_metadata_check.txt](../../screenshots/spark/mongodb_metadata_check.txt) |
+
+### Scope Note
+
+Steps 4 (Neo4j constraints) and 10 (Neo4j/MongoDB store verification) in
+`run_stage2_evidence.sh` overlap with Thanh's scope (tasks 2.3-2.6). They are
+included for shared end-to-end runbook completeness. Truc executes the checks;
+Thanh rechecks and accepts the resulting Graph Stores evidence before Tri's
+merge approval. This execution does not transfer Graph Stores ownership.
