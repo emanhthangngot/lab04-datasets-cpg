@@ -286,6 +286,14 @@ class TestDockerCompose:
         assert "spark-checkpoints" in compose_content
         assert "/mnt/checkpoints" in compose_content
 
+    def test_spark_checkpoint_volume_is_initialized_for_non_root_user(
+        self, compose_content: str
+    ) -> None:
+        """Spark UID 1001 must be able to create its checkpoint directory."""
+        assert "spark-checkpoint-init:" in compose_content
+        assert "chown -R 1001:0 /mnt/checkpoints" in compose_content
+        assert "service_completed_successfully" in compose_content
+
     def test_kafka_auto_create_disabled(self, compose_content: str) -> None:
         """Spec: do not rely on auto-create topics."""
         assert "KAFKA_AUTO_CREATE_TOPICS_ENABLE" in compose_content
@@ -350,3 +358,42 @@ def test_runbook_propagates_spark_evidence_failure() -> None:
     source = (PROJECT_ROOT / "scripts" / "run_stage2_evidence.sh").read_text()
     assert 'wait "$SPARK_PID"' in source
     assert "|| true" not in source[source.index("SPARK_PID=$!") : source.index("# --------------------------------------------------------------------------\n# Summary")]
+
+
+def test_connector_template_does_not_commit_neo4j_password() -> None:
+    connector = json.loads(
+        (PROJECT_ROOT / "neo4j" / "sink_connector.json").read_text(encoding="utf-8")
+    )
+    assert "neo4j.authentication.basic.password" not in connector["config"]
+
+
+def test_registration_injects_neo4j_password_from_environment() -> None:
+    source = (PROJECT_ROOT / "scripts" / "register_neo4j_sink.sh").read_text()
+    assert "NEO4J_PASSWORD:?" in source
+    assert 'os.environ["NEO4J_PASSWORD"]' in source
+    assert 'config["neo4j.authentication.basic.password"]' in source
+
+
+def test_spark_evidence_requires_committed_checkpoint_offset() -> None:
+    source = (PROJECT_ROOT / "scripts" / "capture_spark_evidence.sh").read_text()
+    offsets_block = source[
+        source.index('echo "--- Committed offsets ---"') : source.index(
+            "# --------------------------------------------------------------------------\n# 5."
+        )
+    ]
+    assert "exit 1" in offsets_block
+    assert "no committed offsets yet" not in offsets_block
+
+
+def test_spark_evidence_captures_latest_committed_checkpoint_offset() -> None:
+    source = (PROJECT_ROOT / "scripts" / "capture_spark_evidence.sh").read_text()
+    assert 'LATEST_OFFSET' in source
+    assert 'sort -n' in source
+    assert 'cat "$CHECKPOINT_PATH/offsets/$LATEST_OFFSET"' in source
+    assert 'cat "$CHECKPOINT_PATH/offsets/0"' not in source
+
+
+def test_tracker_keeps_graph_store_acceptance_pending_after_runtime_passes() -> None:
+    source = (PROJECT_ROOT / "docs" / "team" / "kafka-spark.md").read_text()
+    assert "Status: Stage 2 complete." not in source
+    assert "Thanh acceptance pending" in source

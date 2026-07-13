@@ -83,11 +83,20 @@ docker compose exec "$SPARK_SERVICE" ls -laR "$CHECKPOINT_PATH" 2>/dev/null \
 # Show the latest committed offset metadata if available
 echo ""
 echo "--- Committed offsets ---"
+LATEST_OFFSET="$(
+  docker compose exec -T "$SPARK_SERVICE" sh -lc \
+    "ls -1 '$CHECKPOINT_PATH/offsets' 2>/dev/null | grep -E '^[0-9]+$' | sort -n | tail -1" \
+    | tr -d '\r'
+)"
+if ! [[ "$LATEST_OFFSET" =~ ^[0-9]+$ ]]; then
+  echo "ERROR: no committed Spark checkpoint offset was found" >&2
+  exit 1
+fi
 docker compose exec "$SPARK_SERVICE" \
-  cat "$CHECKPOINT_PATH/offsets/0" 2>/dev/null \
+  cat "$CHECKPOINT_PATH/offsets/$LATEST_OFFSET" 2>/dev/null \
   | tee "$EVIDENCE_DIR/checkpoint_offsets.txt" || {
-  echo "  (no committed offsets yet)"
-  echo "  (no committed offsets yet)" > "$EVIDENCE_DIR/checkpoint_offsets.txt"
+  echo "ERROR: failed to read Spark checkpoint offset $LATEST_OFFSET" >&2
+  exit 1
 }
 
 # --------------------------------------------------------------------------
