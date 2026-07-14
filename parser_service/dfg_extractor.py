@@ -5,7 +5,7 @@ from __future__ import annotations
 import ast
 from typing import Iterable
 
-from .ids import get_scope_path, make_edge_id, make_node_id
+from .ids import assign_parents, get_scope_path, make_edge_id, make_node_id
 from .schemas import build_edge_event
 
 
@@ -121,6 +121,8 @@ def _traverse_dfg(
 
 def extract_dfg_edges_gen(*, tree: ast.AST, file_id: str, file_path: str, context) -> Iterable[dict]:
     """Yield intra-scope DFG_DEF_USE edges from assignments to later name loads."""
+
+    assign_parents(tree)
 
     for statements in _statement_scopes(tree):
         latest_defs: dict[str, str] = {}

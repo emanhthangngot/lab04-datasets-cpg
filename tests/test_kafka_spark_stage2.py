@@ -397,3 +397,18 @@ def test_tracker_keeps_graph_store_acceptance_pending_after_runtime_passes() -> 
     source = (PROJECT_ROOT / "docs" / "team" / "kafka-spark.md").read_text()
     assert "Status: Stage 2 complete." not in source
     assert "Thanh acceptance pending" in source
+
+
+def test_stage2_runbook_locks_parser_repository_identity() -> None:
+    source = (PROJECT_ROOT / "scripts" / "run_stage2_evidence.sh").read_text()
+    assert 'EXPECTED_REPO_NAME="huggingface/datasets"' in source
+    assert 'REPO_NAME="$EXPECTED_REPO_NAME"' in source
+    assert "printenv REPO_NAME" in source
+
+
+def test_spark_evidence_requires_commit_and_kafka_catchup() -> None:
+    source = (PROJECT_ROOT / "scripts" / "capture_spark_evidence.sh").read_text()
+    assert "$CHECKPOINT_PATH/commits" in source
+    assert "checkpoint_commits.txt" in source
+    assert "KAFKA_END_OFFSET" in source
+    assert 'CHECKPOINT_KAFKA_OFFSET" = "$KAFKA_END_OFFSET' in source

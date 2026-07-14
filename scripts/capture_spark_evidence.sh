@@ -16,6 +16,7 @@ SPARK_SERVICE="${SPARK_SERVICE:-spark}"
 EVIDENCE_DIR="screenshots/spark"
 CHECKPOINT_PATH="/mnt/checkpoints/cpg_metadata"
 WAIT_SECONDS="${SPARK_WAIT_SECONDS:-30}"
+COMMIT_WAIT_SECONDS="${SPARK_COMMIT_WAIT_SECONDS:-60}"
 
 if [[ -x ".venv/Scripts/python.exe" ]]; then
   PYTHON=".venv/Scripts/python.exe"
@@ -80,22 +81,73 @@ docker compose exec "$SPARK_SERVICE" ls -laR "$CHECKPOINT_PATH" 2>/dev/null \
   exit 1
 }
 
-# Show the latest committed offset metadata if available
+# Wait until Spark records both an offset and a completed batch commit, and
+# require the metadata source offset to catch up with Kafka.
+echo ""
+echo "--- Waiting for committed metadata offset ---"
+DEADLINE=$((SECONDS + COMMIT_WAIT_SECONDS))
+while true; do
+  LATEST_OFFSET="$(
+    docker compose exec -T "$SPARK_SERVICE" sh -lc \
+      "ls -1 '$CHECKPOINT_PATH/offsets' 2>/dev/null | grep -E '^[0-9]+$' | sort -n | tail -1" \
+      | tr -d '\r'
+  )"
+  LATEST_COMMIT="$(
+    docker compose exec -T "$SPARK_SERVICE" sh -lc \
+      "ls -1 '$CHECKPOINT_PATH/commits' 2>/dev/null | grep -E '^[0-9]+$' | sort -n | tail -1" \
+      | tr -d '\r'
+  )"
+
+  if [[ "$LATEST_OFFSET" =~ ^[0-9]+$ ]] && [[ "$LATEST_COMMIT" =~ ^[0-9]+$ ]]; then
+    CHECKPOINT_KAFKA_OFFSET="$(
+      docker compose exec -T "$SPARK_SERVICE" \
+        cat "$CHECKPOINT_PATH/offsets/$LATEST_OFFSET" 2>/dev/null \
+        | "$PYTHON" -c '
+import json
+import sys
+
+lines = [line.strip() for line in sys.stdin if line.strip()]
+payload = json.loads(lines[-1])
+print(sum(int(value) for value in payload.get("cpg.metadata", {}).values()))
+' \
+        | tr -d '\r'
+    )"
+    KAFKA_END_OFFSET="$(
+      docker compose exec -T broker kafka-run-class kafka.tools.GetOffsetShell \
+        --broker-list broker:9092 --topic cpg.metadata --time -1 \
+        | awk -F: '{sum += $3} END {print sum+0}' \
+        | tr -d '\r'
+    )"
+    if [ "$CHECKPOINT_KAFKA_OFFSET" = "$KAFKA_END_OFFSET" ]; then
+      break
+    fi
+  fi
+
+  if (( SECONDS >= DEADLINE )); then
+    echo "ERROR: Spark did not commit and catch up with cpg.metadata within ${COMMIT_WAIT_SECONDS}s" >&2
+    echo "latest offset=${LATEST_OFFSET:-missing}, latest commit=${LATEST_COMMIT:-missing}, checkpoint Kafka offset=${CHECKPOINT_KAFKA_OFFSET:-missing}, Kafka end offset=${KAFKA_END_OFFSET:-missing}" >&2
+    exit 1
+  fi
+  sleep 2
+done
+
+echo "Spark checkpoint caught up at Kafka offset $CHECKPOINT_KAFKA_OFFSET (batch commit $LATEST_COMMIT)."
+
 echo ""
 echo "--- Committed offsets ---"
-LATEST_OFFSET="$(
-  docker compose exec -T "$SPARK_SERVICE" sh -lc \
-    "ls -1 '$CHECKPOINT_PATH/offsets' 2>/dev/null | grep -E '^[0-9]+$' | sort -n | tail -1" \
-    | tr -d '\r'
-)"
-if ! [[ "$LATEST_OFFSET" =~ ^[0-9]+$ ]]; then
-  echo "ERROR: no committed Spark checkpoint offset was found" >&2
-  exit 1
-fi
 docker compose exec "$SPARK_SERVICE" \
   cat "$CHECKPOINT_PATH/offsets/$LATEST_OFFSET" 2>/dev/null \
   | tee "$EVIDENCE_DIR/checkpoint_offsets.txt" || {
   echo "ERROR: failed to read Spark checkpoint offset $LATEST_OFFSET" >&2
+  exit 1
+}
+
+echo ""
+echo "--- Completed batch commit ---"
+docker compose exec "$SPARK_SERVICE" \
+  cat "$CHECKPOINT_PATH/commits/$LATEST_COMMIT" 2>/dev/null \
+  | tee "$EVIDENCE_DIR/checkpoint_commits.txt" || {
+  echo "ERROR: failed to read Spark batch commit $LATEST_COMMIT" >&2
   exit 1
 }
 

@@ -2,6 +2,7 @@
 set -euo pipefail
 
 : "${NEO4J_PASSWORD:?Set NEO4J_PASSWORD before running Stage 2 evidence capture}"
+EXPECTED_REPO_NAME="huggingface/datasets"
 
 # Unified Stage 2 runbook: end-to-end evidence capture.
 # Owner: 23120180 - Tran Le Trung Truc
@@ -34,6 +35,16 @@ docker compose ps
 echo ""
 echo ">>> Step 2: Clone repository"
 bash scripts/clone_repo.sh
+
+echo ">>> Verifying parser repository identity"
+ACTUAL_REPO_NAME="$(
+  docker compose run --rm parser printenv REPO_NAME | tr -d '\r'
+)"
+if [ "$ACTUAL_REPO_NAME" != "$EXPECTED_REPO_NAME" ]; then
+  echo "ERROR: parser REPO_NAME must be $EXPECTED_REPO_NAME, got $ACTUAL_REPO_NAME" >&2
+  exit 1
+fi
+echo "Parser repository identity verified: $ACTUAL_REPO_NAME"
 
 # --------------------------------------------------------------------------
 # Step 3: Create Kafka topics explicitly
@@ -75,7 +86,7 @@ SPARK_PID=$!
 # Step 7: Run parser in sample mode
 # --------------------------------------------------------------------------
 echo ">>> Step 7a: Run parser (sample mode - 5 files)"
-docker compose run --rm parser \
+docker compose run --rm -e REPO_NAME="$EXPECTED_REPO_NAME" parser \
   python -m parser_service.main --repo data/datasets --mode sample
 
 # --------------------------------------------------------------------------
@@ -83,7 +94,7 @@ docker compose run --rm parser \
 # --------------------------------------------------------------------------
 echo ""
 echo ">>> Step 7b: Parse invalid_syntax.py to generate error event"
-docker compose run --rm parser \
+docker compose run --rm -e REPO_NAME="$EXPECTED_REPO_NAME" parser \
   python -m parser_service.main --repo data --mode file --file data/invalid_syntax.py \
   || echo "(Expected: parser emits error event for SyntaxError)"
 
