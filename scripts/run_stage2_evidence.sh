@@ -4,6 +4,14 @@ set -euo pipefail
 : "${NEO4J_PASSWORD:?Set NEO4J_PASSWORD before running Stage 2 evidence capture}"
 EXPECTED_REPO_NAME="huggingface/datasets"
 
+if [[ -x ".venv/Scripts/python.exe" ]]; then
+  PYTHON=".venv/Scripts/python.exe"
+elif command -v python3 >/dev/null 2>&1; then
+  PYTHON="python3"
+else
+  PYTHON="python"
+fi
+
 # Unified Stage 2 runbook: end-to-end evidence capture.
 # Owner: 23120180 - Tran Le Trung Truc
 #
@@ -188,8 +196,8 @@ for dir in screenshots/kafka screenshots/neo4j screenshots/mongodb screenshots/s
   [ -d "$dir" ] || continue
   bash scripts/sanitize_evidence.sh "$dir"/*.json "$dir"/*.txt
 done
-python3 -m json.tool screenshots/kafka/connector_plugins.json >/dev/null
-python3 -m json.tool screenshots/kafka/connector_registration.json >/dev/null
+"$PYTHON" -m json.tool screenshots/kafka/connector_plugins.json >/dev/null
+"$PYTHON" -m json.tool screenshots/kafka/connector_registration.json >/dev/null
 echo "Credential sanitization and JSON validation complete."
 
 echo ""
