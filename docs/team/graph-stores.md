@@ -110,7 +110,7 @@ Done when:
 
 ## Stage 2 Acceptance Update (2026-07-14)
 
-Status: Stage 2 graph-store ingestion and replay acceptance passed locally.
+Status: Stage 2 graph-store clean-run acceptance passed locally; replay remains a separate follow-up.
 
 The earlier Stage 2 evidence is superseded. The old Docker state contained both
 `local-sample/datasets` and `huggingface/datasets`, and the old runbook also
@@ -118,8 +118,8 @@ started the one-shot parser during `docker compose up` before invoking it again
 explicitly. Those two conditions explained the mixed namespace and near-double
 counts; they were not separate remote databases.
 
-Clean-run acceptance after resetting only the local `lab04-datasets-cpg`
-volumes:
+Clean-run acceptance after `RESET_DOCKER_STATE=1` reset the local
+`lab04-datasets-cpg` containers, topics, volumes, and Spark checkpoint:
 
 - Kafka emitted 21,415 node events with 21,415 unique IDs and 7,968 edge events
   with 7,968 unique IDs. Every consumed graph event used
@@ -131,14 +131,9 @@ volumes:
 - Spark clean-run checkpoint reached Kafka metadata offset 5 with numeric batch
   commit 0.
 
-Replay acceptance used a new `run_id` for the same five files. Kafka then held
-42,830 node events/21,415 unique node IDs and 15,936 edge events/7,968 unique
-edge IDs. Neo4j counts remained unchanged, MongoDB remained at 5 documents,
-and Spark caught up to metadata offset 10 with numeric batch commit 2 (an
-intermediate empty micro-batch produced commit 1).
-
-Validation: 94 Python tests passed, Docker Compose config parsed, connector JSON
-parsed, all shell scripts passed `bash -n`, and `scripts/run_checks.sh` passed.
+Validation: 96 Python tests passed, Docker Compose config parsed, connector
+JSON parsed, all shell scripts passed `bash -n`, and
+`scripts/run_checks.sh` passed.
 
 Evidence:
 
@@ -146,15 +141,13 @@ Evidence:
   `edge_count.txt`, `placeholder_count.txt`, `duplicate_nodes.txt`, and
   `duplicate_edges.txt`;
 - `screenshots/mongodb/metadata_evidence.txt`;
-- `screenshots/spark/checkpoint_offsets_clean_run.txt` and
-  `checkpoint_commits_clean_run.txt` for the clean batch;
 - `screenshots/spark/checkpoint_offsets.txt` and `checkpoint_commits.txt` for
-  replay; and
+  the single clean batch; and
 - `screenshots/kafka/sample_cpg_nodes.json`, `sample_cpg_edges.json`,
   `sample_cpg_metadata.json`, and `sample_cpg_errors.json`.
 
 Remaining Stage 3 work: verify stale cleanup behavior across changing file
-contents and `run_id`; idempotent replay for unchanged files is complete.
+contents and `run_id`, then run a separately documented replay if required.
 
 ## Previous Update
 

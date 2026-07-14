@@ -2,6 +2,13 @@
 set -euo pipefail
 
 : "${NEO4J_PASSWORD:?Set NEO4J_PASSWORD before running Stage 2 evidence capture}"
+: "${RESET_DOCKER_STATE:?Set RESET_DOCKER_STATE=1 before starting Stage 2}"
+if [ "$RESET_DOCKER_STATE" != "1" ]; then
+  echo "ERROR: RESET_DOCKER_STATE must be exactly 1 for a clean Stage 2 run" >&2
+  exit 1
+fi
+COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-lab04-datasets-cpg}"
+export COMPOSE_PROJECT_NAME
 EXPECTED_REPO_NAME="huggingface/datasets"
 CONNECT_URL="${CONNECT_URL:-http://localhost:8083}"
 CONNECT_WAIT_SECONDS="${CONNECT_WAIT_SECONDS:-120}"
@@ -27,6 +34,9 @@ echo "============================================================"
 echo " Lab04 Stage 2: Core Streaming Path - Full Evidence Capture"
 echo "============================================================"
 echo ""
+
+echo ">>> Resetting local Docker state for a clean Stage 2 run"
+docker compose down -v --remove-orphans
 
 # --------------------------------------------------------------------------
 # Step 1: Start infrastructure

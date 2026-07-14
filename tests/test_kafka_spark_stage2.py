@@ -72,7 +72,7 @@ class TestSinkConnectorConfig:
         """Neo4j Kafka Connector 5.1.0 has a bug with JsonConverter + schemas.enable=false:
         it treats schemaless JSON payloads as tombstone (null), resulting in 0 nodes/edges.
         StringConverter bypasses this — the connector auto-parses JSON strings into Maps
-        for __value, which works correctly (verified: 21,838 nodes, 7,967 edges)."""
+        for __value, which works correctly (verified: 22,628 nodes, 7,968 edges)."""
         expected = "org.apache.kafka.connect.storage.StringConverter"
         actual = config["config"].get("value.converter", "")
         assert actual == expected, (
@@ -417,6 +417,20 @@ def test_stage2_runbook_waits_for_connect_api() -> None:
     assert "CONNECT_WAIT_SECONDS" in source
     assert 'curl -fsS "$CONNECT_URL/connector-plugins"' in source
     assert "Kafka Connect API is ready" in source
+
+
+def test_stage2_runbook_requires_clean_docker_reset() -> None:
+    source = (PROJECT_ROOT / "scripts" / "run_stage2_evidence.sh").read_text()
+    assert "Set RESET_DOCKER_STATE=1" in source
+    assert 'COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-lab04-datasets-cpg}"' in source
+    assert "docker compose down -v --remove-orphans" in source
+    assert "before starting Stage 2" in source
+
+
+def test_run_checks_prefers_python_with_pytest() -> None:
+    source = (PROJECT_ROOT / "scripts" / "run_checks.sh").read_text()
+    assert '".venv/bin/python"' in source
+    assert 'python3 -m pytest' not in source
 
 
 def test_parser_is_manual_and_runbook_does_not_auto_start_it() -> None:
