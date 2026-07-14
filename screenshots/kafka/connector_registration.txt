@@ -15,12 +15,7 @@
         "neo4j.authentication.basic.password": "***REDACTED***",
         "name": "cpg-neo4j-sink"
     },
-    "tasks": [
-        {
-            "connector": "cpg-neo4j-sink",
-            "task": 0
-        }
-    ],
+    "tasks": [],
     "type": "sink"
 }
 Connector registered or updated: cpg-neo4j-sink

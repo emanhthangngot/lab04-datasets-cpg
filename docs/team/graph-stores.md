@@ -44,12 +44,12 @@ Spec input to Tri:
 
 Tasks:
 
-- [ ] Verify Neo4j receives `cpg.nodes` and `cpg.edges` through Kafka Connect.
-- [ ] Capture Neo4j node and edge counts.
-- [ ] Capture Neo4j duplicate node ID, duplicate edge ID, and placeholder counts.
-- [ ] Verify MongoDB receives file metadata from Spark.
-- [ ] Capture MongoDB document count and sample document.
-- [ ] Capture MongoDB duplicate `file_id` aggregation.
+- [x] Verify Neo4j receives `cpg.nodes` and `cpg.edges` through Kafka Connect.
+- [x] Capture Neo4j node and edge counts.
+- [x] Capture Neo4j duplicate node ID, duplicate edge ID, and placeholder counts.
+- [x] Verify MongoDB receives file metadata from Spark.
+- [x] Capture MongoDB document count and sample document.
+- [x] Capture MongoDB duplicate `file_id` aggregation.
 
 Done when:
 
@@ -81,10 +81,10 @@ Spec input to Tri:
 
 Tasks:
 
-- [ ] Run Neo4j duplicate checks after replay.
-- [ ] Run MongoDB duplicate `file_id` checks after replay.
+- [x] Run Neo4j duplicate checks after replay.
+- [x] Run MongoDB duplicate `file_id` checks after replay.
 - [ ] Verify stale cleanup behavior with `run_id`.
-- [ ] Provide outputs for Task 4, Task 5, and Task 6.
+- [x] Provide outputs for Task 4, Task 5, and Task 6.
 
 Done when:
 
@@ -108,7 +108,55 @@ Done when:
 
 - Tri approves graph-store evidence for final Pages publication.
 
-## Latest Update
+## Stage 2 Acceptance Update (2026-07-14)
+
+Status: Stage 2 graph-store ingestion and replay acceptance passed locally.
+
+The earlier Stage 2 evidence is superseded. The old Docker state contained both
+`local-sample/datasets` and `huggingface/datasets`, and the old runbook also
+started the one-shot parser during `docker compose up` before invoking it again
+explicitly. Those two conditions explained the mixed namespace and near-double
+counts; they were not separate remote databases.
+
+Clean-run acceptance after resetting only the local `lab04-datasets-cpg`
+volumes:
+
+- Kafka emitted 21,415 node events with 21,415 unique IDs and 7,968 edge events
+  with 7,968 unique IDs. Every consumed graph event used
+  `repo=huggingface/datasets`.
+- Neo4j persisted 21,415 non-placeholder nodes, 1,213 placeholders, 22,628
+  total nodes, and 7,968 relationships. Duplicate node and edge groups were 0.
+- MongoDB persisted exactly 5 documents, 5 distinct `file_id` values, 5
+  distinct `file_path` values, and only `huggingface/datasets`.
+- Spark clean-run checkpoint reached Kafka metadata offset 5 with numeric batch
+  commit 0.
+
+Replay acceptance used a new `run_id` for the same five files. Kafka then held
+42,830 node events/21,415 unique node IDs and 15,936 edge events/7,968 unique
+edge IDs. Neo4j counts remained unchanged, MongoDB remained at 5 documents,
+and Spark caught up to metadata offset 10 with numeric batch commit 2 (an
+intermediate empty micro-batch produced commit 1).
+
+Validation: 94 Python tests passed, Docker Compose config parsed, connector JSON
+parsed, all shell scripts passed `bash -n`, and `scripts/run_checks.sh` passed.
+
+Evidence:
+
+- `screenshots/neo4j/node_count.txt`, `non_placeholder_count.txt`,
+  `edge_count.txt`, `placeholder_count.txt`, `duplicate_nodes.txt`, and
+  `duplicate_edges.txt`;
+- `screenshots/mongodb/metadata_evidence.txt`;
+- `screenshots/spark/checkpoint_offsets_clean_run.txt` and
+  `checkpoint_commits_clean_run.txt` for the clean batch;
+- `screenshots/spark/checkpoint_offsets.txt` and `checkpoint_commits.txt` for
+  replay; and
+- `screenshots/kafka/sample_cpg_nodes.json`, `sample_cpg_edges.json`,
+  `sample_cpg_metadata.json`, and `sample_cpg_errors.json`.
+
+Remaining Stage 3 work: verify stale cleanup behavior across changing file
+contents and `run_id`; idempotent replay for unchanged files is complete.
+
+## Previous Update
 
 Status: Stage 1 store foundation verified on 2026-07-06.
 
