@@ -315,9 +315,14 @@ def test_runbook_requires_neo4j_password_without_literal_password() -> None:
 
 
 def test_runbook_keeps_shared_graph_store_checks() -> None:
-    source = (PROJECT_ROOT / "scripts" / "run_stage2_evidence.sh").read_text()
-    for marker in ["node_count", "edge_count", "duplicate_nodes", "duplicate_edges", "file_metadata"]:
+    runbook = (PROJECT_ROOT / "scripts" / "run_stage2_evidence.sh").read_text()
+    source = (PROJECT_ROOT / "scripts" / "capture_store_evidence.sh").read_text()
+    assert "bash scripts/capture_store_evidence.sh" in runbook
+    for marker in ["node_count", "non_placeholder_count", "edge_count", "duplicate_nodes", "duplicate_edges", "file_metadata"]:
         assert marker in source
+    assert 'distinct("file_id")' in source
+    assert 'distinct("file_path")' in source
+    assert 'distinct("repo")' in source
 
 
 def test_tracker_has_one_verified_test_count_and_cross_owner_gate() -> None:
@@ -349,7 +354,8 @@ def test_spark_evidence_fails_when_stream_or_metadata_is_missing() -> None:
     source = (PROJECT_ROOT / "scripts" / "capture_spark_evidence.sh").read_text()
     assert "metadata_stream_to_mongo.py" in source
     assert "Spark metadata stream is not running" in source
-    assert "checkpoint directory was not created" in source
+    assert "Spark did not commit and catch up" in source
+    assert "checkpoint directory disappeared after a committed batch" in source
     assert "file_metadata count is" in source
     assert "MONGO_COUNT" in source
 
@@ -413,9 +419,36 @@ def test_stage2_runbook_waits_for_connect_api() -> None:
     assert "Kafka Connect API is ready" in source
 
 
+def test_parser_is_manual_and_runbook_does_not_auto_start_it() -> None:
+    compose_source = (PROJECT_ROOT / "docker-compose.yml").read_text()
+    runbook_source = (PROJECT_ROOT / "scripts" / "run_stage2_evidence.sh").read_text()
+
+    parser_block = compose_source[compose_source.index("  parser:") : compose_source.index("\nvolumes:")]
+    assert 'profiles: ["manual"]' in parser_block
+    assert "docker compose up -d broker neo4j mongo connect spark" in runbook_source
+    assert "docker compose up -d\n" not in runbook_source
+
+
 def test_spark_evidence_requires_commit_and_kafka_catchup() -> None:
     source = (PROJECT_ROOT / "scripts" / "capture_spark_evidence.sh").read_text()
     assert "$CHECKPOINT_PATH/commits" in source
     assert "checkpoint_commits.txt" in source
     assert "KAFKA_END_OFFSET" in source
     assert 'CHECKPOINT_KAFKA_OFFSET" = "$KAFKA_END_OFFSET' in source
+    assert "MSYS_NO_PATHCONV=1 docker compose" in source
+    assert "Spark metadata stream is already running; reusing it" in source
+    assert "--driver-memory 512m" in source
+    assert "spark_stream.log" in source
+    assert "pgrep -f '[m]etadata_stream_to_mongo.py'" in source
+    assert "pgrep -f 'metadata_stream_to_mongo.py'" not in source
+    assert "SPARK_MONGO_WAIT_SECONDS" in source
+    assert "EXPECTED_MONGO_COUNT" in source
+
+
+def test_connector_wait_requires_persisted_graph_counts() -> None:
+    source = (PROJECT_ROOT / "scripts" / "wait_neo4j_connector_idle.sh").read_text()
+    assert "NEO4J_STORE_WAIT_SECONDS" in source
+    assert "topic_id_counts cpg.nodes" in source and "topic_id_counts cpg.edges" in source
+    assert "duplicate emitted IDs detected" in source
+    assert "coalesce(n.placeholder, false) = false" in source
+    assert "Neo4j persisted graph matches unique emitted Kafka IDs" in source

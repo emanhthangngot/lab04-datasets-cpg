@@ -32,7 +32,9 @@ echo ""
 # Step 1: Start infrastructure
 # --------------------------------------------------------------------------
 echo ">>> Step 1: Starting Docker Compose infrastructure"
-docker compose up -d
+# Do not start the one-shot parser service here. It is invoked exactly once in
+# Step 7 after the topics, connector, and Spark capture are ready.
+docker compose up -d broker neo4j mongo connect spark
 echo "Waiting 15s for services to become healthy..."
 sleep 15
 
@@ -134,53 +136,12 @@ bash scripts/capture_kafka_evidence.sh
 
 # --------------------------------------------------------------------------
 # Step 10: Capture store verification
-# NOTE: Neo4j counts/duplicate checks are part of Thanh's scope (tasks 2.4-2.5).
-# MongoDB verification is Thanh's scope (task 2.6).
-# Included here for end-to-end runbook completeness with Tri's approval.
+# Neo4j/MongoDB evidence and fail-fast acceptance are centralized in the
+# reusable store capture script.
 # --------------------------------------------------------------------------
 echo ""
 echo ">>> Step 10: Neo4j store verification"
-docker compose exec -T neo4j cypher-shell -u neo4j -p "$NEO4J_PASSWORD" \
-  "MATCH (n:CPGNode) RETURN count(n) AS node_count;" \
-  | tee screenshots/neo4j/node_count.txt
-
-docker compose exec -T neo4j cypher-shell -u neo4j -p "$NEO4J_PASSWORD" \
-  "MATCH ()-[r:CPG_EDGE]->() RETURN count(r) AS edge_count;" \
-  | tee screenshots/neo4j/edge_count.txt
-
-docker compose exec -T neo4j cypher-shell -u neo4j -p "$NEO4J_PASSWORD" \
-  "MATCH (n:CPGNode {placeholder: true}) RETURN count(n) AS placeholder_count;" \
-  | tee screenshots/neo4j/placeholder_count.txt
-
-echo ">>> Neo4j duplicate node check"
-docker compose exec -T neo4j cypher-shell -u neo4j -p "$NEO4J_PASSWORD" \
-  "MATCH (n:CPGNode) WITH n.id AS id, count(*) AS c WHERE c > 1 RETURN id, c;" \
-  | tee screenshots/neo4j/duplicate_nodes.txt
-if [ ! -s screenshots/neo4j/duplicate_nodes.txt ]; then
-  echo "No duplicate nodes found" > screenshots/neo4j/duplicate_nodes.txt
-fi
-
-echo ">>> Neo4j duplicate edge check"
-docker compose exec -T neo4j cypher-shell -u neo4j -p "$NEO4J_PASSWORD" \
-  "MATCH ()-[r:CPG_EDGE]->() WITH r.id AS id, count(*) AS c WHERE c > 1 RETURN id, c;" \
-  | tee screenshots/neo4j/duplicate_edges.txt
-if [ ! -s screenshots/neo4j/duplicate_edges.txt ]; then
-  echo "No duplicate edges found" > screenshots/neo4j/duplicate_edges.txt
-fi
-
-echo ""
-echo ">>> MongoDB store verification"
-docker compose exec -T mongo mongosh --quiet --eval '
-  db = db.getSiblingDB("cpg");
-  print("file_metadata count: " + db.file_metadata.countDocuments());
-  print("--- sample document ---");
-  printjson(db.file_metadata.findOne());
-  print("--- duplicate file_id check ---");
-  printjson(db.file_metadata.aggregate([
-    { $group: { _id: "$file_id", count: { $sum: 1 } } },
-    { $match: { count: { $gt: 1 } } }
-  ]).toArray());
-' | tee screenshots/mongodb/metadata_evidence.txt
+bash scripts/capture_store_evidence.sh
 
 # Wait for the Spark evidence background task
 wait "$SPARK_PID"
