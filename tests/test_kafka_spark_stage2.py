@@ -406,6 +406,13 @@ def test_stage2_runbook_locks_parser_repository_identity() -> None:
     assert "printenv REPO_NAME" in source
 
 
+def test_stage2_runbook_waits_for_connect_api() -> None:
+    source = (PROJECT_ROOT / "scripts" / "run_stage2_evidence.sh").read_text()
+    assert "CONNECT_WAIT_SECONDS" in source
+    assert 'curl -fsS "$CONNECT_URL/connector-plugins"' in source
+    assert "Kafka Connect API is ready" in source
+
+
 def test_spark_evidence_requires_commit_and_kafka_catchup() -> None:
     source = (PROJECT_ROOT / "scripts" / "capture_spark_evidence.sh").read_text()
     assert "$CHECKPOINT_PATH/commits" in source

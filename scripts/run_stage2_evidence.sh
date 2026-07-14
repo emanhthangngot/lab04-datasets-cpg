@@ -3,6 +3,8 @@ set -euo pipefail
 
 : "${NEO4J_PASSWORD:?Set NEO4J_PASSWORD before running Stage 2 evidence capture}"
 EXPECTED_REPO_NAME="huggingface/datasets"
+CONNECT_URL="${CONNECT_URL:-http://localhost:8083}"
+CONNECT_WAIT_SECONDS="${CONNECT_WAIT_SECONDS:-120}"
 
 if [[ -x ".venv/Scripts/python.exe" ]]; then
   PYTHON=".venv/Scripts/python.exe"
@@ -80,6 +82,16 @@ docker compose exec -T neo4j cypher-shell -u neo4j -p "$NEO4J_PASSWORD" \
 # --------------------------------------------------------------------------
 echo ""
 echo ">>> Step 5: Verify connector plugin and register Neo4j sink"
+echo "Waiting for Kafka Connect API to become ready..."
+CONNECT_DEADLINE=$((SECONDS + CONNECT_WAIT_SECONDS))
+until curl -fsS "$CONNECT_URL/connector-plugins" >/dev/null 2>&1; do
+  if (( SECONDS >= CONNECT_DEADLINE )); then
+    echo "ERROR: Kafka Connect API was not ready within ${CONNECT_WAIT_SECONDS}s" >&2
+    exit 1
+  fi
+  sleep 2
+done
+echo "Kafka Connect API is ready."
 bash scripts/capture_connector_evidence.sh
 
 # --------------------------------------------------------------------------
