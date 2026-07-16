@@ -45,15 +45,16 @@ docker compose exec "$KAFKA_SERVICE" kafka-topics \
 # --------------------------------------------------------------------------
 capture_samples() {
   local topic="$1"
+  local sample_count="$2"
   local output_file="$EVIDENCE_DIR/sample_${topic//\./_}.json"
 
   echo ""
-  echo "=== Capturing $SAMPLE_COUNT sample messages from $topic ==="
+  echo "=== Capturing $sample_count sample messages from $topic ==="
   docker compose exec "$KAFKA_SERVICE" kafka-console-consumer \
     --bootstrap-server "$BOOTSTRAP" \
     --topic "$topic" \
     --from-beginning \
-    --max-messages "$SAMPLE_COUNT" \
+    --max-messages "$sample_count" \
     --timeout-ms 10000 \
     2>/dev/null | tee "$output_file"
 
@@ -114,9 +115,10 @@ else:
   fi
 }
 
-for topic in cpg.nodes cpg.edges cpg.metadata cpg.errors; do
-  capture_samples "$topic"
-done
+capture_samples cpg.nodes "$SAMPLE_COUNT"
+capture_samples cpg.edges "$SAMPLE_COUNT"
+capture_samples cpg.metadata 5
+capture_samples cpg.errors 1
 
 # --------------------------------------------------------------------------
 # 3. Summary

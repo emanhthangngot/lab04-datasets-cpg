@@ -110,6 +110,19 @@ if [ "$REQUIRE_UNIQUE_EVENT_IDS" = "true" ] && {
   exit 1
 fi
 
+GRAPH_COUNTS_FILE="screenshots/kafka/graph_event_counts.json"
+mkdir -p "$(dirname "$GRAPH_COUNTS_FILE")"
+"$PYTHON" -c '
+import json
+import sys
+
+keys = ("node_events", "unique_node_ids", "edge_events", "unique_edge_ids")
+values = [int(value) for value in sys.argv[1:]]
+json.dump(dict(zip(keys, values)), sys.stdout, indent=2)
+print()
+' "$NODE_EVENTS" "$EXPECTED_NODES" "$EDGE_EVENTS" "$EXPECTED_EDGES" \
+  > "$GRAPH_COUNTS_FILE"
+
 echo "Kafka graph IDs: $NODE_EVENTS node events/$EXPECTED_NODES unique, $EDGE_EVENTS edge events/$EXPECTED_EDGES unique."
 echo "Waiting for Neo4j persistence: $EXPECTED_NODES explicit nodes, $EXPECTED_EDGES edges..."
 DEADLINE=$((SECONDS + STORE_WAIT_SECONDS))

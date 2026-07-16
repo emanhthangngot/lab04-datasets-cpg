@@ -12,6 +12,8 @@ export COMPOSE_PROJECT_NAME
 EXPECTED_REPO_NAME="huggingface/datasets"
 CONNECT_URL="${CONNECT_URL:-http://localhost:8083}"
 CONNECT_WAIT_SECONDS="${CONNECT_WAIT_SECONDS:-120}"
+PIPELINE_COMMIT_SHA="$(git rev-parse HEAD)"
+CAPTURED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
 if [[ -x ".venv/Scripts/python.exe" ]]; then
   PYTHON=".venv/Scripts/python.exe"
@@ -192,6 +194,16 @@ done
 "$PYTHON" -m json.tool screenshots/kafka/connector_plugins.json >/dev/null
 "$PYTHON" -m json.tool screenshots/kafka/connector_registration.json >/dev/null
 echo "Credential sanitization and JSON validation complete."
+
+echo ""
+echo ">>> Building and validating Stage 2 evidence manifest"
+"$PYTHON" scripts/stage2_evidence_manifest.py write \
+  --root . \
+  --pipeline-commit "$PIPELINE_COMMIT_SHA" \
+  --dataset-commit "$DATASET_COMMIT_SHA" \
+  --captured-at "$CAPTURED_AT"
+"$PYTHON" scripts/stage2_evidence_manifest.py validate --root .
+echo "Stage 2 evidence manifest validated."
 
 echo ""
 echo "Next steps:"
