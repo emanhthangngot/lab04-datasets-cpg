@@ -25,12 +25,13 @@ https://github.com/emanhthangngot/lab04-datasets-cpg
 
 ## Deliverable Checklist
 
-- [x] Task 1-6 chapters exist in the Jupyter Book table of contents.
-- [x] Task 1-6 chapters map to matching notebook evidence slots.
+- [x] Task 1-5 are canonical executed notebook chapters.
+- [x] Architecture is backed by an editable Excalidraw source and rendered PNG.
 - [x] Kafka, Neo4j, MongoDB, Spark, and replay screenshot folders exist.
-- [ ] Task 1-6 chapters contain real executed notebook outputs.
-- [ ] Database UI or query screenshots are linked from the relevant chapters.
-- [ ] Reflection sections state what worked, what failed, and what was fixed.
+- [x] Task 1-5 contain real executed outputs from the 2026-07-16 clean run.
+- [x] Neo4j and MongoDB chapters link real query artifacts and duplicate checks.
+- [x] Task 1-5 reflections state what worked, what failed, and what was fixed.
+- [ ] Task 6 replay evidence and reflection are Stage 3 work.
 - [ ] The GitHub Pages build shows the latest content from `main`.
 
 This page must not contain secrets, local credentials, or local-only paths in the

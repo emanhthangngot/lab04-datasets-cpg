@@ -399,10 +399,11 @@ def test_spark_evidence_captures_latest_committed_checkpoint_offset() -> None:
     assert 'cat "$CHECKPOINT_PATH/offsets/0"' not in source
 
 
-def test_tracker_keeps_graph_store_acceptance_pending_after_runtime_passes() -> None:
+def test_tracker_records_evidence_backed_graph_store_acceptance() -> None:
     source = (PROJECT_ROOT / "docs" / "team" / "kafka-spark.md").read_text()
-    assert "Status: Stage 2 complete." not in source
-    assert "Thanh acceptance pending" in source
+    assert "store acceptance" in source
+    assert "stage2_manifest.json" in source
+    assert "Thanh acceptance pending" not in source
 
 
 def test_stage2_runbook_locks_parser_repository_identity() -> None:
@@ -410,6 +411,28 @@ def test_stage2_runbook_locks_parser_repository_identity() -> None:
     assert 'EXPECTED_REPO_NAME="huggingface/datasets"' in source
     assert 'REPO_NAME="$EXPECTED_REPO_NAME"' in source
     assert "printenv REPO_NAME" in source
+
+
+def test_stage2_runbook_propagates_dataset_commit_sha() -> None:
+    source = (PROJECT_ROOT / "scripts" / "run_stage2_evidence.sh").read_text()
+    assert 'DATASET_COMMIT_SHA="$(git -C data/datasets rev-parse HEAD)"' in source
+    assert 'export EXPECTED_COMMIT_SHA="$DATASET_COMMIT_SHA"' in source
+    assert source.count('-e COMMIT_SHA="$DATASET_COMMIT_SHA"') == 2
+
+
+def test_kafka_evidence_rejects_unknown_or_mixed_commit_sha() -> None:
+    source = (PROJECT_ROOT / "scripts" / "capture_kafka_evidence.sh").read_text()
+    assert 'EXPECTED_COMMIT_SHA:?' in source
+    assert 'msg.get("commit_sha")' in source
+    assert '"unknown"' in source
+    assert "unexpected commit_sha values" in source
+
+
+def test_connector_wait_validates_all_graph_event_commit_shas() -> None:
+    source = (PROJECT_ROOT / "scripts" / "wait_neo4j_connector_idle.sh").read_text()
+    assert "EXPECTED_COMMIT_SHA" in source
+    assert 'event.get("commit_sha")' in source
+    assert "unexpected commit_sha values" in source
 
 
 def test_stage2_runbook_waits_for_connect_api() -> None:

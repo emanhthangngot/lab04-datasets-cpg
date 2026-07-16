@@ -1,0 +1,282 @@
+{
+  "artifacts": [
+    {
+      "captured_at": "2026-07-16T09:16:57Z",
+      "command": "bash scripts/capture_kafka_evidence.sh",
+      "path": "screenshots/kafka/connector_plugins.json",
+      "result": "pass",
+      "sha256": "d263c5994c79010edbb535bab9f4446436f53c03b91554ce853f1e286ec96b7c",
+      "source": "Stage 2 clean run",
+      "task": 3
+    },
+    {
+      "captured_at": "2026-07-16T09:16:57Z",
+      "command": "bash scripts/capture_kafka_evidence.sh",
+      "path": "screenshots/kafka/connector_registration.json",
+      "result": "pass",
+      "sha256": "c24ec1f41258c1522241e1d8da74e205b15a258b011fea23b0c9570cf1461396",
+      "source": "Stage 2 clean run",
+      "task": 3
+    },
+    {
+      "captured_at": "2026-07-16T09:16:57Z",
+      "command": "bash scripts/capture_kafka_evidence.sh",
+      "path": "screenshots/kafka/connector_registration.txt",
+      "result": "pass",
+      "sha256": "f4ce1651da56aedd95b1f4ed0c872813e88a510e4f0702bc386f8e41d951ee6b",
+      "source": "Stage 2 clean run",
+      "task": 3
+    },
+    {
+      "captured_at": "2026-07-16T09:16:57Z",
+      "command": "bash scripts/capture_kafka_evidence.sh",
+      "path": "screenshots/kafka/connector_status.json",
+      "result": "pass",
+      "sha256": "e9ab0708519908897dc18ba42f11c34b80ff0e5614b0802b15ed2b27469207c6",
+      "source": "Stage 2 clean run",
+      "task": 3
+    },
+    {
+      "captured_at": "2026-07-16T09:16:57Z",
+      "command": "bash scripts/capture_kafka_evidence.sh",
+      "path": "screenshots/kafka/graph_event_counts.json",
+      "result": "pass",
+      "sha256": "afa34ad7e359b6f5ff76be4826b0fe8e8470e5de0a80c86acd29c9e38322e3cb",
+      "source": "Stage 2 clean run",
+      "task": 3
+    },
+    {
+      "captured_at": "2026-07-16T09:16:57Z",
+      "command": "bash scripts/capture_kafka_evidence.sh",
+      "path": "screenshots/kafka/neo4j_connector_classes.txt",
+      "result": "pass",
+      "sha256": "5abffc2bfdbac89b456ea7b97a398d619f8ec1d03225ea93133c4a67b80f5579",
+      "source": "Stage 2 clean run",
+      "task": 3
+    },
+    {
+      "captured_at": "2026-07-16T09:16:57Z",
+      "command": "bash scripts/capture_kafka_evidence.sh",
+      "path": "screenshots/kafka/neo4j_sink_class.txt",
+      "result": "pass",
+      "sha256": "756765d5b24d3766bdf6d7e1f24bcee0116711f3bada47fa36a2c6bea864796b",
+      "source": "Stage 2 clean run",
+      "task": 3
+    },
+    {
+      "captured_at": "2026-07-16T09:16:57Z",
+      "command": "bash scripts/capture_kafka_evidence.sh",
+      "path": "screenshots/kafka/sample_cpg_edges.json",
+      "result": "pass",
+      "sha256": "8a1e550231a1c7bee72626d7e8d34997f8e20251aef4f9d408cacf210ab611e8",
+      "source": "Stage 2 clean run",
+      "task": 3
+    },
+    {
+      "captured_at": "2026-07-16T09:16:57Z",
+      "command": "bash scripts/capture_kafka_evidence.sh",
+      "path": "screenshots/kafka/sample_cpg_errors.json",
+      "result": "pass",
+      "sha256": "b975d012af29950566cc86ccda5ba7021ee2dd03e11d37655c84343b67c30ee4",
+      "source": "Stage 2 clean run",
+      "task": 3
+    },
+    {
+      "captured_at": "2026-07-16T09:16:57Z",
+      "command": "bash scripts/capture_kafka_evidence.sh",
+      "path": "screenshots/kafka/sample_cpg_metadata.json",
+      "result": "pass",
+      "sha256": "1a331bfd33f8f78f3d2f6c430cce90a89a8382000a4e8d7f8a9f048414b38400",
+      "source": "Stage 2 clean run",
+      "task": 3
+    },
+    {
+      "captured_at": "2026-07-16T09:16:57Z",
+      "command": "bash scripts/capture_kafka_evidence.sh",
+      "path": "screenshots/kafka/sample_cpg_nodes.json",
+      "result": "pass",
+      "sha256": "a1b34cf98626c2b7c758ddb02d0af32f2a0e46b028be53c7dfa4afbf48959e83",
+      "source": "Stage 2 clean run",
+      "task": 3
+    },
+    {
+      "captured_at": "2026-07-16T09:16:57Z",
+      "command": "bash scripts/capture_kafka_evidence.sh",
+      "path": "screenshots/kafka/topic_details.txt",
+      "result": "pass",
+      "sha256": "3b25e614cce1b580cd70793e7002f38aa89a88beb1605d7bec56afc589c8abe1",
+      "source": "Stage 2 clean run",
+      "task": 3
+    },
+    {
+      "captured_at": "2026-07-16T09:16:57Z",
+      "command": "bash scripts/capture_kafka_evidence.sh",
+      "path": "screenshots/kafka/topic_list.txt",
+      "result": "pass",
+      "sha256": "a14edf526e4a538f90c7af38d2f6a49a35a93380544ad7e83af3e00a308db62a",
+      "source": "Stage 2 clean run",
+      "task": 3
+    },
+    {
+      "captured_at": "2026-07-16T09:16:57Z",
+      "command": "bash scripts/capture_store_evidence.sh",
+      "path": "screenshots/neo4j/duplicate_edges.txt",
+      "result": "pass",
+      "sha256": "d023ede47e2090402d8e724f0f150d9f16d4fe9c4e7bd1413601a020fb9d4396",
+      "source": "Stage 2 clean run",
+      "task": 4
+    },
+    {
+      "captured_at": "2026-07-16T09:16:57Z",
+      "command": "bash scripts/capture_store_evidence.sh",
+      "path": "screenshots/neo4j/duplicate_nodes.txt",
+      "result": "pass",
+      "sha256": "d69ecba88679017b52227058177fbfc4847fbba4af43d76c4cfa0ed8ec8299ad",
+      "source": "Stage 2 clean run",
+      "task": 4
+    },
+    {
+      "captured_at": "2026-07-16T09:16:57Z",
+      "command": "bash scripts/capture_store_evidence.sh",
+      "path": "screenshots/neo4j/edge_count.txt",
+      "result": "pass",
+      "sha256": "d0ce938f06987104c459d229e0c05e951a88d4a406f35e87a962329700318718",
+      "source": "Stage 2 clean run",
+      "task": 4
+    },
+    {
+      "captured_at": "2026-07-16T09:16:57Z",
+      "command": "bash scripts/capture_store_evidence.sh",
+      "path": "screenshots/neo4j/node_count.txt",
+      "result": "pass",
+      "sha256": "45ada354a68a2e7af4aa4a28d9ceb04a7951fdd5acb77f9df1a8c6114e4723f3",
+      "source": "Stage 2 clean run",
+      "task": 4
+    },
+    {
+      "captured_at": "2026-07-16T09:16:57Z",
+      "command": "bash scripts/capture_store_evidence.sh",
+      "path": "screenshots/neo4j/non_placeholder_count.txt",
+      "result": "pass",
+      "sha256": "3b632a025594ec42f39717fcd62030273b696eb585a171cd2cad326b471f3890",
+      "source": "Stage 2 clean run",
+      "task": 4
+    },
+    {
+      "captured_at": "2026-07-16T09:16:57Z",
+      "command": "bash scripts/capture_store_evidence.sh",
+      "path": "screenshots/neo4j/placeholder_count.txt",
+      "result": "pass",
+      "sha256": "7604890d5a409f6014cf799f0473b504fc7ef4dd5ad62356a9b3dee45dd1eae5",
+      "source": "Stage 2 clean run",
+      "task": 4
+    },
+    {
+      "captured_at": "2026-07-16T09:16:57Z",
+      "command": "bash scripts/capture_store_evidence.sh",
+      "path": "screenshots/mongodb/metadata_evidence.txt",
+      "result": "pass",
+      "sha256": "fac4848d450f633b9bbfd46a43acac28dd8b65ce800566552252020b3b4bdb39",
+      "source": "Stage 2 clean run",
+      "task": 5
+    },
+    {
+      "captured_at": "2026-07-16T09:16:57Z",
+      "command": "bash scripts/capture_spark_evidence.sh",
+      "path": "screenshots/spark/checkpoint_commits.txt",
+      "result": "pass",
+      "sha256": "e03ead7f1597d288754d29e9b5a074314bc908309db0ead6f6768071d41c41a7",
+      "source": "Stage 2 clean run",
+      "task": 5
+    },
+    {
+      "captured_at": "2026-07-16T09:16:57Z",
+      "command": "bash scripts/capture_spark_evidence.sh",
+      "path": "screenshots/spark/checkpoint_listing.txt",
+      "result": "pass",
+      "sha256": "a9763dbbe2dee9498130ab1bb2cb13d1020f409b2f51f9e81be7ea194fea9e5e",
+      "source": "Stage 2 clean run",
+      "task": 5
+    },
+    {
+      "captured_at": "2026-07-16T09:16:57Z",
+      "command": "bash scripts/capture_spark_evidence.sh",
+      "path": "screenshots/spark/checkpoint_offsets.txt",
+      "result": "pass",
+      "sha256": "8deacb32c269b46beddf6802f28a7e85d33778f39149267b010354834428ce38",
+      "source": "Stage 2 clean run",
+      "task": 5
+    },
+    {
+      "captured_at": "2026-07-16T09:16:57Z",
+      "command": "bash scripts/capture_spark_evidence.sh",
+      "path": "screenshots/spark/mongodb_metadata_check.txt",
+      "result": "pass",
+      "sha256": "8b6e47400856e4ef4a76938fbc4f591f9b930f2687dd186b8bca551a0182596c",
+      "source": "Stage 2 clean run",
+      "task": 5
+    },
+    {
+      "captured_at": "2026-07-16T09:16:57Z",
+      "command": "bash scripts/capture_spark_evidence.sh",
+      "path": "screenshots/spark/spark_stream.log",
+      "result": "pass",
+      "sha256": "ac0d791dc49aaf732359e76a8228677ea44b501824ea2de712d5685d9fceec06",
+      "source": "Stage 2 clean run",
+      "task": 5
+    },
+    {
+      "captured_at": "2026-07-16T09:16:57Z",
+      "command": "bash scripts/capture_spark_evidence.sh",
+      "path": "screenshots/spark/spark_version.txt",
+      "result": "pass",
+      "sha256": "14cd9b4476d850718282d1ce5bd2536445ca14c0b9cf70d0848fffa80165b63f",
+      "source": "Stage 2 clean run",
+      "task": 5
+    }
+  ],
+  "metrics": {
+    "kafka": {
+      "ast_nodes": 21415,
+      "call_edges": 2183,
+      "cfg_edges": 3537,
+      "dfg_edges": 2248,
+      "edge_events": 7968,
+      "error_events": 1,
+      "metadata_events": 5,
+      "node_events": 21415,
+      "total_edges": 7968,
+      "unique_edge_ids": 7968,
+      "unique_node_ids": 21415
+    },
+    "mongodb": {
+      "documents": 5,
+      "duplicate_file_id_groups": 0,
+      "unique_file_ids": 5,
+      "unique_file_paths": 5
+    },
+    "neo4j": {
+      "duplicate_edge_groups": 0,
+      "duplicate_node_groups": 0,
+      "edges": 7968,
+      "explicit_nodes": 21415,
+      "placeholders": 1213,
+      "total_nodes": 22628
+    },
+    "spark": {
+      "completed_batch": 0,
+      "metadata_offset": 5
+    }
+  },
+  "run": {
+    "captured_at": "2026-07-16T09:16:57Z",
+    "dataset_commit": "41adfd0f9ee9ba3a6b4f719d5b551c5b19ae45e2",
+    "dataset_repo": "huggingface/datasets",
+    "error_run_id": "8b99a6696ed545e598d8dbee865e04fc",
+    "parser_run_id": "1e06e5e0ce964386ab66267e8e52e319",
+    "pipeline_commit": "b267a458bc053f76e54e37bbc3644d0c11caedc0"
+  },
+  "schema_version": "1.0",
+  "stage": 2,
+  "status": "pass"
+}

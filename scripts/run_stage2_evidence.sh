@@ -12,6 +12,8 @@ export COMPOSE_PROJECT_NAME
 EXPECTED_REPO_NAME="huggingface/datasets"
 CONNECT_URL="${CONNECT_URL:-http://localhost:8083}"
 CONNECT_WAIT_SECONDS="${CONNECT_WAIT_SECONDS:-120}"
+PIPELINE_COMMIT_SHA="$(git rev-parse HEAD)"
+CAPTURED_AT="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
 
 if [[ -x ".venv/Scripts/python.exe" ]]; then
   PYTHON=".venv/Scripts/python.exe"
@@ -57,6 +59,14 @@ docker compose ps
 echo ""
 echo ">>> Step 2: Clone repository"
 bash scripts/clone_repo.sh
+
+DATASET_COMMIT_SHA="$(git -C data/datasets rev-parse HEAD)"
+if ! [[ "$DATASET_COMMIT_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+  echo "ERROR: invalid dataset commit SHA: $DATASET_COMMIT_SHA" >&2
+  exit 1
+fi
+export EXPECTED_COMMIT_SHA="$DATASET_COMMIT_SHA"
+echo "Dataset commit SHA verified: $DATASET_COMMIT_SHA"
 
 echo ">>> Verifying parser repository identity"
 ACTUAL_REPO_NAME="$(
@@ -118,7 +128,8 @@ SPARK_PID=$!
 # Step 7: Run parser in sample mode
 # --------------------------------------------------------------------------
 echo ">>> Step 7a: Run parser (sample mode - 5 files)"
-docker compose run --rm -e REPO_NAME="$EXPECTED_REPO_NAME" parser \
+docker compose run --rm -e REPO_NAME="$EXPECTED_REPO_NAME" \
+  -e COMMIT_SHA="$DATASET_COMMIT_SHA" parser \
   python -m parser_service.main --repo data/datasets --mode sample
 
 # --------------------------------------------------------------------------
@@ -126,7 +137,8 @@ docker compose run --rm -e REPO_NAME="$EXPECTED_REPO_NAME" parser \
 # --------------------------------------------------------------------------
 echo ""
 echo ">>> Step 7b: Parse invalid_syntax.py to generate error event"
-docker compose run --rm -e REPO_NAME="$EXPECTED_REPO_NAME" parser \
+docker compose run --rm -e REPO_NAME="$EXPECTED_REPO_NAME" \
+  -e COMMIT_SHA="$DATASET_COMMIT_SHA" parser \
   python -m parser_service.main --repo data --mode file --file data/invalid_syntax.py \
   || echo "(Expected: parser emits error event for SyntaxError)"
 
@@ -182,6 +194,16 @@ done
 "$PYTHON" -m json.tool screenshots/kafka/connector_plugins.json >/dev/null
 "$PYTHON" -m json.tool screenshots/kafka/connector_registration.json >/dev/null
 echo "Credential sanitization and JSON validation complete."
+
+echo ""
+echo ">>> Building and validating Stage 2 evidence manifest"
+"$PYTHON" scripts/stage2_evidence_manifest.py write \
+  --root . \
+  --pipeline-commit "$PIPELINE_COMMIT_SHA" \
+  --dataset-commit "$DATASET_COMMIT_SHA" \
+  --captured-at "$CAPTURED_AT"
+"$PYTHON" scripts/stage2_evidence_manifest.py validate --root .
+echo "Stage 2 evidence manifest validated."
 
 echo ""
 echo "Next steps:"
