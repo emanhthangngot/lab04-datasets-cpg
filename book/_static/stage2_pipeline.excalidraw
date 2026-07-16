@@ -3,45 +3,615 @@
   "version": 2,
   "source": "https://excalidraw.com",
   "elements": [
-    {"type":"text","id":"title","x":80,"y":40,"width":920,"height":45,"text":"Stage 2 — Provenance-preserving CPG streaming","originalText":"Stage 2 — Provenance-preserving CPG streaming","fontSize":32,"fontFamily":3,"textAlign":"left","verticalAlign":"top","strokeColor":"#1e40af","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":10001,"version":1,"versionNonce":10002,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"containerId":null,"lineHeight":1.25},
-    {"type":"text","id":"subtitle","x":82,"y":90,"width":1120,"height":25,"text":"One cloned commit fans out through four versioned Kafka contracts into two deliberately separate store routes","originalText":"One cloned commit fans out through four versioned Kafka contracts into two deliberately separate store routes","fontSize":16,"fontFamily":3,"textAlign":"left","verticalAlign":"top","strokeColor":"#64748b","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":10003,"version":1,"versionNonce":10004,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"containerId":null,"lineHeight":1.25},
-    {"type":"ellipse","id":"dataset","x":90,"y":230,"width":210,"height":110,"strokeColor":"#c2410c","backgroundColor":"#fed7aa","fillStyle":"solid","strokeWidth":2,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":10005,"version":1,"versionNonce":10006,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false},
-    {"type":"text","id":"dataset_label","x":118,"y":251,"width":155,"height":56,"text":"huggingface/datasets\nshallow clone","originalText":"huggingface/datasets\nshallow clone","fontSize":18,"fontFamily":3,"textAlign":"center","verticalAlign":"middle","strokeColor":"#374151","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":10007,"version":1,"versionNonce":10008,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"containerId":null,"lineHeight":1.25},
-    {"type":"rectangle","id":"parser","x":390,"y":205,"width":260,"height":160,"strokeColor":"#1e3a5f","backgroundColor":"#3b82f6","fillStyle":"solid","strokeWidth":2,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":10009,"version":1,"versionNonce":10010,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"roundness":{"type":3}},
-    {"type":"text","id":"parser_label","x":430,"y":230,"width":180,"height":75,"text":"parser_service\n5 Python files\nAST + CFG + DFG + CALL","originalText":"parser_service\n5 Python files\nAST + CFG + DFG + CALL","fontSize":18,"fontFamily":3,"textAlign":"center","verticalAlign":"middle","strokeColor":"#ffffff","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":10011,"version":1,"versionNonce":10012,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"containerId":null,"lineHeight":1.25},
-    {"type":"arrow","id":"dataset_to_parser","x":302,"y":285,"width":86,"height":0,"strokeColor":"#c2410c","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":3,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":10013,"version":1,"versionNonce":10014,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"points":[[0,0],[86,0]],"startBinding":null,"endBinding":null,"startArrowhead":null,"endArrowhead":"arrow"},
-    {"type":"text","id":"commit_evidence","x":90,"y":385,"width":565,"height":88,"text":"PROVENANCE GATE\ncommit_sha = 41adfd0f9ee9ba3a6b4f719d5b551c5b19ae45e2\nrepo = huggingface/datasets   schema_version = 1.0","originalText":"PROVENANCE GATE\ncommit_sha = 41adfd0f9ee9ba3a6b4f719d5b551c5b19ae45e2\nrepo = huggingface/datasets   schema_version = 1.0","fontSize":15,"fontFamily":3,"textAlign":"left","verticalAlign":"top","strokeColor":"#22c55e","backgroundColor":"#1e293b","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":10015,"version":1,"versionNonce":10016,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"containerId":null,"lineHeight":1.25},
-    {"type":"text","id":"kafka_title","x":745,"y":145,"width":320,"height":35,"text":"Kafka event fan-out","originalText":"Kafka event fan-out","fontSize":24,"fontFamily":3,"textAlign":"left","verticalAlign":"top","strokeColor":"#1e40af","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":20001,"version":1,"versionNonce":20002,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"containerId":null,"lineHeight":1.25},
-    {"type":"line","id":"kafka_spine","x":780,"y":210,"width":0,"height":370,"strokeColor":"#1e3a5f","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":3,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":20003,"version":1,"versionNonce":20004,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"points":[[0,0],[0,370]]},
-    {"type":"arrow","id":"parser_to_kafka","x":652,"y":285,"width":126,"height":0,"strokeColor":"#1e3a5f","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":3,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":20005,"version":1,"versionNonce":20006,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"points":[[0,0],[126,0]],"startBinding":null,"endBinding":null,"startArrowhead":null,"endArrowhead":"arrow"},
-    {"type":"ellipse","id":"dot_nodes","x":772,"y":225,"width":16,"height":16,"strokeColor":"#3b82f6","backgroundColor":"#3b82f6","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":20007,"version":1,"versionNonce":20008,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false},
-    {"type":"ellipse","id":"dot_edges","x":772,"y":325,"width":16,"height":16,"strokeColor":"#3b82f6","backgroundColor":"#3b82f6","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":20009,"version":1,"versionNonce":20010,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false},
-    {"type":"ellipse","id":"dot_metadata","x":772,"y":425,"width":16,"height":16,"strokeColor":"#3b82f6","backgroundColor":"#3b82f6","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":20011,"version":1,"versionNonce":20012,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false},
-    {"type":"ellipse","id":"dot_errors","x":772,"y":525,"width":16,"height":16,"strokeColor":"#b91c1c","backgroundColor":"#fecaca","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":20013,"version":1,"versionNonce":20014,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false},
-    {"type":"text","id":"nodes_label","x":820,"y":215,"width":330,"height":50,"text":"cpg.nodes  •  21,415 unique events\n4 partitions  •  AST node payloads","originalText":"cpg.nodes  •  21,415 unique events\n4 partitions  •  AST node payloads","fontSize":17,"fontFamily":3,"textAlign":"left","verticalAlign":"top","strokeColor":"#374151","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":20015,"version":1,"versionNonce":20016,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"containerId":null,"lineHeight":1.25},
-    {"type":"text","id":"edges_label","x":820,"y":315,"width":350,"height":50,"text":"cpg.edges  •  7,968 unique events\nCFG 3,537 • DFG 2,248 • CALL 2,183","originalText":"cpg.edges  •  7,968 unique events\nCFG 3,537 • DFG 2,248 • CALL 2,183","fontSize":17,"fontFamily":3,"textAlign":"left","verticalAlign":"top","strokeColor":"#374151","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":20017,"version":1,"versionNonce":20018,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"containerId":null,"lineHeight":1.25},
-    {"type":"text","id":"metadata_label","x":820,"y":415,"width":330,"height":50,"text":"cpg.metadata  •  5 file summaries\n1 partition  •  Spark input only","originalText":"cpg.metadata  •  5 file summaries\n1 partition  •  Spark input only","fontSize":17,"fontFamily":3,"textAlign":"left","verticalAlign":"top","strokeColor":"#374151","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":20019,"version":1,"versionNonce":20020,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"containerId":null,"lineHeight":1.25},
-    {"type":"text","id":"errors_label","x":820,"y":515,"width":330,"height":50,"text":"cpg.errors  •  1 controlled SyntaxError\n1 partition  •  evidence/log path","originalText":"cpg.errors  •  1 controlled SyntaxError\n1 partition  •  evidence/log path","fontSize":17,"fontFamily":3,"textAlign":"left","verticalAlign":"top","strokeColor":"#b91c1c","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":20021,"version":1,"versionNonce":20022,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"containerId":null,"lineHeight":1.25},
-    {"type":"text","id":"routes_title","x":1210,"y":145,"width":350,"height":35,"text":"Purpose-specific store routes","originalText":"Purpose-specific store routes","fontSize":24,"fontFamily":3,"textAlign":"left","verticalAlign":"top","strokeColor":"#1e40af","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":30001,"version":1,"versionNonce":30002,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"containerId":null,"lineHeight":1.25},
-    {"type":"rectangle","id":"connect","x":1220,"y":205,"width":210,"height":90,"strokeColor":"#1e3a5f","backgroundColor":"#60a5fa","fillStyle":"solid","strokeWidth":2,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":30003,"version":1,"versionNonce":30004,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"roundness":{"type":3}},
-    {"type":"text","id":"connect_label","x":1240,"y":225,"width":170,"height":48,"text":"Neo4j Kafka Connector\ndirect node/edge sink","originalText":"Neo4j Kafka Connector\ndirect node/edge sink","fontSize":16,"fontFamily":3,"textAlign":"center","verticalAlign":"middle","strokeColor":"#374151","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":30005,"version":1,"versionNonce":30006,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"containerId":null,"lineHeight":1.25},
-    {"type":"ellipse","id":"neo4j","x":1495,"y":205,"width":210,"height":125,"strokeColor":"#047857","backgroundColor":"#a7f3d0","fillStyle":"solid","strokeWidth":2,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":30007,"version":1,"versionNonce":30008,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false},
-    {"type":"text","id":"neo4j_label","x":1522,"y":225,"width":155,"height":78,"text":"Neo4j\n22,628 total nodes\n7,968 relationships\n0 duplicate groups","originalText":"Neo4j\n22,628 total nodes\n7,968 relationships\n0 duplicate groups","fontSize":16,"fontFamily":3,"textAlign":"center","verticalAlign":"middle","strokeColor":"#374151","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":30009,"version":1,"versionNonce":30010,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"containerId":null,"lineHeight":1.25},
-    {"type":"arrow","id":"nodes_to_connect","x":1160,"y":235,"width":58,"height":10,"strokeColor":"#1e3a5f","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":2,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":30011,"version":1,"versionNonce":30012,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"points":[[0,0],[58,10]],"startBinding":null,"endBinding":null,"startArrowhead":null,"endArrowhead":"arrow"},
-    {"type":"arrow","id":"edges_to_connect","x":1160,"y":335,"width":58,"height":-55,"strokeColor":"#1e3a5f","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":2,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":30013,"version":1,"versionNonce":30014,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"points":[[0,0],[58,-55]],"startBinding":null,"endBinding":null,"startArrowhead":null,"endArrowhead":"arrow"},
-    {"type":"arrow","id":"connect_to_neo4j","x":1432,"y":250,"width":61,"height":10,"strokeColor":"#1e3a5f","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":3,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":30015,"version":1,"versionNonce":30016,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"points":[[0,0],[61,10]],"startBinding":null,"endBinding":null,"startArrowhead":null,"endArrowhead":"arrow"},
-    {"type":"rectangle","id":"spark","x":1220,"y":405,"width":210,"height":90,"strokeColor":"#6d28d9","backgroundColor":"#ddd6fe","fillStyle":"solid","strokeWidth":2,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":30017,"version":1,"versionNonce":30018,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"roundness":{"type":3}},
-    {"type":"text","id":"spark_label","x":1240,"y":425,"width":170,"height":48,"text":"Spark Structured Streaming\ncheckpoint offset = 5","originalText":"Spark Structured Streaming\ncheckpoint offset = 5","fontSize":16,"fontFamily":3,"textAlign":"center","verticalAlign":"middle","strokeColor":"#374151","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":30019,"version":1,"versionNonce":30020,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"containerId":null,"lineHeight":1.25},
-    {"type":"ellipse","id":"mongo","x":1495,"y":405,"width":210,"height":125,"strokeColor":"#047857","backgroundColor":"#a7f3d0","fillStyle":"solid","strokeWidth":2,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":30021,"version":1,"versionNonce":30022,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false},
-    {"type":"text","id":"mongo_label","x":1525,"y":432,"width":150,"height":68,"text":"MongoDB\n5 metadata documents\n5 unique file_id\n0 duplicate groups","originalText":"MongoDB\n5 metadata documents\n5 unique file_id\n0 duplicate groups","fontSize":16,"fontFamily":3,"textAlign":"center","verticalAlign":"middle","strokeColor":"#374151","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":30023,"version":1,"versionNonce":30024,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"containerId":null,"lineHeight":1.25},
-    {"type":"arrow","id":"metadata_to_spark","x":1160,"y":435,"width":58,"height":12,"strokeColor":"#1e3a5f","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":3,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":30025,"version":1,"versionNonce":30026,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"points":[[0,0],[58,12]],"startBinding":null,"endBinding":null,"startArrowhead":null,"endArrowhead":"arrow"},
-    {"type":"arrow","id":"spark_to_mongo","x":1432,"y":450,"width":61,"height":10,"strokeColor":"#6d28d9","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":3,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":30027,"version":1,"versionNonce":30028,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"points":[[0,0],[61,10]],"startBinding":null,"endBinding":null,"startArrowhead":null,"endArrowhead":"arrow"},
-    {"type":"text","id":"separation","x":1210,"y":345,"width":430,"height":30,"text":"Graph bypasses Spark; metadata enters Spark","originalText":"Graph bypasses Spark; metadata enters Spark","fontSize":16,"fontFamily":3,"textAlign":"left","verticalAlign":"top","strokeColor":"#b45309","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":30029,"version":2,"versionNonce":30031,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"containerId":null,"lineHeight":1.25},
-    {"type":"line","id":"evidence_divider","x":80,"y":650,"width":1625,"height":0,"strokeColor":"#64748b","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"dashed","roughness":0,"opacity":100,"angle":0,"seed":40001,"version":1,"versionNonce":40002,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"points":[[0,0],[1625,0]]},
-    {"type":"text","id":"evidence_title","x":80,"y":685,"width":420,"height":35,"text":"Acceptance is computed, not asserted","originalText":"Acceptance is computed, not asserted","fontSize":24,"fontFamily":3,"textAlign":"left","verticalAlign":"top","strokeColor":"#1e40af","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":40003,"version":1,"versionNonce":40004,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"containerId":null,"lineHeight":1.25},
-    {"type":"text","id":"manifest_json","x":80,"y":740,"width":740,"height":120,"text":"stage2_manifest.json\n{ kafka: {nodes: 21415, edges: 7968},\n  neo4j: {explicit: 21415, placeholders: 1213},\n  mongodb: {documents: 5}, spark: {offset: 5} }\nSHA-256 recorded for every raw evidence artifact","originalText":"stage2_manifest.json\n{ kafka: {nodes: 21415, edges: 7968},\n  neo4j: {explicit: 21415, placeholders: 1213},\n  mongodb: {documents: 5}, spark: {offset: 5} }\nSHA-256 recorded for every raw evidence artifact","fontSize":16,"fontFamily":3,"textAlign":"left","verticalAlign":"top","strokeColor":"#22c55e","backgroundColor":"#1e293b","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":40005,"version":1,"versionNonce":40006,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"containerId":null,"lineHeight":1.25},
-    {"type":"text","id":"acceptance_checks","x":920,"y":735,"width":750,"height":130,"text":"✓ commit_sha is real and identical across events\n✓ unique Kafka IDs equal persisted explicit graph objects\n✓ Neo4j and Mongo duplicate groups are zero\n✓ Spark committed the same five metadata records\n✓ one controlled error proves the failure contract","originalText":"✓ commit_sha is real and identical across events\n✓ unique Kafka IDs equal persisted explicit graph objects\n✓ Neo4j and Mongo duplicate groups are zero\n✓ Spark committed the same five metadata records\n✓ one controlled error proves the failure contract","fontSize":18,"fontFamily":3,"textAlign":"left","verticalAlign":"top","strokeColor":"#047857","backgroundColor":"transparent","fillStyle":"solid","strokeWidth":1,"strokeStyle":"solid","roughness":0,"opacity":100,"angle":0,"seed":40007,"version":1,"versionNonce":40008,"isDeleted":false,"groupIds":[],"boundElements":null,"link":null,"locked":false,"containerId":null,"lineHeight":1.25}
+    {
+      "type": "text",
+      "id": "title",
+      "x": 60,
+      "y": 35,
+      "text": "Stage 2 CPG Streaming",
+      "fontSize": 28,
+      "strokeColor": "#1e1e1e"
+    },
+    {
+      "type": "rectangle",
+      "id": "provenance",
+      "x": 60,
+      "y": 85,
+      "width": 1080,
+      "height": 48,
+      "roundness": {
+        "type": 3
+      },
+      "backgroundColor": "#dbe4ff",
+      "fillStyle": "solid",
+      "strokeColor": "#4a9eed",
+      "opacity": 45
+    },
+    {
+      "type": "text",
+      "id": "provenance_text",
+      "x": 92,
+      "y": 99,
+      "text": "huggingface/datasets  ·  commit 41adfd0f  ·  schema 1.0",
+      "fontSize": 16,
+      "strokeColor": "#2563eb"
+    },
+    {
+      "type": "rectangle",
+      "id": "repo",
+      "x": 70,
+      "y": 250,
+      "width": 170,
+      "height": 90,
+      "roundness": {
+        "type": 3
+      },
+      "backgroundColor": "#a5d8ff",
+      "fillStyle": "solid",
+      "strokeColor": "#4a9eed",
+      "boundElements": [
+        {
+          "id": "repo_text",
+          "type": "text"
+        },
+        {
+          "id": "repo_parser",
+          "type": "arrow"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "repo_text",
+      "x": 95,
+      "y": 270,
+      "width": 120,
+      "height": 50,
+      "text": "Repository\nshallow clone",
+      "fontSize": 18,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "repo",
+      "strokeColor": "#1e1e1e"
+    },
+    {
+      "type": "rectangle",
+      "id": "parser",
+      "x": 320,
+      "y": 235,
+      "width": 190,
+      "height": 120,
+      "roundness": {
+        "type": 3
+      },
+      "backgroundColor": "#d0bfff",
+      "fillStyle": "solid",
+      "strokeColor": "#8b5cf6",
+      "boundElements": [
+        {
+          "id": "parser_text",
+          "type": "text"
+        },
+        {
+          "id": "repo_parser",
+          "type": "arrow"
+        },
+        {
+          "id": "parser_kafka",
+          "type": "arrow"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "parser_text",
+      "x": 345,
+      "y": 258,
+      "width": 140,
+      "height": 72,
+      "text": "Parser\nAST + CFG\nDFG + CALL",
+      "fontSize": 18,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "parser",
+      "strokeColor": "#1e1e1e"
+    },
+    {
+      "type": "ellipse",
+      "id": "kafka",
+      "x": 600,
+      "y": 220,
+      "width": 180,
+      "height": 150,
+      "backgroundColor": "#fff3bf",
+      "fillStyle": "solid",
+      "strokeColor": "#f59e0b",
+      "boundElements": [
+        {
+          "id": "kafka_text",
+          "type": "text"
+        },
+        {
+          "id": "parser_kafka",
+          "type": "arrow"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "kafka_text",
+      "x": 630,
+      "y": 270,
+      "width": 120,
+      "height": 50,
+      "text": "Kafka\n4 topics",
+      "fontSize": 20,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "kafka",
+      "strokeColor": "#1e1e1e"
+    },
+    {
+      "type": "rectangle",
+      "id": "neo4j",
+      "x": 940,
+      "y": 180,
+      "width": 200,
+      "height": 120,
+      "roundness": {
+        "type": 3
+      },
+      "backgroundColor": "#c3fae8",
+      "fillStyle": "solid",
+      "strokeColor": "#22c55e",
+      "boundElements": [
+        {
+          "id": "neo4j_text",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "neo4j_text",
+      "x": 965,
+      "y": 202,
+      "width": 150,
+      "height": 78,
+      "text": "Neo4j\n21,415 nodes\n7,968 rels",
+      "fontSize": 18,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "neo4j",
+      "strokeColor": "#15803d"
+    },
+    {
+      "type": "rectangle",
+      "id": "spark",
+      "x": 850,
+      "y": 405,
+      "width": 160,
+      "height": 80,
+      "roundness": {
+        "type": 3
+      },
+      "backgroundColor": "#d0bfff",
+      "fillStyle": "solid",
+      "strokeColor": "#8b5cf6",
+      "boundElements": [
+        {
+          "id": "spark_text",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "spark_text",
+      "x": 875,
+      "y": 425,
+      "width": 110,
+      "height": 40,
+      "text": "Spark\noffset 5",
+      "fontSize": 18,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "spark",
+      "strokeColor": "#1e1e1e"
+    },
+    {
+      "type": "rectangle",
+      "id": "mongo",
+      "x": 1040,
+      "y": 405,
+      "width": 140,
+      "height": 80,
+      "roundness": {
+        "type": 3
+      },
+      "backgroundColor": "#c3fae8",
+      "fillStyle": "solid",
+      "strokeColor": "#22c55e",
+      "boundElements": [
+        {
+          "id": "mongo_text",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "mongo_text",
+      "x": 1060,
+      "y": 425,
+      "width": 100,
+      "height": 40,
+      "text": "MongoDB\n5 documents",
+      "fontSize": 18,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "mongo",
+      "strokeColor": "#15803d"
+    },
+    {
+      "type": "rectangle",
+      "id": "errors",
+      "x": 850,
+      "y": 555,
+      "width": 180,
+      "height": 64,
+      "roundness": {
+        "type": 3
+      },
+      "backgroundColor": "#ffc9c9",
+      "fillStyle": "solid",
+      "strokeColor": "#ef4444",
+      "boundElements": [
+        {
+          "id": "errors_text",
+          "type": "text"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "errors_text",
+      "x": 875,
+      "y": 570,
+      "width": 130,
+      "height": 34,
+      "text": "Errors\n1 controlled event",
+      "fontSize": 16,
+      "textAlign": "center",
+      "verticalAlign": "middle",
+      "containerId": "errors",
+      "strokeColor": "#b91c1c"
+    },
+    {
+      "type": "rectangle",
+      "id": "acceptance",
+      "x": 60,
+      "y": 720,
+      "width": 1080,
+      "height": 70,
+      "roundness": {
+        "type": 3
+      },
+      "backgroundColor": "#d3f9d8",
+      "fillStyle": "solid",
+      "strokeColor": "#22c55e",
+      "opacity": 45
+    },
+    {
+      "type": "text",
+      "id": "acceptance_text",
+      "x": 90,
+      "y": 742,
+      "text": "Manifest validated  ·  1,213 placeholders  ·  zero duplicate groups",
+      "fontSize": 18,
+      "strokeColor": "#15803d"
+    },
+    {
+      "type": "arrow",
+      "id": "repo_parser",
+      "x": 240,
+      "y": 295,
+      "width": 80,
+      "height": 0,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          80,
+          0
+        ]
+      ],
+      "strokeColor": "#4a9eed",
+      "strokeWidth": 2,
+      "endArrowhead": "arrow",
+      "startBinding": {
+        "elementId": "repo",
+        "fixedPoint": [
+          1,
+          0.5
+        ]
+      },
+      "endBinding": {
+        "elementId": "parser",
+        "fixedPoint": [
+          0,
+          0.5
+        ]
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "parser_kafka",
+      "x": 510,
+      "y": 295,
+      "width": 90,
+      "height": 0,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          90,
+          0
+        ]
+      ],
+      "strokeColor": "#8b5cf6",
+      "strokeWidth": 2,
+      "endArrowhead": "arrow",
+      "startBinding": {
+        "elementId": "parser",
+        "fixedPoint": [
+          1,
+          0.5
+        ]
+      },
+      "endBinding": {
+        "elementId": "kafka",
+        "fixedPoint": [
+          0,
+          0.5
+        ]
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "nodes_neo4j",
+      "x": 780,
+      "y": 260,
+      "width": 160,
+      "height": -25,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          70,
+          0
+        ],
+        [
+          160,
+          -25
+        ]
+      ],
+      "strokeColor": "#4a9eed",
+      "strokeWidth": 2,
+      "endArrowhead": "arrow",
+      "startBinding": {
+        "elementId": "kafka",
+        "fixedPoint": [
+          1,
+          0.3
+        ]
+      },
+      "endBinding": {
+        "elementId": "neo4j",
+        "fixedPoint": [
+          0,
+          0.35
+        ]
+      }
+    },
+    {
+      "type": "text",
+      "id": "nodes_label",
+      "x": 805,
+      "y": 230,
+      "text": "cpg.nodes",
+      "fontSize": 14,
+      "strokeColor": "#2563eb"
+    },
+    {
+      "type": "arrow",
+      "id": "edges_neo4j",
+      "x": 780,
+      "y": 320,
+      "width": 160,
+      "height": -25,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          70,
+          0
+        ],
+        [
+          160,
+          -25
+        ]
+      ],
+      "strokeColor": "#06b6d4",
+      "strokeWidth": 2,
+      "endArrowhead": "arrow",
+      "startBinding": {
+        "elementId": "kafka",
+        "fixedPoint": [
+          1,
+          0.7
+        ]
+      },
+      "endBinding": {
+        "elementId": "neo4j",
+        "fixedPoint": [
+          0,
+          0.75
+        ]
+      }
+    },
+    {
+      "type": "text",
+      "id": "edges_label",
+      "x": 805,
+      "y": 325,
+      "text": "cpg.edges",
+      "fontSize": 14,
+      "strokeColor": "#0e7490"
+    },
+    {
+      "type": "arrow",
+      "id": "metadata_spark",
+      "x": 735,
+      "y": 355,
+      "width": 115,
+      "height": 90,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          35,
+          90
+        ],
+        [
+          115,
+          90
+        ]
+      ],
+      "strokeColor": "#8b5cf6",
+      "strokeWidth": 2,
+      "endArrowhead": "arrow",
+      "startBinding": {
+        "elementId": "kafka",
+        "fixedPoint": [
+          0.75,
+          1
+        ]
+      },
+      "endBinding": {
+        "elementId": "spark",
+        "fixedPoint": [
+          0,
+          0.5
+        ]
+      }
+    },
+    {
+      "type": "text",
+      "id": "metadata_label",
+      "x": 720,
+      "y": 415,
+      "text": "cpg.metadata",
+      "fontSize": 14,
+      "strokeColor": "#6d28d9"
+    },
+    {
+      "type": "arrow",
+      "id": "spark_mongo",
+      "x": 1010,
+      "y": 445,
+      "width": 30,
+      "height": 0,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          30,
+          0
+        ]
+      ],
+      "strokeColor": "#22c55e",
+      "strokeWidth": 2,
+      "endArrowhead": "arrow",
+      "startBinding": {
+        "elementId": "spark",
+        "fixedPoint": [
+          1,
+          0.5
+        ]
+      },
+      "endBinding": {
+        "elementId": "mongo",
+        "fixedPoint": [
+          0,
+          0.5
+        ]
+      }
+    },
+    {
+      "type": "arrow",
+      "id": "errors_route",
+      "x": 690,
+      "y": 370,
+      "width": 160,
+      "height": 217,
+      "points": [
+        [
+          0,
+          0
+        ],
+        [
+          0,
+          217
+        ],
+        [
+          160,
+          217
+        ]
+      ],
+      "strokeColor": "#ef4444",
+      "strokeWidth": 2,
+      "endArrowhead": "arrow",
+      "startBinding": {
+        "elementId": "kafka",
+        "fixedPoint": [
+          0.5,
+          1
+        ]
+      },
+      "endBinding": {
+        "elementId": "errors",
+        "fixedPoint": [
+          0,
+          0.5
+        ]
+      }
+    },
+    {
+      "type": "text",
+      "id": "errors_label",
+      "x": 705,
+      "y": 565,
+      "text": "cpg.errors",
+      "fontSize": 14,
+      "strokeColor": "#b91c1c"
+    }
   ],
-  "appState": {"viewBackgroundColor":"#ffffff","gridSize":20},
+  "appState": {
+    "viewBackgroundColor": "#ffffff",
+    "gridSize": 20
+  },
   "files": {}
 }
