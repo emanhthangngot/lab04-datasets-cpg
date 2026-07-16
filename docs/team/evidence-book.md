@@ -55,12 +55,12 @@ Spec input to Tri:
 
 Tasks:
 
-- [ ] Add executed outputs for repository discovery.
-- [ ] Add parser output samples.
-- [ ] Add parser CFG/DFG/CALL edge count evidence from Tri.
-- [ ] Add Kafka message samples.
-- [ ] Add initial Neo4j/MongoDB evidence references from Truc and Thanh.
-- [ ] Keep replay slots pending unless the full replay workflow actually runs.
+- [x] Add executed outputs for repository discovery.
+- [x] Add parser output samples.
+- [x] Add parser CFG/DFG/CALL edge count evidence from Tri.
+- [x] Add Kafka message samples.
+- [x] Add initial Neo4j/MongoDB evidence references from Truc and Thanh.
+- [x] Keep replay slots explicit until the full replay workflow actually runs.
 
 Done when:
 
@@ -108,11 +108,10 @@ Done when:
 
 ## Latest Update
 
-Status: Stage 1 book foundation completed and local Jupyter Book build passes;
-runtime evidence remains pending for later stages.
+Status: Stage 2 Task 1-5 executed chapters, query evidence, manifest, and
+architecture are complete. Task 6 replay and publication remain Stage 3/4.
 
-Next action: After teammates provide runtime outputs, replace pending slots
-with real command, notebook, query, or screenshot evidence only.
+Next action: implement and capture Task 6 replay, then verify the published book.
 
 Evidence links:
 

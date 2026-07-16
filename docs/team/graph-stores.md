@@ -108,7 +108,7 @@ Done when:
 
 - Tri approves graph-store evidence for final Pages publication.
 
-## Stage 2 Acceptance Update (2026-07-14)
+## Stage 2 Acceptance Update (2026-07-16)
 
 Status: Stage 2 graph-store clean-run acceptance passed locally; replay remains a separate follow-up.
 
@@ -120,6 +120,10 @@ counts; they were not separate remote databases.
 
 Clean-run acceptance after `RESET_DOCKER_STATE=1` reset the local
 `lab04-datasets-cpg` containers, topics, volumes, and Spark checkpoint:
+
+- Dataset provenance is the real commit
+  `41adfd0f9ee9ba3a6b4f719d5b551c5b19ae45e2`; the hash-validated summary is
+  `screenshots/stage2_manifest.json`.
 
 - Kafka emitted 21,415 node events with 21,415 unique IDs and 7,968 edge events
   with 7,968 unique IDs. Every consumed graph event used

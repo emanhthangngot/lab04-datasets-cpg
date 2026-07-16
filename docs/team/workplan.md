@@ -66,9 +66,9 @@ source code, notebooks, screenshots, and meaningful commit history.
 
 - [x] Review parser/schema output before downstream ingestion.
 - [x] Confirm parser sample emits CFG, DFG, and CALL edges when constructs exist.
-- [ ] Review Kafka/Spark sample evidence.
-- [ ] Review Neo4j/MongoDB sample evidence.
-- [ ] Ensure sample outputs are captured in notebooks.
+- [x] Review Kafka/Spark sample evidence.
+- [x] Review Neo4j/MongoDB sample evidence.
+- [x] Ensure sample outputs are captured in notebooks.
 
 ### Shared E2E Verification Gate
 
@@ -96,9 +96,9 @@ source code, notebooks, screenshots, and meaningful commit history.
 | Area | Owner | Status | Next Checkpoint |
 |---|---|---|---|
 | Parser/schema/specs | Tri | Schema v1.0 locked; Stage 2 parser-core spec added | Parser sample edge evidence |
-| Kafka/Spark | Truc | Assigned from OpenSpec handoff; Spark image decision recorded | Topic, plugin, connector, and Spark evidence |
-| Neo4j/MongoDB | Thanh | Assigned from OpenSpec handoff | Neo4j/MongoDB validation evidence |
-| Evidence/Jupyter Book | Tuan | Assigned from OpenSpec handoff | Stage 1 book skeleton review |
+| Kafka/Spark | Truc | Stage 2 accepted: topics, connector, checkpoint and offset 5 evidenced | Stage 3 replay |
+| Neo4j/MongoDB | Thanh | Stage 2 accepted: counts and duplicate checks pass | Stage 3 replay/stale cleanup |
+| Evidence/Jupyter Book | Tuan | Task 1-5 executed chapters and architecture complete | Task 6 and Pages |
 
 ## Blocker Policy
 
