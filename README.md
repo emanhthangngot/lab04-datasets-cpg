@@ -67,7 +67,9 @@ docker compose exec spark spark-submit \
   /app/spark_jobs/metadata_stream_to_mongo.py
 
 # 7. Run parser inside Docker network
-docker compose run --rm parser python -m parser_service.main --repo data/datasets --mode full
+COMMIT_SHA="$(git -C data/datasets rev-parse HEAD)"
+docker compose run --rm -e COMMIT_SHA="$COMMIT_SHA" parser \
+  python -m parser_service.main --repo data/datasets --mode full
 
 # 8. Capture evidence and build book
 jupyter notebook notebooks/

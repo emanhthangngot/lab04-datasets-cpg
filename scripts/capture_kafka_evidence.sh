@@ -14,6 +14,7 @@ KAFKA_SERVICE="${KAFKA_SERVICE:-broker}"
 BOOTSTRAP="${KAFKA_BOOTSTRAP_INTERNAL:-broker:9092}"
 EVIDENCE_DIR="screenshots/kafka"
 SAMPLE_COUNT="${SAMPLE_COUNT:-3}"
+: "${EXPECTED_COMMIT_SHA:?Set EXPECTED_COMMIT_SHA to the cloned dataset Git SHA}"
 
 if [[ -x ".venv/Scripts/python.exe" ]]; then
   PYTHON=".venv/Scripts/python.exe"
@@ -66,9 +67,11 @@ import sys
 
 output_file = sys.argv[1]
 topic = sys.argv[2]
+expected_commit = sys.argv[3]
 required = ["schema_version", "event_time", "file_id", "file_path"]
 extra_map_fields = ["properties"] if topic in ("cpg.nodes", "cpg.edges") else []
 errors = []
+commit_shas = set()
 
 with open(output_file) as f:
     for i, line in enumerate(f, 1):
@@ -80,6 +83,7 @@ with open(output_file) as f:
         except json.JSONDecodeError:
             errors.append(f"  Line {i}: invalid JSON")
             continue
+        commit_shas.add(msg.get("commit_sha"))
         for field in required:
             if field not in msg:
                 errors.append(f"  Line {i}: missing {field}")
@@ -90,6 +94,12 @@ with open(output_file) as f:
         if topic == "cpg.errors" and msg.get("status") != "failed":
             errors.append(f"  Line {i}: cpg.errors status must be 'failed'")
 
+if "unknown" in commit_shas or commit_shas != {expected_commit}:
+    errors.append(
+        f"  unexpected commit_sha values: {sorted(repr(value) for value in commit_shas)}; "
+        f"expected {expected_commit!r}"
+    )
+
 if errors:
     print(f"VALIDATION FAILED for {topic}:", file=sys.stderr)
     for e in errors:
@@ -97,7 +107,7 @@ if errors:
     sys.exit(1)
 else:
     print(f"VALIDATION OK: all samples from {topic} contain required fields")
-' "$output_file" "$topic"
+' "$output_file" "$topic" "$EXPECTED_COMMIT_SHA"
   else
     echo "No messages available in $topic" >&2
     return 1

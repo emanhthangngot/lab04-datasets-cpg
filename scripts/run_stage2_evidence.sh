@@ -58,6 +58,14 @@ echo ""
 echo ">>> Step 2: Clone repository"
 bash scripts/clone_repo.sh
 
+DATASET_COMMIT_SHA="$(git -C data/datasets rev-parse HEAD)"
+if ! [[ "$DATASET_COMMIT_SHA" =~ ^[0-9a-f]{40}$ ]]; then
+  echo "ERROR: invalid dataset commit SHA: $DATASET_COMMIT_SHA" >&2
+  exit 1
+fi
+export EXPECTED_COMMIT_SHA="$DATASET_COMMIT_SHA"
+echo "Dataset commit SHA verified: $DATASET_COMMIT_SHA"
+
 echo ">>> Verifying parser repository identity"
 ACTUAL_REPO_NAME="$(
   docker compose run --rm parser printenv REPO_NAME | tr -d '\r'
@@ -118,7 +126,8 @@ SPARK_PID=$!
 # Step 7: Run parser in sample mode
 # --------------------------------------------------------------------------
 echo ">>> Step 7a: Run parser (sample mode - 5 files)"
-docker compose run --rm -e REPO_NAME="$EXPECTED_REPO_NAME" parser \
+docker compose run --rm -e REPO_NAME="$EXPECTED_REPO_NAME" \
+  -e COMMIT_SHA="$DATASET_COMMIT_SHA" parser \
   python -m parser_service.main --repo data/datasets --mode sample
 
 # --------------------------------------------------------------------------
@@ -126,7 +135,8 @@ docker compose run --rm -e REPO_NAME="$EXPECTED_REPO_NAME" parser \
 # --------------------------------------------------------------------------
 echo ""
 echo ">>> Step 7b: Parse invalid_syntax.py to generate error event"
-docker compose run --rm -e REPO_NAME="$EXPECTED_REPO_NAME" parser \
+docker compose run --rm -e REPO_NAME="$EXPECTED_REPO_NAME" \
+  -e COMMIT_SHA="$DATASET_COMMIT_SHA" parser \
   python -m parser_service.main --repo data --mode file --file data/invalid_syntax.py \
   || echo "(Expected: parser emits error event for SyntaxError)"
 

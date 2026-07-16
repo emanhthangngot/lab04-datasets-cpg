@@ -412,6 +412,28 @@ def test_stage2_runbook_locks_parser_repository_identity() -> None:
     assert "printenv REPO_NAME" in source
 
 
+def test_stage2_runbook_propagates_dataset_commit_sha() -> None:
+    source = (PROJECT_ROOT / "scripts" / "run_stage2_evidence.sh").read_text()
+    assert 'DATASET_COMMIT_SHA="$(git -C data/datasets rev-parse HEAD)"' in source
+    assert 'export EXPECTED_COMMIT_SHA="$DATASET_COMMIT_SHA"' in source
+    assert source.count('-e COMMIT_SHA="$DATASET_COMMIT_SHA"') == 2
+
+
+def test_kafka_evidence_rejects_unknown_or_mixed_commit_sha() -> None:
+    source = (PROJECT_ROOT / "scripts" / "capture_kafka_evidence.sh").read_text()
+    assert 'EXPECTED_COMMIT_SHA:?' in source
+    assert 'msg.get("commit_sha")' in source
+    assert '"unknown"' in source
+    assert "unexpected commit_sha values" in source
+
+
+def test_connector_wait_validates_all_graph_event_commit_shas() -> None:
+    source = (PROJECT_ROOT / "scripts" / "wait_neo4j_connector_idle.sh").read_text()
+    assert "EXPECTED_COMMIT_SHA" in source
+    assert 'event.get("commit_sha")' in source
+    assert "unexpected commit_sha values" in source
+
+
 def test_stage2_runbook_waits_for_connect_api() -> None:
     source = (PROJECT_ROOT / "scripts" / "run_stage2_evidence.sh").read_text()
     assert "CONNECT_WAIT_SECONDS" in source

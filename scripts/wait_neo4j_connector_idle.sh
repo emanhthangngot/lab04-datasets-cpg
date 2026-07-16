@@ -10,6 +10,7 @@ CONNECTOR_NAME="${CONNECTOR_NAME:-cpg-neo4j-sink}"
 GROUP="connect-${CONNECTOR_NAME}"
 STORE_WAIT_SECONDS="${NEO4J_STORE_WAIT_SECONDS:-300}"
 EXPECTED_REPO_NAME="${EXPECTED_REPO_NAME:-huggingface/datasets}"
+EXPECTED_COMMIT_SHA="${EXPECTED_COMMIT_SHA:-}"
 REQUIRE_UNIQUE_EVENT_IDS="${REQUIRE_UNIQUE_EVENT_IDS:-true}"
 : "${NEO4J_PASSWORD:?Set NEO4J_PASSWORD before waiting for Neo4j persistence}"
 
@@ -71,9 +72,11 @@ import sys
 
 topic = sys.argv[1]
 expected_repo = sys.argv[2]
+expected_commit = sys.argv[3]
 event_count = 0
 ids = set()
 repos = set()
+commit_shas = set()
 for line in sys.stdin:
     line = line.strip()
     if not line:
@@ -82,10 +85,16 @@ for line in sys.stdin:
     event_count += 1
     ids.add(event["id"])
     repos.add(event.get("repo"))
+    commit_shas.add(event.get("commit_sha"))
 if repos != {expected_repo}:
     raise SystemExit(f"ERROR: {topic} contains unexpected repo values: {sorted(repr(repo) for repo in repos)}")
+if expected_commit and commit_shas != {expected_commit}:
+    raise SystemExit(
+        f"ERROR: {topic} contains unexpected commit_sha values: "
+        f"{sorted(repr(commit_sha) for commit_sha in commit_shas)}"
+    )
 print(event_count, len(ids))
-' "$topic" "$EXPECTED_REPO_NAME"
+' "$topic" "$EXPECTED_REPO_NAME" "$EXPECTED_COMMIT_SHA"
 }
 
 read -r NODE_EVENTS EXPECTED_NODES <<< "$(topic_id_counts cpg.nodes)"
