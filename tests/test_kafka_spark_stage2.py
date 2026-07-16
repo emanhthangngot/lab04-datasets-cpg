@@ -72,7 +72,7 @@ class TestSinkConnectorConfig:
         """Neo4j Kafka Connector 5.1.0 has a bug with JsonConverter + schemas.enable=false:
         it treats schemaless JSON payloads as tombstone (null), resulting in 0 nodes/edges.
         StringConverter bypasses this — the connector auto-parses JSON strings into Maps
-        for __value, which works correctly (verified: 21,838 nodes, 7,967 edges)."""
+        for __value, which works correctly (verified: 22,628 nodes, 7,968 edges)."""
         expected = "org.apache.kafka.connect.storage.StringConverter"
         actual = config["config"].get("value.converter", "")
         assert actual == expected, (
@@ -315,9 +315,14 @@ def test_runbook_requires_neo4j_password_without_literal_password() -> None:
 
 
 def test_runbook_keeps_shared_graph_store_checks() -> None:
-    source = (PROJECT_ROOT / "scripts" / "run_stage2_evidence.sh").read_text()
-    for marker in ["node_count", "edge_count", "duplicate_nodes", "duplicate_edges", "file_metadata"]:
+    runbook = (PROJECT_ROOT / "scripts" / "run_stage2_evidence.sh").read_text()
+    source = (PROJECT_ROOT / "scripts" / "capture_store_evidence.sh").read_text()
+    assert "bash scripts/capture_store_evidence.sh" in runbook
+    for marker in ["node_count", "non_placeholder_count", "edge_count", "duplicate_nodes", "duplicate_edges", "file_metadata"]:
         assert marker in source
+    assert 'distinct("file_id")' in source
+    assert 'distinct("file_path")' in source
+    assert 'distinct("repo")' in source
 
 
 def test_tracker_has_one_verified_test_count_and_cross_owner_gate() -> None:
@@ -349,7 +354,8 @@ def test_spark_evidence_fails_when_stream_or_metadata_is_missing() -> None:
     source = (PROJECT_ROOT / "scripts" / "capture_spark_evidence.sh").read_text()
     assert "metadata_stream_to_mongo.py" in source
     assert "Spark metadata stream is not running" in source
-    assert "checkpoint directory was not created" in source
+    assert "Spark did not commit and catch up" in source
+    assert "checkpoint directory disappeared after a committed batch" in source
     assert "file_metadata count is" in source
     assert "MONGO_COUNT" in source
 
@@ -397,3 +403,66 @@ def test_tracker_keeps_graph_store_acceptance_pending_after_runtime_passes() -> 
     source = (PROJECT_ROOT / "docs" / "team" / "kafka-spark.md").read_text()
     assert "Status: Stage 2 complete." not in source
     assert "Thanh acceptance pending" in source
+
+
+def test_stage2_runbook_locks_parser_repository_identity() -> None:
+    source = (PROJECT_ROOT / "scripts" / "run_stage2_evidence.sh").read_text()
+    assert 'EXPECTED_REPO_NAME="huggingface/datasets"' in source
+    assert 'REPO_NAME="$EXPECTED_REPO_NAME"' in source
+    assert "printenv REPO_NAME" in source
+
+
+def test_stage2_runbook_waits_for_connect_api() -> None:
+    source = (PROJECT_ROOT / "scripts" / "run_stage2_evidence.sh").read_text()
+    assert "CONNECT_WAIT_SECONDS" in source
+    assert 'curl -fsS "$CONNECT_URL/connector-plugins"' in source
+    assert "Kafka Connect API is ready" in source
+
+
+def test_stage2_runbook_requires_clean_docker_reset() -> None:
+    source = (PROJECT_ROOT / "scripts" / "run_stage2_evidence.sh").read_text()
+    assert "Set RESET_DOCKER_STATE=1" in source
+    assert 'COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-lab04-datasets-cpg}"' in source
+    assert "docker compose down -v --remove-orphans" in source
+    assert "before starting Stage 2" in source
+
+
+def test_run_checks_prefers_python_with_pytest() -> None:
+    source = (PROJECT_ROOT / "scripts" / "run_checks.sh").read_text()
+    assert '".venv/bin/python"' in source
+    assert 'python3 -m pytest' not in source
+
+
+def test_parser_is_manual_and_runbook_does_not_auto_start_it() -> None:
+    compose_source = (PROJECT_ROOT / "docker-compose.yml").read_text()
+    runbook_source = (PROJECT_ROOT / "scripts" / "run_stage2_evidence.sh").read_text()
+
+    parser_block = compose_source[compose_source.index("  parser:") : compose_source.index("\nvolumes:")]
+    assert 'profiles: ["manual"]' in parser_block
+    assert "docker compose up -d broker neo4j mongo connect spark" in runbook_source
+    assert "docker compose up -d\n" not in runbook_source
+
+
+def test_spark_evidence_requires_commit_and_kafka_catchup() -> None:
+    source = (PROJECT_ROOT / "scripts" / "capture_spark_evidence.sh").read_text()
+    assert "$CHECKPOINT_PATH/commits" in source
+    assert "checkpoint_commits.txt" in source
+    assert "KAFKA_END_OFFSET" in source
+    assert 'CHECKPOINT_KAFKA_OFFSET" = "$KAFKA_END_OFFSET' in source
+    assert "MSYS_NO_PATHCONV=1 docker compose" in source
+    assert "Spark metadata stream is already running; reusing it" in source
+    assert "--driver-memory 512m" in source
+    assert "spark_stream.log" in source
+    assert "pgrep -f '[m]etadata_stream_to_mongo.py'" in source
+    assert "pgrep -f 'metadata_stream_to_mongo.py'" not in source
+    assert "SPARK_MONGO_WAIT_SECONDS" in source
+    assert "EXPECTED_MONGO_COUNT" in source
+
+
+def test_connector_wait_requires_persisted_graph_counts() -> None:
+    source = (PROJECT_ROOT / "scripts" / "wait_neo4j_connector_idle.sh").read_text()
+    assert "NEO4J_STORE_WAIT_SECONDS" in source
+    assert "topic_id_counts cpg.nodes" in source and "topic_id_counts cpg.edges" in source
+    assert "duplicate emitted IDs detected" in source
+    assert "coalesce(n.placeholder, false) = false" in source
+    assert "Neo4j persisted graph matches unique emitted Kafka IDs" in source

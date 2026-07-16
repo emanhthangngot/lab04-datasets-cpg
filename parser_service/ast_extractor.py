@@ -5,7 +5,7 @@ from __future__ import annotations
 import ast
 from typing import Iterable
 
-from .ids import get_scope_path, make_node_id
+from .ids import assign_parents, get_scope_path, make_node_id
 from .schemas import build_node_event
 
 
@@ -40,6 +40,8 @@ def extract_ast_nodes_gen(*, tree: ast.AST, file_id: str, file_path: str, contex
     TODO: Improve `scope_path` tracking for nested classes/functions. Current
     scaffold keeps scope coarse so downstream schema work can proceed.
     """
+
+    assign_parents(tree)
 
     for node in ast.walk(tree):
         if not isinstance(node, SUPPORTED_NODE_TYPES):

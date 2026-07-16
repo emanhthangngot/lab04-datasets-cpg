@@ -5,7 +5,7 @@ from __future__ import annotations
 import ast
 from typing import Iterable
 
-from .ids import get_scope_path, make_edge_id, make_node_id
+from .ids import assign_parents, get_scope_path, make_edge_id, make_node_id
 from .schemas import build_edge_event
 
 
@@ -48,6 +48,8 @@ def _statement_lists(tree: ast.AST) -> Iterable[list[ast.stmt]]:
 
 def extract_cfg_edges_gen(*, tree: ast.AST, file_id: str, file_path: str, context) -> Iterable[dict]:
     """Yield CFG edge events for common Python statement flow."""
+
+    assign_parents(tree)
 
     for statements in _statement_lists(tree):
         for current, following in zip(statements, statements[1:]):

@@ -11,13 +11,20 @@ else
 fi
 echo
 
-if [[ -x ".venv/Scripts/python.exe" ]]; then
-  PYTHON=".venv/Scripts/python.exe"
-elif command -v python3 >/dev/null 2>&1; then
-  PYTHON="python3"
-else
-  PYTHON="python"
-fi
+PYTHON=""
+for candidate in ".venv/bin/python" ".venv/Scripts/python.exe" python python3 /usr/bin/python; do
+  if [[ "$candidate" == */* && ! -x "$candidate" ]]; then
+    continue
+  fi
+  if ! command -v "$candidate" >/dev/null 2>&1 && [[ ! -x "$candidate" ]]; then
+    continue
+  fi
+  if "$candidate" -c 'import pytest' >/dev/null 2>&1; then
+    PYTHON="$candidate"
+    break
+  fi
+done
+: "${PYTHON:?Install pytest in one of the project Python environments before running checks}"
 
 echo "==> Python tests"
 "$PYTHON" -m pytest

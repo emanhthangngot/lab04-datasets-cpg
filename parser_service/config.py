@@ -13,6 +13,9 @@ from pathlib import Path
 from uuid import uuid4
 
 
+EXPECTED_REPO_NAME = "huggingface/datasets"
+
+
 @dataclass(frozen=True)
 class ParserContext:
     repo_root: Path
@@ -29,9 +32,16 @@ def build_context(repo_root: Path, run_id: str | None = None) -> ParserContext:
     # TODO: Replace unknown commit fallback with `git -C repo_root rev-parse HEAD`
     # once clone workflow is guaranteed to exist in every run.
     commit_sha = os.environ.get("COMMIT_SHA", "unknown")
+    repo_name = os.environ.get("REPO_NAME", EXPECTED_REPO_NAME)
+    if repo_name != EXPECTED_REPO_NAME:
+        raise ValueError(
+            "Invalid REPO_NAME: "
+            f"expected {EXPECTED_REPO_NAME!r}, got {repo_name!r}"
+        )
+
     return ParserContext(
         repo_root=repo_root,
-        repo_name=os.environ.get("REPO_NAME", "huggingface/datasets"),
+        repo_name=repo_name,
         commit_sha=commit_sha,
         run_id=run_id or os.environ.get("RUN_ID", uuid4().hex),
         schema_version=os.environ.get("SCHEMA_VERSION", "1.0"),

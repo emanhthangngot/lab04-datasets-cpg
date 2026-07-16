@@ -2,6 +2,24 @@
 set -euo pipefail
 
 : "${NEO4J_PASSWORD:?Set NEO4J_PASSWORD before running Stage 2 evidence capture}"
+: "${RESET_DOCKER_STATE:?Set RESET_DOCKER_STATE=1 before starting Stage 2}"
+if [ "$RESET_DOCKER_STATE" != "1" ]; then
+  echo "ERROR: RESET_DOCKER_STATE must be exactly 1 for a clean Stage 2 run" >&2
+  exit 1
+fi
+COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-lab04-datasets-cpg}"
+export COMPOSE_PROJECT_NAME
+EXPECTED_REPO_NAME="huggingface/datasets"
+CONNECT_URL="${CONNECT_URL:-http://localhost:8083}"
+CONNECT_WAIT_SECONDS="${CONNECT_WAIT_SECONDS:-120}"
+
+if [[ -x ".venv/Scripts/python.exe" ]]; then
+  PYTHON=".venv/Scripts/python.exe"
+elif command -v python3 >/dev/null 2>&1; then
+  PYTHON="python3"
+else
+  PYTHON="python"
+fi
 
 # Unified Stage 2 runbook: end-to-end evidence capture.
 # Owner: 23120180 - Tran Le Trung Truc
@@ -17,11 +35,16 @@ echo " Lab04 Stage 2: Core Streaming Path - Full Evidence Capture"
 echo "============================================================"
 echo ""
 
+echo ">>> Resetting local Docker state for a clean Stage 2 run"
+docker compose down -v --remove-orphans
+
 # --------------------------------------------------------------------------
 # Step 1: Start infrastructure
 # --------------------------------------------------------------------------
 echo ">>> Step 1: Starting Docker Compose infrastructure"
-docker compose up -d
+# Do not start the one-shot parser service here. It is invoked exactly once in
+# Step 7 after the topics, connector, and Spark capture are ready.
+docker compose up -d broker neo4j mongo connect spark
 echo "Waiting 15s for services to become healthy..."
 sleep 15
 
@@ -34,6 +57,16 @@ docker compose ps
 echo ""
 echo ">>> Step 2: Clone repository"
 bash scripts/clone_repo.sh
+
+echo ">>> Verifying parser repository identity"
+ACTUAL_REPO_NAME="$(
+  docker compose run --rm parser printenv REPO_NAME | tr -d '\r'
+)"
+if [ "$ACTUAL_REPO_NAME" != "$EXPECTED_REPO_NAME" ]; then
+  echo "ERROR: parser REPO_NAME must be $EXPECTED_REPO_NAME, got $ACTUAL_REPO_NAME" >&2
+  exit 1
+fi
+echo "Parser repository identity verified: $ACTUAL_REPO_NAME"
 
 # --------------------------------------------------------------------------
 # Step 3: Create Kafka topics explicitly
@@ -61,6 +94,16 @@ docker compose exec -T neo4j cypher-shell -u neo4j -p "$NEO4J_PASSWORD" \
 # --------------------------------------------------------------------------
 echo ""
 echo ">>> Step 5: Verify connector plugin and register Neo4j sink"
+echo "Waiting for Kafka Connect API to become ready..."
+CONNECT_DEADLINE=$((SECONDS + CONNECT_WAIT_SECONDS))
+until curl -fsS "$CONNECT_URL/connector-plugins" >/dev/null 2>&1; do
+  if (( SECONDS >= CONNECT_DEADLINE )); then
+    echo "ERROR: Kafka Connect API was not ready within ${CONNECT_WAIT_SECONDS}s" >&2
+    exit 1
+  fi
+  sleep 2
+done
+echo "Kafka Connect API is ready."
 bash scripts/capture_connector_evidence.sh
 
 # --------------------------------------------------------------------------
@@ -75,7 +118,7 @@ SPARK_PID=$!
 # Step 7: Run parser in sample mode
 # --------------------------------------------------------------------------
 echo ">>> Step 7a: Run parser (sample mode - 5 files)"
-docker compose run --rm parser \
+docker compose run --rm -e REPO_NAME="$EXPECTED_REPO_NAME" parser \
   python -m parser_service.main --repo data/datasets --mode sample
 
 # --------------------------------------------------------------------------
@@ -83,7 +126,7 @@ docker compose run --rm parser \
 # --------------------------------------------------------------------------
 echo ""
 echo ">>> Step 7b: Parse invalid_syntax.py to generate error event"
-docker compose run --rm parser \
+docker compose run --rm -e REPO_NAME="$EXPECTED_REPO_NAME" parser \
   python -m parser_service.main --repo data --mode file --file data/invalid_syntax.py \
   || echo "(Expected: parser emits error event for SyntaxError)"
 
@@ -103,53 +146,12 @@ bash scripts/capture_kafka_evidence.sh
 
 # --------------------------------------------------------------------------
 # Step 10: Capture store verification
-# NOTE: Neo4j counts/duplicate checks are part of Thanh's scope (tasks 2.4-2.5).
-# MongoDB verification is Thanh's scope (task 2.6).
-# Included here for end-to-end runbook completeness with Tri's approval.
+# Neo4j/MongoDB evidence and fail-fast acceptance are centralized in the
+# reusable store capture script.
 # --------------------------------------------------------------------------
 echo ""
 echo ">>> Step 10: Neo4j store verification"
-docker compose exec -T neo4j cypher-shell -u neo4j -p "$NEO4J_PASSWORD" \
-  "MATCH (n:CPGNode) RETURN count(n) AS node_count;" \
-  | tee screenshots/neo4j/node_count.txt
-
-docker compose exec -T neo4j cypher-shell -u neo4j -p "$NEO4J_PASSWORD" \
-  "MATCH ()-[r:CPG_EDGE]->() RETURN count(r) AS edge_count;" \
-  | tee screenshots/neo4j/edge_count.txt
-
-docker compose exec -T neo4j cypher-shell -u neo4j -p "$NEO4J_PASSWORD" \
-  "MATCH (n:CPGNode {placeholder: true}) RETURN count(n) AS placeholder_count;" \
-  | tee screenshots/neo4j/placeholder_count.txt
-
-echo ">>> Neo4j duplicate node check"
-docker compose exec -T neo4j cypher-shell -u neo4j -p "$NEO4J_PASSWORD" \
-  "MATCH (n:CPGNode) WITH n.id AS id, count(*) AS c WHERE c > 1 RETURN id, c;" \
-  | tee screenshots/neo4j/duplicate_nodes.txt
-if [ ! -s screenshots/neo4j/duplicate_nodes.txt ]; then
-  echo "No duplicate nodes found" > screenshots/neo4j/duplicate_nodes.txt
-fi
-
-echo ">>> Neo4j duplicate edge check"
-docker compose exec -T neo4j cypher-shell -u neo4j -p "$NEO4J_PASSWORD" \
-  "MATCH ()-[r:CPG_EDGE]->() WITH r.id AS id, count(*) AS c WHERE c > 1 RETURN id, c;" \
-  | tee screenshots/neo4j/duplicate_edges.txt
-if [ ! -s screenshots/neo4j/duplicate_edges.txt ]; then
-  echo "No duplicate edges found" > screenshots/neo4j/duplicate_edges.txt
-fi
-
-echo ""
-echo ">>> MongoDB store verification"
-docker compose exec -T mongo mongosh --quiet --eval '
-  db = db.getSiblingDB("cpg");
-  print("file_metadata count: " + db.file_metadata.countDocuments());
-  print("--- sample document ---");
-  printjson(db.file_metadata.findOne());
-  print("--- duplicate file_id check ---");
-  printjson(db.file_metadata.aggregate([
-    { $group: { _id: "$file_id", count: { $sum: 1 } } },
-    { $match: { count: { $gt: 1 } } }
-  ]).toArray());
-' | tee screenshots/mongodb/metadata_evidence.txt
+bash scripts/capture_store_evidence.sh
 
 # Wait for the Spark evidence background task
 wait "$SPARK_PID"
@@ -177,8 +179,8 @@ for dir in screenshots/kafka screenshots/neo4j screenshots/mongodb screenshots/s
   [ -d "$dir" ] || continue
   bash scripts/sanitize_evidence.sh "$dir"/*.json "$dir"/*.txt
 done
-python3 -m json.tool screenshots/kafka/connector_plugins.json >/dev/null
-python3 -m json.tool screenshots/kafka/connector_registration.json >/dev/null
+"$PYTHON" -m json.tool screenshots/kafka/connector_plugins.json >/dev/null
+"$PYTHON" -m json.tool screenshots/kafka/connector_registration.json >/dev/null
 echo "Credential sanitization and JSON validation complete."
 
 echo ""

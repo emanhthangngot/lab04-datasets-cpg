@@ -101,9 +101,9 @@ Done when:
 
 ## Latest Update
 
-Status: Stage 2 implementation and shared E2E verification complete; Thanh acceptance pending.
+Status: Stage 2 clean-run implementation and shared E2E verification complete; Thanh acceptance pending.
 
-Date: 2026-07-13
+Date: 2026-07-14
 
 Completed in Stage 2:
 
@@ -123,15 +123,17 @@ Completed in Stage 2:
 | Connector registration evidence shows correct Neo4j class | ✅ Evidence captured: [connector_plugins.json](../../screenshots/kafka/connector_plugins.json) |
 | Spark reads cpg.metadata and writes metadata path evidence | ✅ Checkpoint offset committed and MongoDB contains 5 metadata documents |
 | Progress and evidence links updated in this file | ✅ Updated |
-| All existing tests still pass | ✅ 82 tests passed |
+| All existing tests still pass | ✅ 96 tests passed |
 
 ### Latest Runtime Recheck
 
-The full Docker run verified Kafka sample contracts, a RUNNING Neo4j connector,
-Neo4j ingestion (21,838 nodes, 7,967 edges, 1,213 placeholders, no duplicate
-nodes/edges), a committed Spark checkpoint offset, and 5 MongoDB metadata
-documents with no duplicate `file_id`. Truc's Stage 2 runtime path is verified;
-Thanh must still recheck and accept the Graph Stores evidence before merge.
+The clean Docker run used `RESET_DOCKER_STATE=1` and verified Kafka sample
+contracts, a RUNNING Neo4j connector, Neo4j ingestion (22,628 nodes, 21,415
+non-placeholder nodes, 7,968 edges, 1,213 placeholders, no duplicate
+nodes/edges), a committed Spark checkpoint at metadata offset 5, and 5 MongoDB
+metadata documents with no duplicate `file_id`. Truc's Stage 2 runtime path is
+verified; Thanh must still recheck and accept the Graph Stores evidence before
+merge.
 
 ### Baseline Checks (task 1.2)
 
@@ -142,9 +144,9 @@ Thanh must still recheck and accept the Graph Stores evidence before merge.
 | Command | Result |
 |---|---|
 | `git status --short` | Clean working tree (all changes committed) |
-| `bash scripts/run_checks.sh` | Pass: pytest 82 tests, Docker Compose syntax valid, JSON connector config valid |
+| `bash scripts/run_checks.sh` | Pass: pytest 96 passed; Docker Compose syntax valid; JSON connector config valid |
 | `docker compose config --quiet` | Pass: no errors |
-| `python -m pytest tests/ -v --override-ini="addopts=" -p no:langsmith` | Pass: 82 tests passed after remediation contracts |
+| `pytest tests/ -q --override-ini="addopts=" -p no:langsmith` | Pass: 96 tests passed after remediation contracts |
 
 ### Scripts Created
 
