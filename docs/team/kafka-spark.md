@@ -101,9 +101,9 @@ Done when:
 
 ## Latest Update
 
-Status: Stage 2 clean-run implementation and shared E2E verification complete; Thanh acceptance pending.
+Status: Stage 2 clean-run implementation, store acceptance, and notebook evidence complete.
 
-Date: 2026-07-14
+Date: 2026-07-16
 
 Completed in Stage 2:
 
@@ -123,7 +123,7 @@ Completed in Stage 2:
 | Connector registration evidence shows correct Neo4j class | ✅ Evidence captured: [connector_plugins.json](../../screenshots/kafka/connector_plugins.json) |
 | Spark reads cpg.metadata and writes metadata path evidence | ✅ Checkpoint offset committed and MongoDB contains 5 metadata documents |
 | Progress and evidence links updated in this file | ✅ Updated |
-| All existing tests still pass | ✅ 96 tests passed |
+| All existing tests still pass | ✅ Full verification recorded in the Stage 2 PR |
 
 ### Latest Runtime Recheck
 
@@ -131,9 +131,9 @@ The clean Docker run used `RESET_DOCKER_STATE=1` and verified Kafka sample
 contracts, a RUNNING Neo4j connector, Neo4j ingestion (22,628 nodes, 21,415
 non-placeholder nodes, 7,968 edges, 1,213 placeholders, no duplicate
 nodes/edges), a committed Spark checkpoint at metadata offset 5, and 5 MongoDB
-metadata documents with no duplicate `file_id`. Truc's Stage 2 runtime path is
-verified; Thanh must still recheck and accept the Graph Stores evidence before
-merge.
+metadata documents with no duplicate `file_id`. All sampled events carry the
+real dataset commit `41adfd0f9ee9ba3a6b4f719d5b551c5b19ae45e2`; the validated
+manifest is [stage2_manifest.json](../../screenshots/stage2_manifest.json).
 
 ### Baseline Checks (task 1.2)
 

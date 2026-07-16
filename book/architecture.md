@@ -1,23 +1,42 @@
 # Architecture
 
-```text
-huggingface/datasets -> parser_service -> Kafka
-Kafka cpg.nodes/cpg.edges -> Neo4j Kafka Connector -> Neo4j
-Kafka cpg.metadata -> Spark Structured Streaming -> MongoDB
-Kafka cpg.errors -> logs / evidence
+![Stage 2 CPG streaming architecture](_static/stage2_pipeline.png)
+
+The editable source is [`stage2_pipeline.excalidraw`](_static/stage2_pipeline.excalidraw). It records the same run as `screenshots/stage2_manifest.json`: dataset commit `41adfd0f9ee9ba3a6b4f719d5b551c5b19ae45e2`, captured at `2026-07-16T09:16:57Z`.
+
+## Why the routes are separate
+
+`cpg.nodes` and `cpg.edges` go directly from Kafka Connect to Neo4j. Spark is not between Kafka and Neo4j because the Neo4j sink already provides the required direct, idempotent graph upserts. Adding Spark there would create an unnecessary transformation and checkpoint layer.
+
+Only `cpg.metadata` goes through Spark Structured Streaming. Spark validates and reshapes file summaries, commits Kafka offset 5, and upserts five documents into MongoDB by `file_id`. `cpg.errors` is retained as an observable failure/evidence stream.
+
+## Services and local ports
+
+| Service | Compose role | Local port |
+|---|---|---:|
+| Kafka broker | Four CPG topics | `9092` |
+| Kafka Connect | Neo4j sink REST API | `8083` |
+| Neo4j | Browser / Bolt | `7474` / `7687` |
+| MongoDB | Metadata store | `27017` |
+| Mongo Express | Read-only evidence profile | `127.0.0.1:8081` |
+| Spark | Structured Streaming worker | internal only |
+
+The Mongo Express service is excluded from the default stack, read-only, and bound to localhost. The clean run is accepted from direct queries and the hash-validated manifest; no synthetic UI screenshot is used.
+
+## Reproduce
+
+```bash
+NEO4J_PASSWORD=password \
+RESET_DOCKER_STATE=1 \
+CONNECT_WAIT_SECONDS=180 \
+SPARK_WAIT_SECONDS=90 \
+SPARK_COMMIT_WAIT_SECONDS=300 \
+SPARK_MONGO_WAIT_SECONDS=300 \
+bash scripts/run_stage2_evidence.sh
 ```
 
-## Evidence Slots
+Then validate the captured contract:
 
-| Slot | Status | Source |
-|---|---|---|
-| Final architecture diagram or screenshot | Pending | `book/architecture.md` |
-| Service names and ports | Pending | `docker-compose.yml` |
-| Neo4j path explanation | Pending | `openspec/specs/graph-stores/spec.md` |
-| Spark metadata path explanation | Pending | `openspec/specs/kafka-spark/spec.md` |
-
-## Pending Work
-
-- Replace the text diagram with the final architecture diagram or screenshot.
-- Explain why Spark is not between Kafka and Neo4j.
-- Record service names and ports from `docker-compose.yml`.
+```bash
+python3 scripts/stage2_evidence_manifest.py validate --root .
+```

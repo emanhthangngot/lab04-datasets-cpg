@@ -399,10 +399,11 @@ def test_spark_evidence_captures_latest_committed_checkpoint_offset() -> None:
     assert 'cat "$CHECKPOINT_PATH/offsets/0"' not in source
 
 
-def test_tracker_keeps_graph_store_acceptance_pending_after_runtime_passes() -> None:
+def test_tracker_records_evidence_backed_graph_store_acceptance() -> None:
     source = (PROJECT_ROOT / "docs" / "team" / "kafka-spark.md").read_text()
-    assert "Status: Stage 2 complete." not in source
-    assert "Thanh acceptance pending" in source
+    assert "store acceptance" in source
+    assert "stage2_manifest.json" in source
+    assert "Thanh acceptance pending" not in source
 
 
 def test_stage2_runbook_locks_parser_repository_identity() -> None:
