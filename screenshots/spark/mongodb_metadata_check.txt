@@ -1,12 +1,12 @@
 file_metadata count: 5
 sample document:
 {
-  _id: ObjectId('6a5882ebe191315e770b3610'),
+  _id: ObjectId('6a58a1e2b3ba03f6a286f854'),
   schema_version: '1.0',
-  event_time: '2026-07-16T07:05:49.457Z',
+  event_time: '2026-07-16T09:17:56.519Z',
   repo: 'huggingface/datasets',
-  commit_sha: 'unknown',
-  run_id: 'df63395b925046fe86a9b2cc0bd20fd0',
+  commit_sha: '41adfd0f9ee9ba3a6b4f719d5b551c5b19ae45e2',
+  run_id: '1e06e5e0ce964386ab66267e8e52e319',
   file_id: '6c39568a6a11c430',
   file_path: 'src/datasets/__init__.py',
   file_size: Long('1635'),
@@ -16,6 +16,6 @@ sample document:
   num_dfg_edges: Long('0'),
   num_call_edges: Long('0'),
   num_total_edges: Long('15'),
-  parse_duration_ms: Long('5'),
+  parse_duration_ms: Long('4'),
   status: 'success'
 }
