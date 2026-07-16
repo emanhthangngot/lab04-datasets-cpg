@@ -92,7 +92,7 @@ def _artifact_records(root: Path, captured_at: str) -> list[dict[str, Any]]:
                     "captured_at": captured_at,
                     "result": "pass",
                     "source": "Stage 2 clean run",
-                    "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+                    "sha256": hashlib.sha256(path.read_bytes().replace(b"\r\n", b"\n")).hexdigest(),
                 }
             )
     return records
