@@ -88,7 +88,7 @@ Với vai trò Lead, Tri thực hiện quản lý vòng đời đặc tả dự 
 
 1. **Tạo thư mục Change Proposal:** Tạo gói thay đổi mới cho Stage 3 thông qua OpenSpec CLI:
    ```bash
-   openspec change stage3-replay-hardening
+   openspec new change stage3-replay-hardening
    ```
 2. **Khai báo yêu cầu Delta:** Soạn thảo các yêu cầu đặc tả thêm mới phục vụ riêng cho Stage 3 (ví dụ: logic replay, cleanup) vào thư mục mới `openspec/changes/stage3-replay-hardening/specs/`.
 3. **Phân công nhiệm vụ:** Soạn thảo bảng phân công công việc chi tiết cho các thành viên tại `openspec/changes/stage3-replay-hardening/tasks.md`.

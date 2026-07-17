@@ -12,6 +12,7 @@ STORE_WAIT_SECONDS="${NEO4J_STORE_WAIT_SECONDS:-300}"
 EXPECTED_REPO_NAME="${EXPECTED_REPO_NAME:-huggingface/datasets}"
 EXPECTED_COMMIT_SHA="${EXPECTED_COMMIT_SHA:-}"
 REQUIRE_UNIQUE_EVENT_IDS="${REQUIRE_UNIQUE_EVENT_IDS:-true}"
+GRAPH_COUNTS_FILE="${GRAPH_COUNTS_FILE:-screenshots/kafka/graph_event_counts.json}"
 : "${NEO4J_PASSWORD:?Set NEO4J_PASSWORD before waiting for Neo4j persistence}"
 
 if [[ -x ".venv/Scripts/python.exe" ]]; then
@@ -110,7 +111,6 @@ if [ "$REQUIRE_UNIQUE_EVENT_IDS" = "true" ] && {
   exit 1
 fi
 
-GRAPH_COUNTS_FILE="screenshots/kafka/graph_event_counts.json"
 mkdir -p "$(dirname "$GRAPH_COUNTS_FILE")"
 "$PYTHON" -c '
 import json

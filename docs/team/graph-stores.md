@@ -81,10 +81,12 @@ Spec input to Tri:
 
 Tasks:
 
-- [x] Run Neo4j duplicate checks after replay.
-- [x] Run MongoDB duplicate `file_id` checks after replay.
-- [ ] Verify stale cleanup behavior with `run_id`.
-- [x] Provide outputs for Task 4, Task 5, and Task 6.
+- [x] Run Neo4j duplicate checks after the canonical Stage 3 replay.
+- [x] Run MongoDB duplicate `file_id` checks after the canonical Stage 3 replay.
+- [x] Verify stale cleanup behavior with `run_id`.
+- [x] Capture before, pre-cleanup, and final store JSON under `screenshots/replay/`.
+- [x] Capture Neo4j Browser and Mongo Express replay screenshots.
+- [x] Provide final outputs for Task 6.
 
 Done when:
 
@@ -150,8 +152,11 @@ Evidence:
 - `screenshots/kafka/sample_cpg_nodes.json`, `sample_cpg_edges.json`,
   `sample_cpg_metadata.json`, and `sample_cpg_errors.json`.
 
-Remaining Stage 3 work: verify stale cleanup behavior across changing file
-contents and `run_id`, then run a separately documented replay if required.
+Stage 3 store acceptance update (2026-07-17): the canonical replay removed 3
+stale target nodes and 2 stale target edges. Final Neo4j duplicate groups are
+zero, MongoDB retains 5 unique documents with four unchanged hashes, both UI
+screenshots were inspected, and `screenshots/replay/stage3_replay_manifest.json`
+validates with status `pass`.
 
 ## Previous Update
 
@@ -211,3 +216,35 @@ Blockers:
 - Initial `scripts/check_connect_plugins.sh` execution under Git Bash resolved
   `python3` to the WindowsApps shim and failed with permission denied. The
   script now follows the same Python selection pattern as `run_checks.sh`.
+
+## Post-Merge Acceptance PR
+
+This is Thanh's mandatory independent Stage 3 store acceptance. Start only
+after Truc's Windows acceptance PR has merged. Review the committed manifest,
+raw JSON evidence, and both database UI screenshots independently; this review
+must not alter expected counts.
+
+```bash
+git switch dev
+git pull --ff-only origin dev
+git switch -c review/thanh/stage3-store-acceptance
+python scripts/stage3_replay_manifest.py validate --root .
+```
+
+The tracker-only PR must record all of the following:
+
+- Neo4j before state: 19 target nodes and 15 target edges.
+- Neo4j append state: 26 target nodes and 18 target edges.
+- Neo4j final replay state: 23 target nodes and 16 target edges.
+- Reconciliation removed exactly 3 stale target nodes and 2 stale target
+  edges; duplicate-node and duplicate-edge groups are both zero.
+- MongoDB still has 5 unique metadata documents, with 4 unchanged hashes and
+  zero duplicate `file_id` groups.
+- Neo4j Browser and Mongo Express values agree with their corresponding JSON
+  artifacts and with the validated manifest.
+
+Acceptance status: `APPROVED` or `BLOCKED`
+
+For `BLOCKED`, identify the mismatching field, expected and actual values,
+failing command, and artifact or screenshot path. Do not regenerate evidence or
+change the acceptance constants inside this PR.

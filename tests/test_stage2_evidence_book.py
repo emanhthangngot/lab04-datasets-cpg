@@ -22,7 +22,7 @@ def test_tasks_1_to_5_are_canonical_executed_notebooks() -> None:
         assert all(cell.get("outputs") for cell in code_cells)
         source = "\n".join("".join(cell["source"]) for cell in notebook["cells"])
         assert "## Reflection" in source
-        assert "2026-07-16T09:16:57Z" in source
+        assert "screenshots/stage2_manifest.json" in source
         assert "pending" not in source.lower()
         assert not (BOOK / f"task{task}_{slug}.md").exists()
 
@@ -49,6 +49,13 @@ def test_architecture_page_embeds_editable_diagram_and_explains_routes() -> None
     assert "Pending" not in source
 
 
-def test_task_6_remains_explicitly_out_of_stage_2_scope() -> None:
-    source = (BOOK / "task6_replay.md").read_text().lower()
-    assert "pending" in source
+def test_task_6_is_a_canonical_manifest_backed_notebook() -> None:
+    notebook = _notebook(6, "replay")
+    source = "\n".join("".join(cell["source"]) for cell in notebook["cells"])
+    assert "stage3_replay_manifest.json" in source
+    assert "neo4j_after_cleanup.png" in source
+    assert "mongodb_after_replay.png" in source
+    assert "## Reflection" in source
+    assert "pending" not in source.lower()
+    assert not (BOOK / "task6_replay.md").exists()
+    assert not (ROOT / "notebooks" / "06_idempotent_replay.ipynb").exists()

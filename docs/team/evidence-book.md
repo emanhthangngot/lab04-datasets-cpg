@@ -77,10 +77,11 @@ Spec input to Tri:
 
 Tasks:
 
-- [ ] Add replay notebook output.
-- [ ] Add replay screenshots or query outputs.
-- [ ] Add chapter reflections for Task 1-6.
-- [ ] Build the book locally and fix broken links.
+- [x] Execute the canonical `book/task6_replay.ipynb` against the strict Stage 3 manifest.
+- [x] Embed Neo4j Browser and Mongo Express replay screenshots.
+- [x] Re-execute canonical Task 1-6 notebooks after the fresh evidence run.
+- [x] Complete Task 6 and final chapter reflections.
+- [x] Build the book locally and fix broken links.
 
 Done when:
 
@@ -108,17 +109,18 @@ Done when:
 
 ## Latest Update
 
-Status: Stage 2 Task 1-5 executed chapters, query evidence, manifest, and
-architecture are complete. Task 6 replay and publication remain Stage 3/4.
+Status: Stage 3 Task 1-6 executed chapters, replay evidence, strict manifest,
+reflection, and local Jupyter Book build are complete. Publication remains Stage 4.
 
-Next action: implement and capture Task 6 replay, then verify the published book.
+Next action: complete the Windows wrapper smoke check, record Stage 3 acceptance,
+then verify the published book in Stage 4.
 
 Evidence links:
 
 - [_toc.yml](../../book/_toc.yml)
 - [index.md](../../book/index.md)
-- [task1_repository.md](../../book/task1_repository.md) through [task6_replay.md](../../book/task6_replay.md)
-- [01_repository_discovery.ipynb](../../notebooks/01_repository_discovery.ipynb) through [06_idempotent_replay.ipynb](../../notebooks/06_idempotent_replay.ipynb)
+- [task1_repository.ipynb](../../book/task1_repository.ipynb) through [task6_replay.ipynb](../../book/task6_replay.ipynb)
+- [stage3_replay_manifest.json](../../screenshots/replay/stage3_replay_manifest.json)
 - [README.md](../../screenshots/README.md)
 
 Commands run on 2026-07-05:
@@ -137,7 +139,35 @@ Commands run on 2026-07-05:
 
 Blockers:
 
-- Runtime evidence is still pending for Stage 2 and Stage 3.
+- Runtime evidence for Stage 2 and Stage 3 is captured and hash-validated.
 - `bash scripts/run_checks.sh` still requires a working Bash runtime on this
   Windows machine; use `.\scripts\run_checks.ps1` for local Windows scaffold
   validation until WSL or another Bash runtime is installed.
+
+## Post-Merge Acceptance PR
+
+This is Tuan's mandatory Stage 3 book acceptance. Start only after Thanh's
+store-acceptance PR has merged, and perform the build from the latest `dev`
+without live Docker services.
+
+```bash
+git switch dev
+git pull --ff-only origin dev
+git switch -c review/tuan/stage3-book-acceptance
+bash scripts/run_checks.sh
+python scripts/stage3_replay_manifest.py validate --root .
+jupyter-book clean book
+jupyter-book build book
+```
+
+The tracker-only PR must record the exit code of each command and confirm that
+all six task chapters have executed outputs. For Task 6, verify the strict
+manifest, Neo4j and MongoDB images, replay narrative, and reflection agree with
+one another. Confirm the clean book build succeeds without live Docker services
+and that no generated `_build/` content is committed.
+
+Acceptance status: `APPROVED` or `BLOCKED`
+
+For `BLOCKED`, include the failing command, exit code, broken chapter or link,
+and the relevant build log or artifact path. GitHub Pages publication remains a
+Stage 4 task after the accepted Stage 3 changes reach `main`.
