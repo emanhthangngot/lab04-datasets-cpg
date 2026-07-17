@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
+COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-lab04-datasets-cpg}"
+export COMPOSE_PROJECT_NAME
+
 : "${RESET_DOCKER_STATE:?Set RESET_DOCKER_STATE=1 for the canonical Stage 3 run}"
 : "${NEO4J_PASSWORD:?Set NEO4J_PASSWORD for the local Neo4j container}"
 if [[ "$RESET_DOCKER_STATE" != "1" ]]; then
