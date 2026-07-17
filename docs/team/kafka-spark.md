@@ -72,10 +72,19 @@ Spec input to Tri:
 
 Tasks:
 
-- [ ] Re-run Kafka/Spark flow during replay demo.
-- [ ] Capture before/after metadata messages.
-- [ ] Confirm consumer lag or stream status is stable before evidence capture.
-- [ ] Provide outputs for Task 3 and Task 5 chapters.
+- [x] Re-run Kafka/Spark flow during replay demo.
+- [x] Capture before/after metadata messages.
+- [x] Confirm consumer lag or stream status is stable before evidence capture.
+- [x] Provide outputs for Task 3 and Task 5 chapters.
+
+Stage 3 adds these exact gates:
+
+- [x] Rebuild the five-file baseline with metadata offset 5.
+- [x] Restart Spark with the same checkpoint and prove the offset remains 5.
+- [x] Replay only `src/datasets/__init__.py` and prove metadata advances to 6.
+- [x] Record Kafka deltas of 23 node, 16 edge, 1 metadata, and 0 error events.
+- [ ] Run the PowerShell wrapper smoke check on Windows with Docker Desktop and
+  Git Bash.
 
 Done when:
 
@@ -192,3 +201,36 @@ Steps 4 (Neo4j constraints) and 10 (Neo4j/MongoDB store verification) in
 included for shared end-to-end runbook completeness. Truc executes the checks;
 Thanh rechecks and accepts the resulting Graph Stores evidence before Tri's
 merge approval. This execution does not transfer Graph Stores ownership.
+
+## Post-Merge Acceptance PR
+
+This is Truc's mandatory Stage 3 acceptance after Tri's implementation PR has
+merged into `dev`. Perform it in a disposable Windows clone or worktree so the
+canonical evidence in `screenshots/` cannot be overwritten accidentally. Use
+Docker Desktop, PowerShell, and Git Bash from the same workstation being
+accepted.
+
+Branch and runbook:
+
+```powershell
+git switch dev
+git pull --ff-only origin dev
+git switch -c test/truc/stage3-windows-acceptance
+$password = Read-Host "Neo4j password" -AsSecureString
+./scripts/run_stage3_evidence.ps1 `
+  -ResetDockerState `
+  -Neo4jPassword $password
+```
+
+The acceptance PR is tracker-only. Do not commit regenerated canonical runtime
+evidence. Record the Windows, PowerShell, Docker Desktop, and Git Bash versions;
+the command exit code; the observed offset sequence `5 -> 5 -> 6`; and replay
+deltas of 23 nodes, 16 edges, 1 metadata event, and 0 errors. Confirm that the
+password was not printed and that the wrapper restored the source checkout
+after its temporary changes.
+
+Acceptance status: `APPROVED` or `BLOCKED`
+
+For `BLOCKED`, paste the failing command, exit code, relevant output, and an
+artifact path or screenshot. Do not relax expected values or edit the canonical
+manifest to turn a failure into approval.

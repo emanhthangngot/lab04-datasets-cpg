@@ -78,10 +78,33 @@ source code, notebooks, screenshots, and meaningful commit history.
 
 ### Stage 3
 
-- [ ] Review replay strategy and duplicate checks.
-- [ ] Confirm each task chapter has real executed output.
-- [ ] Confirm screenshots are stored under `screenshots/`.
-- [ ] Resolve any blocker before final freeze.
+- [x] Review replay strategy and duplicate checks.
+- [x] Confirm each task chapter has real executed output.
+- [x] Confirm screenshots are stored under `screenshots/`.
+- [ ] Resolve the remaining Windows PowerShell/Docker Desktop smoke check before final freeze.
+
+Stage 3 change package:
+[`stage3-replay-hardening`](../../openspec/changes/stage3-replay-hardening/README.md).
+
+| Owner | Branch | Deliverable | Acceptance owner |
+|---|---|---|---|
+| Tri | `feature/tri/stage3-replay-hardening` | OpenSpec, replay contracts, strict manifest validator, final gate | Tri |
+| Thanh | `fix/thanh/stage3-replay-stores` | Three-phase Neo4j/Mongo evidence, stale cleanup, two UI screenshots | Tri |
+| Truc | `feature/truc/stage3-replay-runtime` | Clean orchestrator, Kafka deltas, Spark restart proof, Windows wrapper | Thanh for stores; Tri final |
+| Tuan | `docs/tuan/stage3-replay-book` | Canonical Task 6 notebook, six executed chapters, Reflection, local build | Tri |
+
+Implementation merge order: contracts/store helpers, runtime, canonical
+evidence, then book.
+
+Post-merge acceptance order:
+
+1. `test/truc/stage3-windows-acceptance` — Windows runtime record.
+2. `review/thanh/stage3-store-acceptance` — committed store evidence approval.
+3. `review/tuan/stage3-book-acceptance` — committed book approval.
+
+Each branch starts from the latest `origin/dev` and returns through a separate
+PR into `dev`. Tri records Stage 3 acceptance and archives OpenSpec only after
+all three acceptance PRs merge. Main merge and Pages remain Stage 4.
 
 ### Stage 4
 
@@ -95,10 +118,10 @@ source code, notebooks, screenshots, and meaningful commit history.
 
 | Area | Owner | Status | Next Checkpoint |
 |---|---|---|---|
-| Parser/schema/specs | Tri | Schema v1.0 locked; Stage 2 parser-core spec added | Parser sample edge evidence |
-| Kafka/Spark | Truc | Stage 2 accepted: topics, connector, checkpoint and offset 5 evidenced | Stage 3 replay |
-| Neo4j/MongoDB | Thanh | Stage 2 accepted: counts and duplicate checks pass | Stage 3 replay/stale cleanup |
-| Evidence/Jupyter Book | Tuan | Task 1-5 executed chapters and architecture complete | Task 6 and Pages |
+| Parser/schema/specs | Tri | Strict Stage 3 manifest passes; schema v1.0 unchanged | Windows smoke and final acceptance |
+| Kafka/Spark | Truc | Baseline 5, restart 5, replay 6; Kafka delta 23/16/1/0 | Windows wrapper smoke |
+| Neo4j/MongoDB | Thanh | Three-phase replay passed; stale 3/2 removed; duplicates 0 | Stage 4 publication review |
+| Evidence/Jupyter Book | Tuan | Tasks 1-6 executed; screenshots embedded; local build passed | Stage 4 Pages review |
 
 ## Blocker Policy
 
