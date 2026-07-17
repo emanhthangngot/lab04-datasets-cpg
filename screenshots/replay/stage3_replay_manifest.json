@@ -5,7 +5,7 @@
     "screenshots/replay/kafka_offsets_after.json": "ee0488286bf4b6333c50201cb2f3df456c3018dfde84a83530b323eb56eb2d18",
     "screenshots/replay/kafka_offsets_before.json": "c78e380af35e701602063a97276b7735306ce6114631e08829f4de1bbbd190db",
     "screenshots/replay/mongodb_after_replay.json": "f78e012aadd40c2b8ebfd347af259ba8c7bca44e0cc5e5347bbc8cfd1f498830",
-    "screenshots/replay/mongodb_after_replay.png": "b16c6ebed77718812d0e0bd34dc468e492e7472e9a55b7d54b28115e4df213b5",
+    "screenshots/replay/mongodb_after_replay.png": "4073b13640a2797fb13103847c3e8a6523d087ac6bd7286d75364ca063059821",
     "screenshots/replay/mongodb_after_restart.json": "5cc2dbbd39c345847d4c61fdae9dd66b79e4ddf02c6288739acf94aefddfea73",
     "screenshots/replay/mongodb_before.json": "5cc2dbbd39c345847d4c61fdae9dd66b79e4ddf02c6288739acf94aefddfea73",
     "screenshots/replay/neo4j_after.json": "740da29836408d2a3b0b47e42e5a580e81d524071d3b8894d579427b3a36ab40",
