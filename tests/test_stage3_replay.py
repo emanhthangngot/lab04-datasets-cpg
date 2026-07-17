@@ -312,3 +312,20 @@ def test_legacy_replay_entrypoint_delegates_to_canonical_workflow() -> None:
 def test_fixture_hash_helper_is_deterministic() -> None:
     payload = b"stage3"
     assert hashlib.sha256(payload).hexdigest() == hashlib.sha256(payload).hexdigest()
+
+
+def test_post_merge_owner_acceptance_is_normative() -> None:
+    change = PROJECT_ROOT / "openspec" / "changes" / "stage3-replay-hardening"
+    specs = {
+        "kafka": (change / "specs/kafka-spark/spec.md").read_text(),
+        "stores": (change / "specs/graph-stores/spec.md").read_text(),
+        "book": (change / "specs/evidence-book/spec.md").read_text(),
+    }
+
+    assert "test/truc/stage3-windows-acceptance" in specs["kafka"]
+    assert "5 -> 5 -> 6" in specs["kafka"]
+    assert "23 nodes, 16 edges, 1 metadata, and 0 errors" in specs["kafka"]
+    assert "review/thanh/stage3-store-acceptance" in specs["stores"]
+    assert "must not alter expected counts" in specs["stores"].lower()
+    assert "review/tuan/stage3-book-acceptance" in specs["book"]
+    assert "without live Docker services" in specs["book"]

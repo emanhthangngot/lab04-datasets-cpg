@@ -30,3 +30,18 @@ validated manifest.
 - **AND** Task 6 and the final Reflection state what worked, failed, was fixed,
   and remains limited
 - **AND** `jupyter-book build book/` succeeds without live Docker services
+
+### Requirement: Book Receives Post-Merge Acceptance
+
+After Thanh's acceptance PR merges, Tuan SHALL open
+`review/tuan/stage3-book-acceptance` from the updated `origin/dev`, validate the
+committed manifest, and build the book without live Docker services.
+
+#### Scenario: Book acceptance PR
+
+- **WHEN** repository checks, manifest validation, and a clean Jupyter Book build pass
+- **THEN** Tuan confirms all six notebooks contain executed output
+- **AND** Task 6 reads the strict manifest and embeds both UI screenshots
+- **AND** Task 6 and Reflection explain replay events, unique IDs, stale cleanup, checkpoint resume, and MongoDB replacement accurately
+- **AND** Tuan opens a tracker-only acceptance PR into `dev` with `APPROVED`
+- **AND** GitHub Pages verification remains Stage 4
