@@ -77,9 +77,10 @@ Spec input to Tri:
 
 Tasks:
 
-- [ ] Add replay notebook output.
-- [ ] Add replay screenshots or query outputs.
-- [ ] Add chapter reflections for Task 1-6.
+- [ ] Execute the canonical `book/task6_replay.ipynb` against the strict Stage 3 manifest.
+- [ ] Embed Neo4j Browser and Mongo Express replay screenshots.
+- [ ] Re-execute canonical Task 1-6 notebooks after the fresh evidence run.
+- [ ] Complete Task 6 and final chapter reflections.
 - [ ] Build the book locally and fix broken links.
 
 Done when:
