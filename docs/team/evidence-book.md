@@ -77,11 +77,11 @@ Spec input to Tri:
 
 Tasks:
 
-- [ ] Execute the canonical `book/task6_replay.ipynb` against the strict Stage 3 manifest.
-- [ ] Embed Neo4j Browser and Mongo Express replay screenshots.
-- [ ] Re-execute canonical Task 1-6 notebooks after the fresh evidence run.
-- [ ] Complete Task 6 and final chapter reflections.
-- [ ] Build the book locally and fix broken links.
+- [x] Execute the canonical `book/task6_replay.ipynb` against the strict Stage 3 manifest.
+- [x] Embed Neo4j Browser and Mongo Express replay screenshots.
+- [x] Re-execute canonical Task 1-6 notebooks after the fresh evidence run.
+- [x] Complete Task 6 and final chapter reflections.
+- [x] Build the book locally and fix broken links.
 
 Done when:
 
@@ -109,17 +109,18 @@ Done when:
 
 ## Latest Update
 
-Status: Stage 2 Task 1-5 executed chapters, query evidence, manifest, and
-architecture are complete. Task 6 replay and publication remain Stage 3/4.
+Status: Stage 3 Task 1-6 executed chapters, replay evidence, strict manifest,
+reflection, and local Jupyter Book build are complete. Publication remains Stage 4.
 
-Next action: implement and capture Task 6 replay, then verify the published book.
+Next action: complete the Windows wrapper smoke check, record Stage 3 acceptance,
+then verify the published book in Stage 4.
 
 Evidence links:
 
 - [_toc.yml](../../book/_toc.yml)
 - [index.md](../../book/index.md)
-- [task1_repository.md](../../book/task1_repository.md) through [task6_replay.md](../../book/task6_replay.md)
-- [01_repository_discovery.ipynb](../../notebooks/01_repository_discovery.ipynb) through [06_idempotent_replay.ipynb](../../notebooks/06_idempotent_replay.ipynb)
+- [task1_repository.ipynb](../../book/task1_repository.ipynb) through [task6_replay.ipynb](../../book/task6_replay.ipynb)
+- [stage3_replay_manifest.json](../../screenshots/replay/stage3_replay_manifest.json)
 - [README.md](../../screenshots/README.md)
 
 Commands run on 2026-07-05:
@@ -138,7 +139,7 @@ Commands run on 2026-07-05:
 
 Blockers:
 
-- Runtime evidence is still pending for Stage 2 and Stage 3.
+- Runtime evidence for Stage 2 and Stage 3 is captured and hash-validated.
 - `bash scripts/run_checks.sh` still requires a working Bash runtime on this
   Windows machine; use `.\scripts\run_checks.ps1` for local Windows scaffold
   validation until WSL or another Bash runtime is installed.

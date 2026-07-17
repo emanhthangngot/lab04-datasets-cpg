@@ -78,10 +78,10 @@ source code, notebooks, screenshots, and meaningful commit history.
 
 ### Stage 3
 
-- [ ] Review replay strategy and duplicate checks.
-- [ ] Confirm each task chapter has real executed output.
-- [ ] Confirm screenshots are stored under `screenshots/`.
-- [ ] Resolve any blocker before final freeze.
+- [x] Review replay strategy and duplicate checks.
+- [x] Confirm each task chapter has real executed output.
+- [x] Confirm screenshots are stored under `screenshots/`.
+- [ ] Resolve the remaining Windows PowerShell/Docker Desktop smoke check before final freeze.
 
 Stage 3 change package:
 [`stage3-replay-hardening`](../../openspec/changes/stage3-replay-hardening/README.md).
@@ -108,10 +108,10 @@ Stage 3 acceptance and OpenSpec archive. Main merge and Pages remain Stage 4.
 
 | Area | Owner | Status | Next Checkpoint |
 |---|---|---|---|
-| Parser/schema/specs | Tri | Stage 3 replay change specified; schema v1.0 unchanged | Manifest and contract verification |
-| Kafka/Spark | Truc | Stage 2 accepted at offset 5 | Restart at 5, replay to 6 |
-| Neo4j/MongoDB | Thanh | Stage 2 clean baseline accepted | Three-phase replay and stale cleanup |
-| Evidence/Jupyter Book | Tuan | Task 1-5 executed chapters and architecture complete | Task 6, Reflection, local build |
+| Parser/schema/specs | Tri | Strict Stage 3 manifest passes; schema v1.0 unchanged | Windows smoke and final acceptance |
+| Kafka/Spark | Truc | Baseline 5, restart 5, replay 6; Kafka delta 23/16/1/0 | Windows wrapper smoke |
+| Neo4j/MongoDB | Thanh | Three-phase replay passed; stale 3/2 removed; duplicates 0 | Stage 4 publication review |
+| Evidence/Jupyter Book | Tuan | Tasks 1-6 executed; screenshots embedded; local build passed | Stage 4 Pages review |
 
 ## Blocker Policy
 

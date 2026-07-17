@@ -81,12 +81,12 @@ Spec input to Tri:
 
 Tasks:
 
-- [ ] Run Neo4j duplicate checks after the canonical Stage 3 replay.
-- [ ] Run MongoDB duplicate `file_id` checks after the canonical Stage 3 replay.
-- [ ] Verify stale cleanup behavior with `run_id`.
-- [ ] Capture before, pre-cleanup, and final store JSON under `screenshots/replay/`.
-- [ ] Capture Neo4j Browser and Mongo Express replay screenshots.
-- [ ] Provide final outputs for Task 6.
+- [x] Run Neo4j duplicate checks after the canonical Stage 3 replay.
+- [x] Run MongoDB duplicate `file_id` checks after the canonical Stage 3 replay.
+- [x] Verify stale cleanup behavior with `run_id`.
+- [x] Capture before, pre-cleanup, and final store JSON under `screenshots/replay/`.
+- [x] Capture Neo4j Browser and Mongo Express replay screenshots.
+- [x] Provide final outputs for Task 6.
 
 Done when:
 
@@ -152,10 +152,11 @@ Evidence:
 - `screenshots/kafka/sample_cpg_nodes.json`, `sample_cpg_edges.json`,
   `sample_cpg_metadata.json`, and `sample_cpg_errors.json`.
 
-Remaining Stage 3 work: run the approved `stage3-replay-hardening` canonical
-workflow, verify 3 stale target nodes and 2 stale target edges are removed,
-confirm four unchanged MongoDB documents retain their hashes, and approve both
-UI screenshots before manifest finalization.
+Stage 3 store acceptance update (2026-07-17): the canonical replay removed 3
+stale target nodes and 2 stale target edges. Final Neo4j duplicate groups are
+zero, MongoDB retains 5 unique documents with four unchanged hashes, both UI
+screenshots were inspected, and `screenshots/replay/stage3_replay_manifest.json`
+validates with status `pass`.
 
 ## Previous Update
 
