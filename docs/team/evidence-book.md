@@ -143,3 +143,31 @@ Blockers:
 - `bash scripts/run_checks.sh` still requires a working Bash runtime on this
   Windows machine; use `.\scripts\run_checks.ps1` for local Windows scaffold
   validation until WSL or another Bash runtime is installed.
+
+## Post-Merge Acceptance PR
+
+This is Tuan's mandatory Stage 3 book acceptance. Start only after Thanh's
+store-acceptance PR has merged, and perform the build from the latest `dev`
+without live Docker services.
+
+```bash
+git switch dev
+git pull --ff-only origin dev
+git switch -c review/tuan/stage3-book-acceptance
+bash scripts/run_checks.sh
+python scripts/stage3_replay_manifest.py validate --root .
+jupyter-book clean book
+jupyter-book build book
+```
+
+The tracker-only PR must record the exit code of each command and confirm that
+all six task chapters have executed outputs. For Task 6, verify the strict
+manifest, Neo4j and MongoDB images, replay narrative, and reflection agree with
+one another. Confirm the clean book build succeeds without live Docker services
+and that no generated `_build/` content is committed.
+
+Acceptance status: `APPROVED` or `BLOCKED`
+
+For `BLOCKED`, include the failing command, exit code, broken chapter or link,
+and the relevant build log or artifact path. GitHub Pages publication remains a
+Stage 4 task after the accepted Stage 3 changes reach `main`.
