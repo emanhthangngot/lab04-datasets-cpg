@@ -1,0 +1,2 @@
+stale_edges_deleted=2
+stale_nodes_deleted=3

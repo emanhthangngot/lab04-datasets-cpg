@@ -31,7 +31,7 @@ https://github.com/emanhthangngot/lab04-datasets-cpg
 - [x] Task 1-5 contain real executed outputs from the 2026-07-16 clean run.
 - [x] Neo4j and MongoDB chapters link real query artifacts and duplicate checks.
 - [x] Task 1-5 reflections state what worked, what failed, and what was fixed.
-- [ ] Task 6 replay evidence and reflection are Stage 3 work.
+- [x] Task 6 contains executed replay evidence and the final reflection is complete.
 - [ ] The GitHub Pages build shows the latest content from `main`.
 
 This page must not contain secrets, local credentials, or local-only paths in the

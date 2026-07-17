@@ -30,7 +30,7 @@ def test_mongo_express_profile_is_isolated_and_read_only() -> None:
     assert 'profiles: ["evidence-ui"]' in block
     assert '"127.0.0.1:8081:8081"' in block
     assert 'ME_CONFIG_SITE_READONLY: "true"' in block
-    assert 'ME_CONFIG_BASICAUTH_ENABLED: "false"' in block
+    assert 'ME_CONFIG_BASICAUTH: "false"' in block
 
 
 def test_connector_wait_captures_machine_readable_graph_counts() -> None:

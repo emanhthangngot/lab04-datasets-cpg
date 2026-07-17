@@ -225,6 +225,7 @@ def test_runtime_script_locks_replay_order_and_target() -> None:
 
     assert 'COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-lab04-datasets-cpg}"' in source
     assert "export COMPOSE_PROJECT_NAME" in source
+    assert "diff -u -U0" in source
 
     markers = [
         ': "${RESET_DOCKER_STATE:?',

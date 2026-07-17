@@ -1,3 +1,4 @@
+	max.poll.records = 500
 	metadata.max.age.ms = 300000
 	metric.reporters = []
 	metrics.num.samples = 2
@@ -64,110 +65,110 @@
 	ssl.truststore.type = JKS
 	value.deserializer = class org.apache.kafka.common.serialization.ByteArrayDeserializer
 
-26/07/17 00:19:15 INFO AppInfoParser: Kafka version: 3.4.1
-26/07/17 00:19:15 INFO AppInfoParser: Kafka commitId: 8a516edc2755df89
-26/07/17 00:19:15 INFO AppInfoParser: Kafka startTimeMs: 1784247555029
-26/07/17 00:19:15 INFO KafkaConsumer: [Consumer clientId=consumer-spark-kafka-source-a76dbfac-41de-4d9c-adf4-40bb761eb37f--1951162449-executor-1, groupId=spark-kafka-source-a76dbfac-41de-4d9c-adf4-40bb761eb37f--1951162449-executor] Assigned to partition(s): cpg.metadata-0
-26/07/17 00:19:15 INFO KafkaConsumer: [Consumer clientId=consumer-spark-kafka-source-a76dbfac-41de-4d9c-adf4-40bb761eb37f--1951162449-executor-1, groupId=spark-kafka-source-a76dbfac-41de-4d9c-adf4-40bb761eb37f--1951162449-executor] Seeking to offset 0 for partition cpg.metadata-0
-26/07/17 00:19:15 INFO Metadata: [Consumer clientId=consumer-spark-kafka-source-a76dbfac-41de-4d9c-adf4-40bb761eb37f--1951162449-executor-1, groupId=spark-kafka-source-a76dbfac-41de-4d9c-adf4-40bb761eb37f--1951162449-executor] Resetting the last seen epoch of partition cpg.metadata-0 to 0 since the associated topicId changed from null to OTI8PMf1Ru-A2NvWp0SemA
-26/07/17 00:19:15 INFO Metadata: [Consumer clientId=consumer-spark-kafka-source-a76dbfac-41de-4d9c-adf4-40bb761eb37f--1951162449-executor-1, groupId=spark-kafka-source-a76dbfac-41de-4d9c-adf4-40bb761eb37f--1951162449-executor] Cluster ID: MkU3OEVBNTcwNTJENDM2Qg
-26/07/17 00:19:15 INFO SubscriptionState: [Consumer clientId=consumer-spark-kafka-source-a76dbfac-41de-4d9c-adf4-40bb761eb37f--1951162449-executor-1, groupId=spark-kafka-source-a76dbfac-41de-4d9c-adf4-40bb761eb37f--1951162449-executor] Seeking to earliest offset of partition cpg.metadata-0
-26/07/17 00:19:15 INFO SubscriptionState: [Consumer clientId=consumer-spark-kafka-source-a76dbfac-41de-4d9c-adf4-40bb761eb37f--1951162449-executor-1, groupId=spark-kafka-source-a76dbfac-41de-4d9c-adf4-40bb761eb37f--1951162449-executor] Resetting offset for partition cpg.metadata-0 to position FetchPosition{offset=0, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[broker:9092 (id: 1 rack: null)], epoch=0}}.
-26/07/17 00:19:15 INFO SubscriptionState: [Consumer clientId=consumer-spark-kafka-source-a76dbfac-41de-4d9c-adf4-40bb761eb37f--1951162449-executor-1, groupId=spark-kafka-source-a76dbfac-41de-4d9c-adf4-40bb761eb37f--1951162449-executor] Seeking to latest offset of partition cpg.metadata-0
-26/07/17 00:19:15 INFO SubscriptionState: [Consumer clientId=consumer-spark-kafka-source-a76dbfac-41de-4d9c-adf4-40bb761eb37f--1951162449-executor-1, groupId=spark-kafka-source-a76dbfac-41de-4d9c-adf4-40bb761eb37f--1951162449-executor] Resetting offset for partition cpg.metadata-0 to position FetchPosition{offset=5, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[broker:9092 (id: 1 rack: null)], epoch=0}}.
-26/07/17 00:19:15 INFO MemoryStore: Block rdd_7_0 stored as values in memory (estimated size 1847.0 B, free 127.1 MiB)
-26/07/17 00:19:15 INFO BlockManagerInfo: Added rdd_7_0 in memory on f2fd6849aaaf:40209 (size: 1847.0 B, free: 127.2 MiB)
-26/07/17 00:19:15 INFO CodeGenerator: Code generated in 3.418797 ms
-26/07/17 00:19:15 INFO CodeGenerator: Code generated in 13.98911 ms
-26/07/17 00:19:15 INFO CodeGenerator: Code generated in 6.978851 ms
-26/07/17 00:19:15 INFO KafkaDataConsumer: From Kafka topicPartition=cpg.metadata-0 groupId=spark-kafka-source-a76dbfac-41de-4d9c-adf4-40bb761eb37f--1951162449-executor read 5 records through 1 polls (polled  out 5 records), taking 547722050 nanos, during time span of 725517575 nanos.
-26/07/17 00:19:15 INFO Executor: Finished task 0.0 in stage 0.0 (TID 0). 2584 bytes result sent to driver
-26/07/17 00:19:15 INFO TaskSetManager: Finished task 0.0 in stage 0.0 (TID 0) in 1030 ms on f2fd6849aaaf (executor driver) (1/1)
-26/07/17 00:19:15 INFO TaskSchedulerImpl: Removed TaskSet 0.0, whose tasks have all completed, from pool
-26/07/17 00:19:15 INFO DAGScheduler: ShuffleMapStage 0 (start at NativeMethodAccessorImpl.java:0) finished in 1.193 s
-26/07/17 00:19:15 INFO DAGScheduler: looking for newly runnable stages
-26/07/17 00:19:15 INFO DAGScheduler: running: Set()
-26/07/17 00:19:15 INFO DAGScheduler: waiting: Set(ResultStage 1)
-26/07/17 00:19:15 INFO DAGScheduler: failed: Set()
-26/07/17 00:19:15 INFO DAGScheduler: Submitting ResultStage 1 (MapPartitionsRDD[15] at start at NativeMethodAccessorImpl.java:0), which has no missing parents
-26/07/17 00:19:15 INFO MemoryStore: Block broadcast_1 stored as values in memory (estimated size 12.5 KiB, free 127.1 MiB)
-26/07/17 00:19:15 INFO MemoryStore: Block broadcast_1_piece0 stored as bytes in memory (estimated size 5.9 KiB, free 127.1 MiB)
-26/07/17 00:19:15 INFO BlockManagerInfo: Added broadcast_1_piece0 in memory on f2fd6849aaaf:40209 (size: 5.9 KiB, free: 127.2 MiB)
-26/07/17 00:19:15 INFO SparkContext: Created broadcast 1 from broadcast at DAGScheduler.scala:1580
-26/07/17 00:19:15 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 1 (MapPartitionsRDD[15] at start at NativeMethodAccessorImpl.java:0) (first 15 tasks are for partitions Vector(0))
-26/07/17 00:19:15 INFO TaskSchedulerImpl: Adding task set 1.0 with 1 tasks resource profile 0
-26/07/17 00:19:15 INFO TaskSetManager: Starting task 0.0 in stage 1.0 (TID 1) (f2fd6849aaaf, executor driver, partition 0, NODE_LOCAL, 10726 bytes)
-26/07/17 00:19:15 INFO Executor: Running task 0.0 in stage 1.0 (TID 1)
-26/07/17 00:19:15 INFO BlockManagerInfo: Removed broadcast_0_piece0 on f2fd6849aaaf:40209 in memory (size: 19.4 KiB, free: 127.2 MiB)
-26/07/17 00:19:15 INFO ShuffleBlockFetcherIterator: Getting 1 (60.0 B) non-empty blocks including 1 (60.0 B) local and 0 (0.0 B) host-local and 0 (0.0 B) push-merged-local and 0 (0.0 B) remote blocks
-26/07/17 00:19:15 INFO ShuffleBlockFetcherIterator: Started 0 remote fetches in 8 ms
-26/07/17 00:19:15 INFO CodeGenerator: Code generated in 6.074953 ms
-26/07/17 00:19:15 INFO Executor: Finished task 0.0 in stage 1.0 (TID 1). 4081 bytes result sent to driver
-26/07/17 00:19:15 INFO TaskSetManager: Finished task 0.0 in stage 1.0 (TID 1) in 71 ms on f2fd6849aaaf (executor driver) (1/1)
-26/07/17 00:19:15 INFO TaskSchedulerImpl: Removed TaskSet 1.0, whose tasks have all completed, from pool
-26/07/17 00:19:15 INFO DAGScheduler: ResultStage 1 (start at NativeMethodAccessorImpl.java:0) finished in 0.086 s
-26/07/17 00:19:15 INFO DAGScheduler: Job 0 is finished. Cancelling potential speculative or zombie tasks for this job
-26/07/17 00:19:15 INFO TaskSchedulerImpl: Killing all running tasks in stage 1: Stage finished
-26/07/17 00:19:15 INFO DAGScheduler: Job 0 finished: start at NativeMethodAccessorImpl.java:0, took 1.337733 s
+26/07/17 00:22:18 INFO AppInfoParser: Kafka version: 3.4.1
+26/07/17 00:22:18 INFO AppInfoParser: Kafka commitId: 8a516edc2755df89
+26/07/17 00:22:18 INFO AppInfoParser: Kafka startTimeMs: 1784247738181
+26/07/17 00:22:18 INFO KafkaConsumer: [Consumer clientId=consumer-spark-kafka-source-a3a0bf15-7dcd-496c-aea5-3eef44dfafc8--1951162449-executor-1, groupId=spark-kafka-source-a3a0bf15-7dcd-496c-aea5-3eef44dfafc8--1951162449-executor] Assigned to partition(s): cpg.metadata-0
+26/07/17 00:22:18 INFO KafkaConsumer: [Consumer clientId=consumer-spark-kafka-source-a3a0bf15-7dcd-496c-aea5-3eef44dfafc8--1951162449-executor-1, groupId=spark-kafka-source-a3a0bf15-7dcd-496c-aea5-3eef44dfafc8--1951162449-executor] Seeking to offset 0 for partition cpg.metadata-0
+26/07/17 00:22:18 INFO Metadata: [Consumer clientId=consumer-spark-kafka-source-a3a0bf15-7dcd-496c-aea5-3eef44dfafc8--1951162449-executor-1, groupId=spark-kafka-source-a3a0bf15-7dcd-496c-aea5-3eef44dfafc8--1951162449-executor] Resetting the last seen epoch of partition cpg.metadata-0 to 0 since the associated topicId changed from null to CEZysIHZSjmSvoZLNqgr8w
+26/07/17 00:22:18 INFO Metadata: [Consumer clientId=consumer-spark-kafka-source-a3a0bf15-7dcd-496c-aea5-3eef44dfafc8--1951162449-executor-1, groupId=spark-kafka-source-a3a0bf15-7dcd-496c-aea5-3eef44dfafc8--1951162449-executor] Cluster ID: MkU3OEVBNTcwNTJENDM2Qg
+26/07/17 00:22:18 INFO SubscriptionState: [Consumer clientId=consumer-spark-kafka-source-a3a0bf15-7dcd-496c-aea5-3eef44dfafc8--1951162449-executor-1, groupId=spark-kafka-source-a3a0bf15-7dcd-496c-aea5-3eef44dfafc8--1951162449-executor] Seeking to earliest offset of partition cpg.metadata-0
+26/07/17 00:22:18 INFO SubscriptionState: [Consumer clientId=consumer-spark-kafka-source-a3a0bf15-7dcd-496c-aea5-3eef44dfafc8--1951162449-executor-1, groupId=spark-kafka-source-a3a0bf15-7dcd-496c-aea5-3eef44dfafc8--1951162449-executor] Resetting offset for partition cpg.metadata-0 to position FetchPosition{offset=0, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[broker:9092 (id: 1 rack: null)], epoch=0}}.
+26/07/17 00:22:18 INFO SubscriptionState: [Consumer clientId=consumer-spark-kafka-source-a3a0bf15-7dcd-496c-aea5-3eef44dfafc8--1951162449-executor-1, groupId=spark-kafka-source-a3a0bf15-7dcd-496c-aea5-3eef44dfafc8--1951162449-executor] Seeking to latest offset of partition cpg.metadata-0
+26/07/17 00:22:18 INFO SubscriptionState: [Consumer clientId=consumer-spark-kafka-source-a3a0bf15-7dcd-496c-aea5-3eef44dfafc8--1951162449-executor-1, groupId=spark-kafka-source-a3a0bf15-7dcd-496c-aea5-3eef44dfafc8--1951162449-executor] Resetting offset for partition cpg.metadata-0 to position FetchPosition{offset=5, offsetEpoch=Optional.empty, currentLeader=LeaderAndEpoch{leader=Optional[broker:9092 (id: 1 rack: null)], epoch=0}}.
+26/07/17 00:22:18 INFO MemoryStore: Block rdd_7_0 stored as values in memory (estimated size 1841.0 B, free 127.1 MiB)
+26/07/17 00:22:18 INFO BlockManagerInfo: Added rdd_7_0 in memory on fd353707331c:33183 (size: 1841.0 B, free: 127.2 MiB)
+26/07/17 00:22:18 INFO CodeGenerator: Code generated in 3.176278 ms
+26/07/17 00:22:18 INFO CodeGenerator: Code generated in 11.64435 ms
+26/07/17 00:22:18 INFO CodeGenerator: Code generated in 5.172859 ms
+26/07/17 00:22:18 INFO KafkaDataConsumer: From Kafka topicPartition=cpg.metadata-0 groupId=spark-kafka-source-a3a0bf15-7dcd-496c-aea5-3eef44dfafc8--1951162449-executor read 5 records through 1 polls (polled  out 5 records), taking 541150752 nanos, during time span of 708536941 nanos.
+26/07/17 00:22:18 INFO Executor: Finished task 0.0 in stage 0.0 (TID 0). 2627 bytes result sent to driver
+26/07/17 00:22:18 INFO TaskSetManager: Finished task 0.0 in stage 0.0 (TID 0) in 987 ms on fd353707331c (executor driver) (1/1)
+26/07/17 00:22:18 INFO TaskSchedulerImpl: Removed TaskSet 0.0, whose tasks have all completed, from pool
+26/07/17 00:22:18 INFO DAGScheduler: ShuffleMapStage 0 (start at NativeMethodAccessorImpl.java:0) finished in 1.127 s
+26/07/17 00:22:18 INFO DAGScheduler: looking for newly runnable stages
+26/07/17 00:22:18 INFO DAGScheduler: running: Set()
+26/07/17 00:22:18 INFO DAGScheduler: waiting: Set(ResultStage 1)
+26/07/17 00:22:18 INFO DAGScheduler: failed: Set()
+26/07/17 00:22:18 INFO DAGScheduler: Submitting ResultStage 1 (MapPartitionsRDD[15] at start at NativeMethodAccessorImpl.java:0), which has no missing parents
+26/07/17 00:22:18 INFO MemoryStore: Block broadcast_1 stored as values in memory (estimated size 12.5 KiB, free 127.1 MiB)
+26/07/17 00:22:18 INFO MemoryStore: Block broadcast_1_piece0 stored as bytes in memory (estimated size 5.9 KiB, free 127.1 MiB)
+26/07/17 00:22:18 INFO BlockManagerInfo: Added broadcast_1_piece0 in memory on fd353707331c:33183 (size: 5.9 KiB, free: 127.2 MiB)
+26/07/17 00:22:18 INFO SparkContext: Created broadcast 1 from broadcast at DAGScheduler.scala:1580
+26/07/17 00:22:18 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 1 (MapPartitionsRDD[15] at start at NativeMethodAccessorImpl.java:0) (first 15 tasks are for partitions Vector(0))
+26/07/17 00:22:18 INFO TaskSchedulerImpl: Adding task set 1.0 with 1 tasks resource profile 0
+26/07/17 00:22:18 INFO TaskSetManager: Starting task 0.0 in stage 1.0 (TID 1) (fd353707331c, executor driver, partition 0, NODE_LOCAL, 10726 bytes)
+26/07/17 00:22:18 INFO Executor: Running task 0.0 in stage 1.0 (TID 1)
+26/07/17 00:22:18 INFO ShuffleBlockFetcherIterator: Getting 1 (60.0 B) non-empty blocks including 1 (60.0 B) local and 0 (0.0 B) host-local and 0 (0.0 B) push-merged-local and 0 (0.0 B) remote blocks
+26/07/17 00:22:18 INFO ShuffleBlockFetcherIterator: Started 0 remote fetches in 5 ms
+26/07/17 00:22:18 INFO CodeGenerator: Code generated in 5.119237 ms
+26/07/17 00:22:18 INFO Executor: Finished task 0.0 in stage 1.0 (TID 1). 4081 bytes result sent to driver
+26/07/17 00:22:18 INFO TaskSetManager: Finished task 0.0 in stage 1.0 (TID 1) in 49 ms on fd353707331c (executor driver) (1/1)
+26/07/17 00:22:18 INFO TaskSchedulerImpl: Removed TaskSet 1.0, whose tasks have all completed, from pool
+26/07/17 00:22:18 INFO DAGScheduler: ResultStage 1 (start at NativeMethodAccessorImpl.java:0) finished in 0.060 s
+26/07/17 00:22:18 INFO DAGScheduler: Job 0 is finished. Cancelling potential speculative or zombie tasks for this job
+26/07/17 00:22:18 INFO TaskSchedulerImpl: Killing all running tasks in stage 1: Stage finished
+26/07/17 00:22:18 INFO DAGScheduler: Job 0 finished: start at NativeMethodAccessorImpl.java:0, took 1.228556 s
 [Batch 0] Writing 5 metadata document(s) to MongoDB
-26/07/17 00:19:15 INFO MongoTable: Creating MongoTable: mongo-spark-connector-10.3.0
-26/07/17 00:19:15 WARN CaseInsensitiveStringMap: Converting duplicated key spark.mongodb.write.idFieldList into CaseInsensitiveStringMap.
-26/07/17 00:19:15 WARN CaseInsensitiveStringMap: Converting duplicated key spark.mongodb.write.operationType into CaseInsensitiveStringMap.
-26/07/17 00:19:15 WARN CaseInsensitiveStringMap: Converting duplicated key spark.mongodb.write.upsertDocument into CaseInsensitiveStringMap.
-26/07/17 00:19:15 INFO AppendDataExec: Start processing data source write support: com.mongodb.spark.sql.connector.write.MongoBatchWrite@7a25fbc. The input RDD has 1 partitions.
-26/07/17 00:19:15 INFO SparkContext: Starting job: start at NativeMethodAccessorImpl.java:0
-26/07/17 00:19:15 INFO DAGScheduler: Got job 1 (start at NativeMethodAccessorImpl.java:0) with 1 output partitions
-26/07/17 00:19:15 INFO DAGScheduler: Final stage: ResultStage 2 (start at NativeMethodAccessorImpl.java:0)
-26/07/17 00:19:15 INFO DAGScheduler: Parents of final stage: List()
-26/07/17 00:19:15 INFO DAGScheduler: Missing parents: List()
-26/07/17 00:19:15 INFO DAGScheduler: Submitting ResultStage 2 (MapPartitionsRDD[18] at start at NativeMethodAccessorImpl.java:0), which has no missing parents
-26/07/17 00:19:15 INFO MemoryStore: Block broadcast_2 stored as values in memory (estimated size 50.4 KiB, free 127.1 MiB)
-26/07/17 00:19:15 INFO MemoryStore: Block broadcast_2_piece0 stored as bytes in memory (estimated size 18.8 KiB, free 127.1 MiB)
-26/07/17 00:19:15 INFO BlockManagerInfo: Added broadcast_2_piece0 in memory on f2fd6849aaaf:40209 (size: 18.8 KiB, free: 127.2 MiB)
-26/07/17 00:19:15 INFO SparkContext: Created broadcast 2 from broadcast at DAGScheduler.scala:1580
-26/07/17 00:19:15 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 2 (MapPartitionsRDD[18] at start at NativeMethodAccessorImpl.java:0) (first 15 tasks are for partitions Vector(0))
-26/07/17 00:19:15 INFO TaskSchedulerImpl: Adding task set 2.0 with 1 tasks resource profile 0
-26/07/17 00:19:15 INFO TaskSetManager: Starting task 0.0 in stage 2.0 (TID 2) (f2fd6849aaaf, executor driver, partition 0, PROCESS_LOCAL, 11668 bytes)
-26/07/17 00:19:15 INFO Executor: Running task 0.0 in stage 2.0 (TID 2)
-26/07/17 00:19:16 INFO BlockManager: Found block rdd_7_0 locally
-26/07/17 00:19:16 INFO CodeGenerator: Code generated in 15.835477 ms
-26/07/17 00:19:16 INFO CodeGenerator: Code generated in 16.345562 ms
-26/07/17 00:19:16 INFO DataWritingSparkTask: Commit authorized for partition 0 (task 2, attempt 0, stage 2.0)
-26/07/17 00:19:17 INFO client: MongoClient with metadata {"driver": {"name": "mongo-java-driver|sync|mongo-spark-connector|sink", "version": "4.8.2|10.3.0"}, "os": {"type": "Linux", "name": "Linux", "architecture": "amd64", "version": "7.1.2-arch3-1"}, "platform": "Java/BellSoft/17.0.10+13-LTS|Scala/2.12.18/Spark/3.5.0"} created with settings MongoClientSettings{readPreference=primary, writeConcern=WriteConcern{w=null, wTimeout=null ms, journal=null}, retryWrites=true, retryReads=true, readConcern=ReadConcern{level=null}, credential=null, streamFactoryFactory=null, commandListeners=[], codecRegistry=ProvidersCodecRegistry{codecProviders=[ValueCodecProvider{}, BsonValueCodecProvider{}, DBRefCodecProvider{}, DBObjectCodecProvider{}, DocumentCodecProvider{}, CollectionCodecProvider{}, IterableCodecProvider{}, MapCodecProvider{}, GeoJsonCodecProvider{}, GridFSFileCodecProvider{}, Jsr310CodecProvider{}, JsonObjectCodecProvider{}, BsonCodecProvider{}, EnumCodecProvider{}, com.mongodb.Jep395RecordCodecProvider@492a7416]}, clusterSettings={hosts=[mongo:27017], srvServiceName=mongodb, mode=SINGLE, requiredClusterType=UNKNOWN, requiredReplicaSetName='null', serverSelector='null', clusterListeners='[]', serverSelectionTimeout='30000 ms', localThreshold='30000 ms'}, socketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=0, receiveBufferSize=0, sendBufferSize=0}, heartbeatSocketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=10000, receiveBufferSize=0, sendBufferSize=0}, connectionPoolSettings=ConnectionPoolSettings{maxSize=100, minSize=0, maxWaitTimeMS=120000, maxConnectionLifeTimeMS=0, maxConnectionIdleTimeMS=0, maintenanceInitialDelayMS=0, maintenanceFrequencyMS=60000, connectionPoolListeners=[], maxConnecting=2}, serverSettings=ServerSettings{heartbeatFrequencyMS=10000, minHeartbeatFrequencyMS=500, serverListeners='[]', serverMonitorListeners='[]'}, sslSettings=SslSettings{enabled=false, invalidHostNameAllowed=false, context=null}, applicationName='null', compressorList=[], uuidRepresentation=UNSPECIFIED, serverApi=null, autoEncryptionSettings=null, contextProvider=null}
-26/07/17 00:19:17 INFO cluster: Cluster description not yet available. Waiting for 30000 ms before timing out
-26/07/17 00:19:17 INFO cluster: Monitor thread successfully connected to server with description ServerDescription{address=mongo:27017, type=STANDALONE, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=21, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=20779956}
-26/07/17 00:19:17 INFO DataWritingSparkTask: Committed partition 0 (task 2, attempt 0, stage 2.0)
-26/07/17 00:19:17 INFO Executor: Finished task 0.0 in stage 2.0 (TID 2). 2244 bytes result sent to driver
-26/07/17 00:19:17 INFO TaskSetManager: Finished task 0.0 in stage 2.0 (TID 2) in 1165 ms on f2fd6849aaaf (executor driver) (1/1)
-26/07/17 00:19:17 INFO TaskSchedulerImpl: Removed TaskSet 2.0, whose tasks have all completed, from pool
-26/07/17 00:19:17 INFO DAGScheduler: ResultStage 2 (start at NativeMethodAccessorImpl.java:0) finished in 1.174 s
-26/07/17 00:19:17 INFO DAGScheduler: Job 1 is finished. Cancelling potential speculative or zombie tasks for this job
-26/07/17 00:19:17 INFO TaskSchedulerImpl: Killing all running tasks in stage 2: Stage finished
-26/07/17 00:19:17 INFO DAGScheduler: Job 1 finished: start at NativeMethodAccessorImpl.java:0, took 1.177085 s
-26/07/17 00:19:17 INFO AppendDataExec: Data source write support com.mongodb.spark.sql.connector.write.MongoBatchWrite@7a25fbc is committing.
-26/07/17 00:19:17 INFO AppendDataExec: Data source write support com.mongodb.spark.sql.connector.write.MongoBatchWrite@7a25fbc committed.
-26/07/17 00:19:17 INFO MapPartitionsRDD: Removing RDD 7 from persistence list
-26/07/17 00:19:17 INFO BlockManager: Removing RDD 7
-26/07/17 00:19:17 INFO BlockManagerInfo: Removed broadcast_1_piece0 on f2fd6849aaaf:40209 in memory (size: 5.9 KiB, free: 127.2 MiB)
-26/07/17 00:19:17 INFO CheckpointFileManager: Writing atomically to file:/mnt/checkpoints/cpg_metadata/commits/0 using temp file file:/mnt/checkpoints/cpg_metadata/commits/.0.af1bad5f-898a-4fc8-af30-874ed6d8a3e0.tmp
-26/07/17 00:19:17 INFO CheckpointFileManager: Renamed temp file file:/mnt/checkpoints/cpg_metadata/commits/.0.af1bad5f-898a-4fc8-af30-874ed6d8a3e0.tmp to file:/mnt/checkpoints/cpg_metadata/commits/0
-26/07/17 00:19:17 INFO MicroBatchExecution: Streaming query made progress: {
-  "id" : "cd95fbc2-9e11-441d-b680-e2cd34a6d414",
-  "runId" : "d8eddf69-da1d-4090-a68e-96ef9c3aa49e",
+26/07/17 00:22:19 INFO BlockManagerInfo: Removed broadcast_0_piece0 on fd353707331c:33183 in memory (size: 19.4 KiB, free: 127.2 MiB)
+26/07/17 00:22:19 INFO MongoTable: Creating MongoTable: mongo-spark-connector-10.3.0
+26/07/17 00:22:19 WARN CaseInsensitiveStringMap: Converting duplicated key spark.mongodb.write.idFieldList into CaseInsensitiveStringMap.
+26/07/17 00:22:19 WARN CaseInsensitiveStringMap: Converting duplicated key spark.mongodb.write.operationType into CaseInsensitiveStringMap.
+26/07/17 00:22:19 WARN CaseInsensitiveStringMap: Converting duplicated key spark.mongodb.write.upsertDocument into CaseInsensitiveStringMap.
+26/07/17 00:22:19 INFO AppendDataExec: Start processing data source write support: com.mongodb.spark.sql.connector.write.MongoBatchWrite@524b2cde. The input RDD has 1 partitions.
+26/07/17 00:22:19 INFO SparkContext: Starting job: start at NativeMethodAccessorImpl.java:0
+26/07/17 00:22:19 INFO DAGScheduler: Got job 1 (start at NativeMethodAccessorImpl.java:0) with 1 output partitions
+26/07/17 00:22:19 INFO DAGScheduler: Final stage: ResultStage 2 (start at NativeMethodAccessorImpl.java:0)
+26/07/17 00:22:19 INFO DAGScheduler: Parents of final stage: List()
+26/07/17 00:22:19 INFO DAGScheduler: Missing parents: List()
+26/07/17 00:22:19 INFO DAGScheduler: Submitting ResultStage 2 (MapPartitionsRDD[18] at start at NativeMethodAccessorImpl.java:0), which has no missing parents
+26/07/17 00:22:19 INFO MemoryStore: Block broadcast_2 stored as values in memory (estimated size 50.4 KiB, free 127.1 MiB)
+26/07/17 00:22:19 INFO MemoryStore: Block broadcast_2_piece0 stored as bytes in memory (estimated size 18.8 KiB, free 127.1 MiB)
+26/07/17 00:22:19 INFO BlockManagerInfo: Added broadcast_2_piece0 in memory on fd353707331c:33183 (size: 18.8 KiB, free: 127.2 MiB)
+26/07/17 00:22:19 INFO BlockManagerInfo: Removed broadcast_1_piece0 on fd353707331c:33183 in memory (size: 5.9 KiB, free: 127.2 MiB)
+26/07/17 00:22:19 INFO SparkContext: Created broadcast 2 from broadcast at DAGScheduler.scala:1580
+26/07/17 00:22:19 INFO DAGScheduler: Submitting 1 missing tasks from ResultStage 2 (MapPartitionsRDD[18] at start at NativeMethodAccessorImpl.java:0) (first 15 tasks are for partitions Vector(0))
+26/07/17 00:22:19 INFO TaskSchedulerImpl: Adding task set 2.0 with 1 tasks resource profile 0
+26/07/17 00:22:19 INFO TaskSetManager: Starting task 0.0 in stage 2.0 (TID 2) (fd353707331c, executor driver, partition 0, PROCESS_LOCAL, 11668 bytes)
+26/07/17 00:22:19 INFO Executor: Running task 0.0 in stage 2.0 (TID 2)
+26/07/17 00:22:19 INFO BlockManager: Found block rdd_7_0 locally
+26/07/17 00:22:19 INFO CodeGenerator: Code generated in 14.610921 ms
+26/07/17 00:22:19 INFO CodeGenerator: Code generated in 12.451494 ms
+26/07/17 00:22:19 INFO DataWritingSparkTask: Commit authorized for partition 0 (task 2, attempt 0, stage 2.0)
+26/07/17 00:22:19 INFO client: MongoClient with metadata {"driver": {"name": "mongo-java-driver|sync|mongo-spark-connector|sink", "version": "4.8.2|10.3.0"}, "os": {"type": "Linux", "name": "Linux", "architecture": "amd64", "version": "7.1.2-arch3-1"}, "platform": "Java/BellSoft/17.0.10+13-LTS|Scala/2.12.18/Spark/3.5.0"} created with settings MongoClientSettings{readPreference=primary, writeConcern=WriteConcern{w=null, wTimeout=null ms, journal=null}, retryWrites=true, retryReads=true, readConcern=ReadConcern{level=null}, credential=null, streamFactoryFactory=null, commandListeners=[], codecRegistry=ProvidersCodecRegistry{codecProviders=[ValueCodecProvider{}, BsonValueCodecProvider{}, DBRefCodecProvider{}, DBObjectCodecProvider{}, DocumentCodecProvider{}, CollectionCodecProvider{}, IterableCodecProvider{}, MapCodecProvider{}, GeoJsonCodecProvider{}, GridFSFileCodecProvider{}, Jsr310CodecProvider{}, JsonObjectCodecProvider{}, BsonCodecProvider{}, EnumCodecProvider{}, com.mongodb.Jep395RecordCodecProvider@269783b5]}, clusterSettings={hosts=[mongo:27017], srvServiceName=mongodb, mode=SINGLE, requiredClusterType=UNKNOWN, requiredReplicaSetName='null', serverSelector='null', clusterListeners='[]', serverSelectionTimeout='30000 ms', localThreshold='30000 ms'}, socketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=0, receiveBufferSize=0, sendBufferSize=0}, heartbeatSocketSettings=SocketSettings{connectTimeoutMS=10000, readTimeoutMS=10000, receiveBufferSize=0, sendBufferSize=0}, connectionPoolSettings=ConnectionPoolSettings{maxSize=100, minSize=0, maxWaitTimeMS=120000, maxConnectionLifeTimeMS=0, maxConnectionIdleTimeMS=0, maintenanceInitialDelayMS=0, maintenanceFrequencyMS=60000, connectionPoolListeners=[], maxConnecting=2}, serverSettings=ServerSettings{heartbeatFrequencyMS=10000, minHeartbeatFrequencyMS=500, serverListeners='[]', serverMonitorListeners='[]'}, sslSettings=SslSettings{enabled=false, invalidHostNameAllowed=false, context=null}, applicationName='null', compressorList=[], uuidRepresentation=UNSPECIFIED, serverApi=null, autoEncryptionSettings=null, contextProvider=null}
+26/07/17 00:22:19 INFO cluster: Cluster description not yet available. Waiting for 30000 ms before timing out
+26/07/17 00:22:19 INFO cluster: Monitor thread successfully connected to server with description ServerDescription{address=mongo:27017, type=STANDALONE, state=CONNECTED, ok=true, minWireVersion=0, maxWireVersion=21, maxDocumentSize=16777216, logicalSessionTimeoutMinutes=30, roundTripTimeNanos=22964948}
+26/07/17 00:22:20 INFO DataWritingSparkTask: Committed partition 0 (task 2, attempt 0, stage 2.0)
+26/07/17 00:22:20 INFO Executor: Finished task 0.0 in stage 2.0 (TID 2). 2244 bytes result sent to driver
+26/07/17 00:22:20 INFO TaskSetManager: Finished task 0.0 in stage 2.0 (TID 2) in 946 ms on fd353707331c (executor driver) (1/1)
+26/07/17 00:22:20 INFO TaskSchedulerImpl: Removed TaskSet 2.0, whose tasks have all completed, from pool
+26/07/17 00:22:20 INFO DAGScheduler: ResultStage 2 (start at NativeMethodAccessorImpl.java:0) finished in 0.956 s
+26/07/17 00:22:20 INFO DAGScheduler: Job 1 is finished. Cancelling potential speculative or zombie tasks for this job
+26/07/17 00:22:20 INFO TaskSchedulerImpl: Killing all running tasks in stage 2: Stage finished
+26/07/17 00:22:20 INFO DAGScheduler: Job 1 finished: start at NativeMethodAccessorImpl.java:0, took 0.959666 s
+26/07/17 00:22:20 INFO AppendDataExec: Data source write support com.mongodb.spark.sql.connector.write.MongoBatchWrite@524b2cde is committing.
+26/07/17 00:22:20 INFO AppendDataExec: Data source write support com.mongodb.spark.sql.connector.write.MongoBatchWrite@524b2cde committed.
+26/07/17 00:22:20 INFO MapPartitionsRDD: Removing RDD 7 from persistence list
+26/07/17 00:22:20 INFO BlockManager: Removing RDD 7
+26/07/17 00:22:20 INFO CheckpointFileManager: Writing atomically to file:/mnt/checkpoints/cpg_metadata/commits/0 using temp file file:/mnt/checkpoints/cpg_metadata/commits/.0.d66c7c0a-4388-46c3-9510-001c1b5012bf.tmp
+26/07/17 00:22:20 INFO CheckpointFileManager: Renamed temp file file:/mnt/checkpoints/cpg_metadata/commits/.0.d66c7c0a-4388-46c3-9510-001c1b5012bf.tmp to file:/mnt/checkpoints/cpg_metadata/commits/0
+26/07/17 00:22:20 INFO MicroBatchExecution: Streaming query made progress: {
+  "id" : "ab5c1747-d300-4e21-a6d6-16b8abbb45e7",
+  "runId" : "8e958dfb-3022-4c84-8e62-3584eaeaa206",
   "name" : null,
-  "timestamp" : "2026-07-17T00:19:12.291Z",
+  "timestamp" : "2026-07-17T00:22:16.212Z",
   "batchId" : 0,
   "numInputRows" : 5,
   "inputRowsPerSecond" : 0.0,
-  "processedRowsPerSecond" : 1.0119409026512851,
+  "processedRowsPerSecond" : 1.2830382345393894,
   "durationMs" : {
-    "addBatch" : 3404,
-    "commitOffsets" : 45,
-    "getBatch" : 25,
-    "latestOffset" : 830,
-    "queryPlanning" : 552,
-    "triggerExecution" : 4940,
-    "walCommit" : 55
+    "addBatch" : 2822,
+    "commitOffsets" : 56,
+    "getBatch" : 17,
+    "latestOffset" : 602,
+    "queryPlanning" : 331,
+    "triggerExecution" : 3897,
+    "walCommit" : 45
   },
   "stateOperators" : [ ],
   "sources" : [ {
@@ -185,7 +186,7 @@
     },
     "numInputRows" : 5,
     "inputRowsPerSecond" : 0.0,
-    "processedRowsPerSecond" : 1.0119409026512851,
+    "processedRowsPerSecond" : 1.2830382345393894,
     "metrics" : {
       "avgOffsetsBehindLatest" : "0.0",
       "maxOffsetsBehindLatest" : "0",
@@ -197,4 +198,3 @@
     "numOutputRows" : -1
   }
 }
-26/07/17 00:19:30 INFO MicroBatchExecution: Streaming query has been idle and waiting for new data more than 10000 ms.

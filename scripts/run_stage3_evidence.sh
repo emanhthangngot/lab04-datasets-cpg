@@ -143,7 +143,7 @@ if [[ "$AFTER_CONTENT_HASH" == "$BEFORE_CONTENT_HASH" ]]; then
 fi
 
 diff_status=0
-diff -u --label "a/$TARGET_RELATIVE" --label "b/$TARGET_RELATIVE" \
+diff -u -U0 --label "a/$TARGET_RELATIVE" --label "b/$TARGET_RELATIVE" \
   "$ORIGINAL_TARGET" "$TARGET_FILE" > "$EVIDENCE_DIR/source_patch.diff" || diff_status=$?
 if [[ "$diff_status" != "1" ]]; then
   echo "ERROR: source patch capture returned unexpected status $diff_status" >&2

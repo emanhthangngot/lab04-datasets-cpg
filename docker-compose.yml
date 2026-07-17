@@ -107,7 +107,7 @@ services:
     environment:
       ME_CONFIG_MONGODB_URL: mongodb://mongo:27017/
       ME_CONFIG_SITE_READONLY: "true"
-      ME_CONFIG_BASICAUTH_ENABLED: "false"
+      ME_CONFIG_BASICAUTH: "false"
 
   spark-checkpoint-init:
     image: docker.io/bitnamilegacy/spark:3.5.0
