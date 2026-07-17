@@ -93,8 +93,18 @@ Stage 3 change package:
 | Truc | `feature/truc/stage3-replay-runtime` | Clean orchestrator, Kafka deltas, Spark restart proof, Windows wrapper | Thanh for stores; Tri final |
 | Tuan | `docs/tuan/stage3-replay-book` | Canonical Task 6 notebook, six executed chapters, Reflection, local build | Tri |
 
-Merge order: contracts/store helpers, runtime, canonical evidence, book, then
-Stage 3 acceptance and OpenSpec archive. Main merge and Pages remain Stage 4.
+Implementation merge order: contracts/store helpers, runtime, canonical
+evidence, then book.
+
+Post-merge acceptance order:
+
+1. `test/truc/stage3-windows-acceptance` — Windows runtime record.
+2. `review/thanh/stage3-store-acceptance` — committed store evidence approval.
+3. `review/tuan/stage3-book-acceptance` — committed book approval.
+
+Each branch starts from the latest `origin/dev` and returns through a separate
+PR into `dev`. Tri records Stage 3 acceptance and archives OpenSpec only after
+all three acceptance PRs merge. Main merge and Pages remain Stage 4.
 
 ### Stage 4
 

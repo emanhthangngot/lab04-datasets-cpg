@@ -43,11 +43,25 @@
 - [x] 4.4 Complete `book/reflection.md`, build the book locally, and update
   `docs/team/evidence-book.md`.
 
-## 5. Shared Final Gate
+## 5. Post-Merge Owner Acceptance
 
-- [x] 5.1 `openspec validate --all --strict` passes.
-- [ ] 5.2 Full Python tests, shell syntax, PowerShell syntax, Compose config,
+- [ ] 5.1 Truc opens `test/truc/stage3-windows-acceptance` from updated
+  `origin/dev`, records the Windows Docker Desktop/Git Bash smoke result, and
+  merges its tracker-only PR into `dev`.
+- [ ] 5.2 After 5.1 merges, Thanh opens
+  `review/thanh/stage3-store-acceptance`, independently approves the committed
+  store manifest/artifacts, and merges its tracker-only PR into `dev`.
+- [ ] 5.3 After 5.2 merges, Tuan opens `review/tuan/stage3-book-acceptance`,
+  approves the committed Task 1-6 book from a clean local build, and merges its
+  tracker-only PR into `dev`.
+
+## 6. Shared Final Gate
+
+- [x] 6.1 `openspec validate --all --strict` passes.
+- [ ] 6.2 Full Python tests, shell syntax, PowerShell syntax, Compose config,
   manifest validation, notebook execution, and Jupyter Book build pass.
-- [x] 5.3 Source clone is clean and no credentials, private paths, or fabricated
+- [x] 6.3 Source clone is clean and no credentials, private paths, or fabricated
   evidence are committed.
-- [ ] 5.4 Tri records Stage 3 acceptance; main merge and Pages remain Stage 4.
+- [ ] 6.4 After all three acceptance PRs merge, Tri reviews their tracker
+  records, records Stage 3 acceptance, and archives this change. Main merge and
+  Pages remain Stage 4.
