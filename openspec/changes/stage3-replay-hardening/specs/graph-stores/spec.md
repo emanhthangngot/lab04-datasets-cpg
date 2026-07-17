@@ -24,3 +24,19 @@ before cleanup, and after cleanup.
 - **AND** the other four documents retain their baseline `run_id` and
   `content_hash`
 - **AND** duplicate `file_id` groups are zero
+
+### Requirement: Store Evidence Receives Independent Acceptance
+
+After Truc's acceptance PR merges, Thanh SHALL open
+`review/thanh/stage3-store-acceptance` from the updated `origin/dev`, validate
+the strict manifest, and independently compare the committed JSON and UI
+evidence. Thanh must not alter expected counts to make failed evidence pass.
+
+#### Scenario: Store acceptance PR
+
+- **WHEN** manifest validation returns `stage=3, status=pass`
+- **THEN** Thanh confirms target states `19/15`, `26/18`, and `23/16`
+- **AND** stale deletion is `3/2` and final stale, duplicate, and old-run counts are zero
+- **AND** MongoDB contains five documents with four unchanged non-target documents
+- **AND** JSON and UI evidence agree on target `file_id`, replay `run_id`, and counts
+- **AND** Thanh opens a tracker-only acceptance PR into `dev` with `APPROVED`
