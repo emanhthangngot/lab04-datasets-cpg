@@ -71,10 +71,22 @@ COMMIT_SHA="$(git -C data/datasets rev-parse HEAD)"
 docker compose run --rm -e COMMIT_SHA="$COMMIT_SHA" parser \
   python -m parser_service.main --repo data/datasets --mode full
 
-# 8. Capture evidence and build book
+# 8. Capture Stage 3 replay evidence and build book
 jupyter notebook notebooks/
-bash scripts/run_replay_demo.sh
+NEO4J_PASSWORD=<local-lab-password> RESET_DOCKER_STATE=1 \
+  bash scripts/run_stage3_evidence.sh
+# Capture the two required database UI images, then:
+bash scripts/finalize_stage3_evidence.sh
 jupyter-book build book/
+```
+
+On Windows, run the same canonical Bash workflow through the PowerShell
+wrapper so Docker Desktop and Git Bash use one implementation:
+
+```powershell
+.\scripts\run_stage3_evidence.ps1 `
+  -ResetDockerState `
+  -Neo4jPassword (Read-Host -AsSecureString)
 ```
 
 ## Evidence Targets
@@ -84,7 +96,8 @@ jupyter-book build book/
 - Task 3: Kafka topic layout and sample messages.
 - Task 4: Neo4j node/edge ingestion and duplicate checks.
 - Task 5: MongoDB metadata ingestion and checkpoint evidence.
-- Task 6: idempotent replay evidence.
+- Task 6: modified-file replay, Spark checkpoint resume, stale cleanup, store
+  duplicate checks, and strict manifest evidence.
 - Architecture diagram: full parser -> Kafka -> Neo4j/Spark/MongoDB flow.
 
 ## Team Workflow

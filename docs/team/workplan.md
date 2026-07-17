@@ -83,6 +83,19 @@ source code, notebooks, screenshots, and meaningful commit history.
 - [ ] Confirm screenshots are stored under `screenshots/`.
 - [ ] Resolve any blocker before final freeze.
 
+Stage 3 change package:
+[`stage3-replay-hardening`](../../openspec/changes/stage3-replay-hardening/README.md).
+
+| Owner | Branch | Deliverable | Acceptance owner |
+|---|---|---|---|
+| Tri | `feature/tri/stage3-replay-hardening` | OpenSpec, replay contracts, strict manifest validator, final gate | Tri |
+| Thanh | `fix/thanh/stage3-replay-stores` | Three-phase Neo4j/Mongo evidence, stale cleanup, two UI screenshots | Tri |
+| Truc | `feature/truc/stage3-replay-runtime` | Clean orchestrator, Kafka deltas, Spark restart proof, Windows wrapper | Thanh for stores; Tri final |
+| Tuan | `docs/tuan/stage3-replay-book` | Canonical Task 6 notebook, six executed chapters, Reflection, local build | Tri |
+
+Merge order: contracts/store helpers, runtime, canonical evidence, book, then
+Stage 3 acceptance and OpenSpec archive. Main merge and Pages remain Stage 4.
+
 ### Stage 4
 
 - [ ] Run local checks and `jupyter-book build book/`.
@@ -95,10 +108,10 @@ source code, notebooks, screenshots, and meaningful commit history.
 
 | Area | Owner | Status | Next Checkpoint |
 |---|---|---|---|
-| Parser/schema/specs | Tri | Schema v1.0 locked; Stage 2 parser-core spec added | Parser sample edge evidence |
-| Kafka/Spark | Truc | Stage 2 accepted: topics, connector, checkpoint and offset 5 evidenced | Stage 3 replay |
-| Neo4j/MongoDB | Thanh | Stage 2 accepted: counts and duplicate checks pass | Stage 3 replay/stale cleanup |
-| Evidence/Jupyter Book | Tuan | Task 1-5 executed chapters and architecture complete | Task 6 and Pages |
+| Parser/schema/specs | Tri | Stage 3 replay change specified; schema v1.0 unchanged | Manifest and contract verification |
+| Kafka/Spark | Truc | Stage 2 accepted at offset 5 | Restart at 5, replay to 6 |
+| Neo4j/MongoDB | Thanh | Stage 2 clean baseline accepted | Three-phase replay and stale cleanup |
+| Evidence/Jupyter Book | Tuan | Task 1-5 executed chapters and architecture complete | Task 6, Reflection, local build |
 
 ## Blocker Policy
 

@@ -2,7 +2,7 @@
 
 ![Stage 2 CPG streaming architecture](_static/stage2_pipeline.png)
 
-The editable source is [`stage2_pipeline.excalidraw`](_static/stage2_pipeline.excalidraw). It records the same run as `screenshots/stage2_manifest.json`: dataset commit `41adfd0f9ee9ba3a6b4f719d5b551c5b19ae45e2`, captured at `2026-07-16T09:16:57Z`.
+The editable source is [`stage2_pipeline.excalidraw`](_static/stage2_pipeline.excalidraw). It records the same dataset and pipeline route as `screenshots/stage2_manifest.json`; the exact capture time and artifact hashes remain in that validated manifest.
 
 ## Why the routes are separate
 

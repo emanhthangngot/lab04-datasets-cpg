@@ -81,10 +81,12 @@ Spec input to Tri:
 
 Tasks:
 
-- [x] Run Neo4j duplicate checks after replay.
-- [x] Run MongoDB duplicate `file_id` checks after replay.
+- [ ] Run Neo4j duplicate checks after the canonical Stage 3 replay.
+- [ ] Run MongoDB duplicate `file_id` checks after the canonical Stage 3 replay.
 - [ ] Verify stale cleanup behavior with `run_id`.
-- [x] Provide outputs for Task 4, Task 5, and Task 6.
+- [ ] Capture before, pre-cleanup, and final store JSON under `screenshots/replay/`.
+- [ ] Capture Neo4j Browser and Mongo Express replay screenshots.
+- [ ] Provide final outputs for Task 6.
 
 Done when:
 
@@ -150,8 +152,10 @@ Evidence:
 - `screenshots/kafka/sample_cpg_nodes.json`, `sample_cpg_edges.json`,
   `sample_cpg_metadata.json`, and `sample_cpg_errors.json`.
 
-Remaining Stage 3 work: verify stale cleanup behavior across changing file
-contents and `run_id`, then run a separately documented replay if required.
+Remaining Stage 3 work: run the approved `stage3-replay-hardening` canonical
+workflow, verify 3 stale target nodes and 2 stale target edges are removed,
+confirm four unchanged MongoDB documents retain their hashes, and approve both
+UI screenshots before manifest finalization.
 
 ## Previous Update
 
