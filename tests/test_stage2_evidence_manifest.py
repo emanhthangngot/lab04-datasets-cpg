@@ -29,7 +29,7 @@ def test_mongo_express_profile_is_isolated_and_read_only() -> None:
     assert "mongo-express:1.0.2-20-alpine3.19" in block
     assert 'profiles: ["evidence-ui"]' in block
     assert '"127.0.0.1:8081:8081"' in block
-    assert 'ME_CONFIG_SITE_READONLY: "true"' in block
+    assert 'ME_CONFIG_OPTIONS_READONLY: "true"' in block
     assert 'ME_CONFIG_BASICAUTH: "false"' in block
 
 
