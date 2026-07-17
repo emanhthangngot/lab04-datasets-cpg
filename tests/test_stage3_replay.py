@@ -351,3 +351,18 @@ def test_post_merge_acceptance_order_and_archive_gate_are_documented() -> None:
     assert "all three acceptance PRs" in tasks
     assert "all three acceptance PRs" in workplan
     assert "Pages remain Stage 4" in workplan
+
+
+def test_owner_trackers_define_post_merge_signoff_records() -> None:
+    trackers = {
+        "truc": (PROJECT_ROOT / "docs/team/kafka-spark.md").read_text(),
+        "thanh": (PROJECT_ROOT / "docs/team/graph-stores.md").read_text(),
+        "tuan": (PROJECT_ROOT / "docs/team/evidence-book.md").read_text(),
+    }
+    for source in trackers.values():
+        assert "## Post-Merge Acceptance PR" in source
+        assert "Acceptance status: `APPROVED` or `BLOCKED`" in source
+        assert "git pull --ff-only origin dev" in source
+    assert 'Read-Host "Neo4j password" -AsSecureString' in trackers["truc"]
+    assert "stage3_replay_manifest.py validate --root ." in trackers["thanh"]
+    assert "jupyter-book clean book" in trackers["tuan"]

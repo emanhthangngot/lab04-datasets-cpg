@@ -201,3 +201,36 @@ Steps 4 (Neo4j constraints) and 10 (Neo4j/MongoDB store verification) in
 included for shared end-to-end runbook completeness. Truc executes the checks;
 Thanh rechecks and accepts the resulting Graph Stores evidence before Tri's
 merge approval. This execution does not transfer Graph Stores ownership.
+
+## Post-Merge Acceptance PR
+
+This is Truc's mandatory Stage 3 acceptance after Tri's implementation PR has
+merged into `dev`. Perform it in a disposable Windows clone or worktree so the
+canonical evidence in `screenshots/` cannot be overwritten accidentally. Use
+Docker Desktop, PowerShell, and Git Bash from the same workstation being
+accepted.
+
+Branch and runbook:
+
+```powershell
+git switch dev
+git pull --ff-only origin dev
+git switch -c test/truc/stage3-windows-acceptance
+$password = Read-Host "Neo4j password" -AsSecureString
+./scripts/run_stage3_evidence.ps1 `
+  -ResetDockerState `
+  -Neo4jPassword $password
+```
+
+The acceptance PR is tracker-only. Do not commit regenerated canonical runtime
+evidence. Record the Windows, PowerShell, Docker Desktop, and Git Bash versions;
+the command exit code; the observed offset sequence `5 -> 5 -> 6`; and replay
+deltas of 23 nodes, 16 edges, 1 metadata event, and 0 errors. Confirm that the
+password was not printed and that the wrapper restored the source checkout
+after its temporary changes.
+
+Acceptance status: `APPROVED` or `BLOCKED`
+
+For `BLOCKED`, paste the failing command, exit code, relevant output, and an
+artifact path or screenshot. Do not relax expected values or edit the canonical
+manifest to turn a failure into approval.
