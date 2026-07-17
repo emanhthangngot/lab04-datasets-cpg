@@ -329,3 +329,25 @@ def test_post_merge_owner_acceptance_is_normative() -> None:
     assert "must not alter expected counts" in specs["stores"].lower()
     assert "review/tuan/stage3-book-acceptance" in specs["book"]
     assert "without live Docker services" in specs["book"]
+
+
+def test_post_merge_acceptance_order_and_archive_gate_are_documented() -> None:
+    tasks = (
+        PROJECT_ROOT / "openspec/changes/stage3-replay-hardening/tasks.md"
+    ).read_text()
+    workplan = (PROJECT_ROOT / "docs/team/workplan.md").read_text()
+
+    ordered = [
+        "test/truc/stage3-windows-acceptance",
+        "review/thanh/stage3-store-acceptance",
+        "review/tuan/stage3-book-acceptance",
+    ]
+    assert [tasks.index(value) for value in ordered] == sorted(
+        tasks.index(value) for value in ordered
+    )
+    assert [workplan.index(value) for value in ordered] == sorted(
+        workplan.index(value) for value in ordered
+    )
+    assert "all three acceptance PRs" in tasks
+    assert "all three acceptance PRs" in workplan
+    assert "Pages remain Stage 4" in workplan
