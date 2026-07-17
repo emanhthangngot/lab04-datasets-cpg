@@ -223,6 +223,9 @@ def test_manifest_rejects_pending_or_private_text(tmp_path: Path) -> None:
 def test_runtime_script_locks_replay_order_and_target() -> None:
     source = (PROJECT_ROOT / "scripts" / "run_stage3_evidence.sh").read_text()
 
+    assert 'COMPOSE_PROJECT_NAME="${COMPOSE_PROJECT_NAME:-lab04-datasets-cpg}"' in source
+    assert "export COMPOSE_PROJECT_NAME" in source
+
     markers = [
         ': "${RESET_DOCKER_STATE:?',
         'TARGET_RELATIVE="src/datasets/__init__.py"',
