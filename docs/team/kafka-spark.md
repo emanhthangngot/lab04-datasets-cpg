@@ -83,7 +83,7 @@ Stage 3 adds these exact gates:
 - [x] Restart Spark with the same checkpoint and prove the offset remains 5.
 - [x] Replay only `src/datasets/__init__.py` and prove metadata advances to 6.
 - [x] Record Kafka deltas of 23 node, 16 edge, 1 metadata, and 0 error events.
-- [ ] Run the PowerShell wrapper smoke check on Windows with Docker Desktop and
+- [x] Run the PowerShell wrapper smoke check on Windows with Docker Desktop and
   Git Bash.
 
 Done when:
@@ -110,9 +110,9 @@ Done when:
 
 ## Latest Update
 
-Status: Stage 2 clean-run implementation, store acceptance, and notebook evidence complete.
+Status: Stage 3 Windows runtime acceptance complete.
 
-Date: 2026-07-16
+Date: 2026-07-17
 
 Completed in Stage 2:
 
@@ -229,8 +229,34 @@ deltas of 23 nodes, 16 edges, 1 metadata event, and 0 errors. Confirm that the
 password was not printed and that the wrapper restored the source checkout
 after its temporary changes.
 
-Acceptance status: `APPROVED` or `BLOCKED`
+Acceptance status: `APPROVED`
 
-For `BLOCKED`, paste the failing command, exit code, relevant output, and an
-artifact path or screenshot. Do not relax expected values or edit the canonical
-manifest to turn a failure into approval.
+### Acceptance Record
+
+Date: 2026-07-17
+
+| Item | Value |
+|---|---|
+| Windows | Microsoft Windows 11 Home Single Language (NT 10.0.26200.0) |
+| PowerShell | 5.1.26100.8875 |
+| Docker Desktop | Docker 29.2.1, Docker Compose v5.1.0 |
+| Git Bash | GNU bash 5.2.37(1)-release (x86_64-pc-msys) |
+| Command | `./scripts/run_stage3_evidence.ps1 -ResetDockerState -Neo4jPassword $password` |
+| Exit code | `0` |
+| Spark metadata offset (before) | `5` |
+| Spark metadata offset (after restart) | `5` |
+| Spark metadata offset (after replay) | `6` |
+| Offset sequence | `5 → 5 → 6` ✅ |
+| Kafka delta cpg.nodes | `21438 − 21415 = 23` ✅ |
+| Kafka delta cpg.edges | `7984 − 7968 = 16` ✅ |
+| Kafka delta cpg.metadata | `6 − 5 = 1` ✅ |
+| Kafka delta cpg.errors | `1 − 1 = 0` ✅ |
+| Password printed to stdout | No — `SecureString` input via `Read-Host -AsSecureString`; `ZeroFreeBSTR` cleanup in `finally` block; no plaintext password in script output |
+| Source restored after replay | Yes — `run_metadata.json` confirms `source_restored: true`; script completed without restore error |
+
+Note: Initial run failed with exit code 49 due to Windows App Execution Alias
+for `python3` intercepting the call inside Git Bash
+(`capture_connector_evidence.sh` line 20). The workaround was creating a
+`.venv` so that the script's first-priority check (`.venv/Scripts/python.exe`
+at line 18) succeeds. This is a known Windows environment issue, not a pipeline
+bug. Reported to Tri for awareness.
