@@ -81,7 +81,7 @@ source code, notebooks, screenshots, and meaningful commit history.
 - [x] Review replay strategy and duplicate checks.
 - [x] Confirm each task chapter has real executed output.
 - [x] Confirm screenshots are stored under `screenshots/`.
-- [ ] Resolve the remaining Windows PowerShell/Docker Desktop smoke check before final freeze.
+- [x] Resolve the remaining Windows PowerShell/Docker Desktop smoke check before final freeze.
 
 Stage 3 change package:
 [`stage3-replay-hardening`](../../openspec/changes/stage3-replay-hardening/README.md).
@@ -118,9 +118,9 @@ all three acceptance PRs merge. Main merge and Pages remain Stage 4.
 
 | Area | Owner | Status | Next Checkpoint |
 |---|---|---|---|
-| Parser/schema/specs | Tri | Strict Stage 3 manifest passes; schema v1.0 unchanged | Windows smoke and final acceptance |
-| Kafka/Spark | Truc | Baseline 5, restart 5, replay 6; Kafka delta 23/16/1/0 | Windows wrapper smoke |
-| Neo4j/MongoDB | Thanh | Three-phase replay passed; stale 3/2 removed; duplicates 0 | Stage 4 publication review |
+| Parser/schema/specs | Tri | Strict Stage 3 manifest passes; schema v1.0 unchanged | Thanh store acceptance and final acceptance |
+| Kafka/Spark | Truc | Windows acceptance complete; baseline 5, restart 5, replay 6; Kafka delta 23/16/1/0 | Support remaining final checks |
+| Neo4j/MongoDB | Thanh | Three-phase replay passed; stale 3/2 removed; duplicates 0 | `review/thanh/stage3-store-acceptance` |
 | Evidence/Jupyter Book | Tuan | Tasks 1-6 executed; screenshots embedded; local build passed | Stage 4 Pages review |
 
 ## Blocker Policy

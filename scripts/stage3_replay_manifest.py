@@ -36,6 +36,7 @@ JSON_ARTIFACTS = (
 TEXT_ARTIFACTS = ("source_patch.diff", "neo4j_cleanup.txt")
 PNG_ARTIFACTS = ("neo4j_after_cleanup.png", "mongodb_after_replay.png")
 REQUIRED_ARTIFACTS = JSON_ARTIFACTS + TEXT_ARTIFACTS + PNG_ARTIFACTS
+CANONICAL_TEXT_ARTIFACTS = frozenset(JSON_ARTIFACTS + TEXT_ARTIFACTS)
 
 EXPECTED_KAFKA_BEFORE = {
     "cpg.nodes": 21415,
@@ -104,11 +105,10 @@ def _read_json(path: Path) -> dict[str, Any]:
 
 
 def _sha256(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(65536), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
+    payload = path.read_bytes()
+    if path.name in CANONICAL_TEXT_ARTIFACTS:
+        payload = payload.replace(b"\r\n", b"\n")
+    return hashlib.sha256(payload).hexdigest()
 
 
 def _require(condition: bool, message: str) -> None:
@@ -268,7 +268,8 @@ def _build_manifest(root: Path) -> dict[str, Any]:
     _require_exact(set(screenshots), set(PNG_ARTIFACTS), "UI screenshot metadata")
 
     artifact_hashes = {
-        str(REPLAY_RELATIVE / name): _sha256(replay / name) for name in REQUIRED_ARTIFACTS
+        (REPLAY_RELATIVE / name).as_posix(): _sha256(replay / name)
+        for name in REQUIRED_ARTIFACTS
     }
     return {
         "schema_version": "1.0",
