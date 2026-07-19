@@ -245,6 +245,33 @@ The tracker-only PR must record all of the following:
 
 Acceptance status: `APPROVED` or `BLOCKED`
 
+Recorded acceptance status: `APPROVED`
+
+### Acceptance Record
+
+Date: 2026-07-19
+
+Base commit: `e60e3d0d6d7df1d9a882d67dc8e548177ae9d777`
+
+- `scripts/run_checks.ps1` passed with 130 tests, valid Compose config, and a
+  valid Neo4j connector JSON document.
+- Strict manifest validation returned `stage=3, status=pass`; OpenSpec strict
+  validation passed all five items.
+- Neo4j target state progressed from `19/15` before replay to `26/18` before
+  cleanup and `23/16` after cleanup. Reconciliation removed exactly 3 stale
+  nodes and 2 stale edges.
+- Final stale node/edge counts, duplicate node/edge groups, and old-run entity
+  count are all zero.
+- MongoDB contains 5 unique metadata documents with zero duplicate `file_id`
+  groups. Four non-target documents retain their baseline `run_id` and
+  `content_hash`; the target document matches replay run
+  `stage3-replay-20260717T002053Z` and its replay content hash.
+- `neo4j_after_cleanup.png` shows 23 target/replay nodes, 16 target/replay
+  edges, and zero stale nodes or edges. `mongodb_after_replay.png` shows the
+  matching target `file_id`, replay document, and collection count of 5.
+- JSON artifacts, both database UI screenshots, and the strict manifest agree.
+  No canonical evidence or acceptance constants were changed.
+
 For `BLOCKED`, identify the mismatching field, expected and actual values,
 failing command, and artifact or screenshot path. Do not regenerate evidence or
 change the acceptance constants inside this PR.
