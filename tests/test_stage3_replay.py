@@ -174,6 +174,7 @@ def test_manifest_write_and_validate_accepts_canonical_replay(tmp_path: Path) ->
     assert manifest["spark"]["metadata_offset_after_replay"] == 6
     assert manifest["neo4j"]["stale_deleted"] == {"nodes": 3, "edges": 2}
     assert manifest["mongodb"]["unchanged_documents"] == 4
+    assert all("\\" not in path for path in manifest["artifacts"])
     assert validated == manifest
 
 
@@ -183,6 +184,35 @@ def test_manifest_rejects_changed_artifact_hash(tmp_path: Path) -> None:
     module.write_manifest(tmp_path)
     changed = tmp_path / REPLAY_DIR / "neo4j_cleanup.txt"
     changed.write_text(changed.read_text(encoding="utf-8") + "changed\n", encoding="utf-8")
+
+    with pytest.raises(module.EvidenceError, match="hash mismatch"):
+        module.validate_manifest(tmp_path)
+
+
+def test_manifest_accepts_crlf_checkout_for_text_artifacts(tmp_path: Path) -> None:
+    _write_valid_raw_evidence(tmp_path)
+    module = _load_manifest_module()
+    replay = tmp_path / REPLAY_DIR
+
+    for name in module.JSON_ARTIFACTS + module.TEXT_ARTIFACTS:
+        path = replay / name
+        path.write_bytes(path.read_bytes().replace(b"\r\n", b"\n"))
+
+    manifest = module.write_manifest(tmp_path)
+
+    for name in module.JSON_ARTIFACTS + module.TEXT_ARTIFACTS:
+        path = replay / name
+        path.write_bytes(path.read_bytes().replace(b"\n", b"\r\n"))
+
+    assert module.validate_manifest(tmp_path) == manifest
+
+
+def test_manifest_hashes_png_artifacts_as_raw_bytes(tmp_path: Path) -> None:
+    _write_valid_raw_evidence(tmp_path)
+    module = _load_manifest_module()
+    module.write_manifest(tmp_path)
+    png = tmp_path / REPLAY_DIR / "neo4j_after_cleanup.png"
+    png.write_bytes(png.read_bytes() + b"changed")
 
     with pytest.raises(module.EvidenceError, match="hash mismatch"):
         module.validate_manifest(tmp_path)
@@ -364,5 +394,6 @@ def test_owner_trackers_define_post_merge_signoff_records() -> None:
         assert "Acceptance status: `APPROVED` or `BLOCKED`" in source
         assert "git pull --ff-only origin dev" in source
     assert 'Read-Host "Neo4j password" -AsSecureString' in trackers["truc"]
+    assert "Recorded acceptance status: `APPROVED`" in trackers["truc"]
     assert "stage3_replay_manifest.py validate --root ." in trackers["thanh"]
     assert "jupyter-book clean book" in trackers["tuan"]

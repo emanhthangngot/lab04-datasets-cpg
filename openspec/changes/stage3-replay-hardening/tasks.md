@@ -45,7 +45,7 @@
 
 ## 5. Post-Merge Owner Acceptance
 
-- [ ] 5.1 Truc opens `test/truc/stage3-windows-acceptance` from updated
+- [x] 5.1 Truc opens `test/truc/stage3-windows-acceptance` from updated
   `origin/dev`, records the Windows Docker Desktop/Git Bash smoke result, and
   merges its tracker-only PR into `dev`.
 - [ ] 5.2 After 5.1 merges, Thanh opens

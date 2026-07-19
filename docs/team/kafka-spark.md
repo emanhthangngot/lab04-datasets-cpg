@@ -114,6 +114,9 @@ Status: Stage 3 Windows runtime acceptance complete.
 
 Date: 2026-07-17
 
+Stage 2 clean-run implementation, store acceptance, and notebook evidence
+remain complete.
+
 Completed in Stage 2:
 
 - [x] Created `scripts/capture_kafka_evidence.sh` — captures topic list, topic details, and sample messages from all 4 topics with field validation.
@@ -229,7 +232,9 @@ deltas of 23 nodes, 16 edges, 1 metadata event, and 0 errors. Confirm that the
 password was not printed and that the wrapper restored the source checkout
 after its temporary changes.
 
-Acceptance status: `APPROVED`
+Acceptance status: `APPROVED` or `BLOCKED`
+
+Recorded acceptance status: `APPROVED`
 
 ### Acceptance Record
 
