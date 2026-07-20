@@ -5,68 +5,68 @@ parallel handoff is required.
 
 ## 1. Establish The Release Baseline
 
-- [ ] 1.1 Start from clean, synchronized `dev` and record its commit SHA.
-- [ ] 1.2 Confirm Stage 3 is archived and all archived Stage 3 tasks are complete.
-- [ ] 1.3 Run strict OpenSpec and Stage 3 manifest validation.
-- [ ] 1.4 Record current `main`, `dev`, Pages, `gh-pages`, and latest workflow
+- [x] 1.1 Start from clean, synchronized `dev` and record its commit SHA.
+- [x] 1.2 Confirm Stage 3 is archived and all archived Stage 3 tasks are complete.
+- [x] 1.3 Run strict OpenSpec and Stage 3 manifest validation.
+- [x] 1.4 Record current `main`, `dev`, Pages, `gh-pages`, and latest workflow
   state before making Stage 4 changes.
-- [ ] 1.5 Confirm no destructive runtime or evidence regeneration is required.
+- [x] 1.5 Confirm no destructive runtime or evidence regeneration is required.
 
 ## 2. Repair The Publication Workflow
 
-- [ ] 2.1 Add a failing static contract test proving the workflow does not use
+- [x] 2.1 Add a failing static contract test proving the workflow does not use
   unpinned `pip install -U jupyter-book` and requires Jupyter Book 1.0.3.
-- [ ] 2.2 Update `.github/workflows/publish-book.yml` to install locked
+- [x] 2.2 Update `.github/workflows/publish-book.yml` to install locked
   dependencies or `jupyter-book==1.0.3` on Python 3.11.
-- [ ] 2.3 Add an explicit existence gate for
+- [x] 2.3 Add an explicit existence gate for
   `book/_build/html/index.html` before deployment.
-- [ ] 2.4 Ensure deployment runs only after a successful build and retains one
+- [x] 2.4 Ensure deployment runs only after a successful build and retains one
   publication mechanism.
-- [ ] 2.5 Run the focused workflow contract tests.
+- [x] 2.5 Run the focused workflow contract tests.
 
 ## 3. Reconcile Public Documentation
 
-- [ ] 3.1 Fix README references to missing `.codex/scripts/doctor.sh`, the
+- [x] 3.1 Fix README references to missing `.codex/scripts/doctor.sh`, the
   removed `notebooks/` directory, and obsolete active OpenSpec task paths.
-- [ ] 3.2 Replace inaccurate scaffold/TODO completion claims with the current
+- [x] 3.2 Replace inaccurate scaffold/TODO completion claims with the current
   finished architecture and verification workflow.
-- [ ] 3.3 Review source/docs TODO markers; remove stale claims and retain only
+- [x] 3.3 Review source/docs TODO markers; remove stale claims and retain only
   truthful future limitations.
-- [ ] 3.4 Replace `NEO4J_PASSWORD=password` in the public book with a safe
+- [x] 3.4 Replace `NEO4J_PASSWORD=password` in the public book with a safe
   placeholder.
-- [ ] 3.5 Recheck all public run commands against tracked files.
+- [x] 3.5 Recheck all public run commands against tracked files.
 
 ## 4. Complete Final Evidence Presentation
 
-- [ ] 4.1 Re-run final Neo4j and MongoDB verification queries without changing
+- [x] 4.1 Re-run final Neo4j and MongoDB verification queries without changing
   accepted counts or hashed evidence.
-- [ ] 4.2 Compare query results, screenshots, JSON/text artifacts, and the Stage
+- [x] 4.2 Compare query results, screenshots, JSON/text artifacts, and the Stage
   3 manifest.
-- [ ] 4.3 Add or embed real, correctly labeled Neo4j UI evidence in Task 4.
-- [ ] 4.4 Add or embed real, correctly labeled MongoDB UI evidence in Task 5.
-- [ ] 4.5 Review Task 3 Kafka, Task 5 Spark, and Task 6 replay narratives against
+- [x] 4.3 Add or embed real, correctly labeled Neo4j UI evidence in Task 4.
+- [x] 4.4 Add or embed real, correctly labeled MongoDB UI evidence in Task 5.
+- [x] 4.5 Review Task 3 Kafka, Task 5 Spark, and Task 6 replay narratives against
   the accepted artifacts.
-- [ ] 4.6 Confirm Task 1-6 and Reflection contain executed output, approach,
+- [x] 4.6 Confirm Task 1-6 and Reflection contain executed output, approach,
   failure/fix explanation, and honest limitations.
 
 ## 5. Run Local Release Gates
 
-- [ ] 5.1 Run full Python tests with zero failures.
-- [ ] 5.2 Run `openspec validate --all --strict`.
-- [ ] 5.3 Run strict Stage 3 manifest validation.
-- [ ] 5.4 Validate Docker Compose, connector JSON, and all Bash scripts.
-- [ ] 5.5 Validate PowerShell syntax when `.ps1` files changed; otherwise cite
+- [x] 5.1 Run full Python tests with zero failures.
+- [x] 5.2 Run `openspec validate --all --strict`.
+- [x] 5.3 Run strict Stage 3 manifest validation.
+- [x] 5.4 Validate Docker Compose, connector JSON, and all Bash scripts.
+- [x] 5.5 Validate PowerShell syntax when `.ps1` files changed; otherwise cite
   the accepted Windows record.
-- [ ] 5.6 Clean and build the Jupyter Book with Jupyter Book 1.0.3.
-- [ ] 5.7 Confirm all nine generated HTML pages and required images exist.
-- [ ] 5.8 Run broken-link, credential, token, private-path, personal-data,
+- [x] 5.6 Clean and build the Jupyter Book with Jupyter Book 1.0.3.
+- [x] 5.7 Confirm all nine generated HTML pages and required images exist.
+- [x] 5.8 Run broken-link, credential, token, private-path, personal-data,
   pending-marker, and tracked-build-output scans.
-- [ ] 5.9 Run `git diff --check` and confirm the release worktree is clean after
+- [x] 5.9 Run `git diff --check` and confirm the release worktree is clean after
   committing the Stage 4 changes.
 
 ## 6. Integrate Dev Into Main
 
-- [ ] 6.1 Review commits unique to `main` and `dev` and simulate the final merge.
+- [x] 6.1 Review commits unique to `main` and `dev` and simulate the final merge.
 - [ ] 6.2 Open a PR from `dev` into `main` with release commands and evidence.
 - [ ] 6.3 Review the complete PR diff; reject unrelated runtime or evidence
   changes.
