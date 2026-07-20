@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Verify that the Neo4j Kafka Connector is installed in Kafka Connect.
-# TODO: If no Neo4j class is printed, rebuild `connect` from kafka-connect/Dockerfile.
+# If no Neo4j class is printed, rebuild `connect` from kafka-connect/Dockerfile.
 
 CONNECT_URL="${CONNECT_URL:-http://localhost:8083}"
 EXPECTED_NEO4J_CLASS="${EXPECTED_NEO4J_CLASS:-org.neo4j.connectors.kafka.sink.Neo4jConnector}"

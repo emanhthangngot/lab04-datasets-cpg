@@ -26,7 +26,7 @@ The Mongo Express service is excluded from the default stack, read-only, and bou
 ## Reproduce
 
 ```bash
-NEO4J_PASSWORD=password \
+NEO4J_PASSWORD=<local-lab-password> \
 RESET_DOCKER_STATE=1 \
 CONNECT_WAIT_SECONDS=180 \
 SPARK_WAIT_SECONDS=90 \

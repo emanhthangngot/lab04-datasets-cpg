@@ -1,7 +1,4 @@
-"""Pytest configuration for Lab04 scaffold tests.
-
-TODO: Add shared fixtures for sample Python files as parser implementation grows.
-"""
+"""Pytest configuration for Lab04 repository tests."""
 
 from __future__ import annotations
 

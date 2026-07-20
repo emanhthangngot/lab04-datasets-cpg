@@ -123,6 +123,11 @@ Final Stage 3 acceptance recorded by Le Xuan Tri on 2026-07-20:
 
 ### Stage 4
 
+Stage 4 follows the single-executor checklist in
+[`stage4-final-publication`](../../openspec/changes/stage4-final-publication/tasks.md).
+These release items remain pending until local gates, deployment, and live-site
+acceptance all pass.
+
 - [ ] Run local checks and `jupyter-book build book/`.
 - [ ] Merge `dev` into `main`.
 - [ ] Confirm GitHub Pages workflow passes.

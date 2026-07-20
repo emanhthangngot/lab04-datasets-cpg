@@ -6,5 +6,3 @@ pytest==8.3.4
 jupyter==1.1.1
 jupyter-book==1.0.3
 pymongo==4.10.1
-
-# TODO: Add optional lint/format tools after team agrees on style.

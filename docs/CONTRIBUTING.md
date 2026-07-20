@@ -6,8 +6,8 @@ contain the source code, notebooks, screenshots, and meaningful commit history.
 
 ## Branch Flow
 
-- `main`: final publish branch. Pushes that change `book/`, `notebooks/`, or
-  `screenshots/` trigger GitHub Pages publication.
+- `main`: final publish branch. Pushes that change `book/`, `screenshots/`, the
+  locked requirements, or the publication workflow trigger GitHub Pages.
 - `dev`: team integration branch. Team members branch from `dev` and open pull
   requests back into `dev`.
 - Feature branches:
@@ -84,8 +84,15 @@ bash scripts/run_checks.sh
 Before final publication:
 
 ```bash
+python scripts/stage3_replay_manifest.py validate --root .
+jupyter-book clean book/
 jupyter-book build book/
+test -f book/_build/html/index.html
 ```
+
+Stage 4 is performed by one sequential executor. Publication completion is not
+recorded until the reviewed `dev` to `main` merge, workflow deployment, and live
+review of all book pages have passed.
 
 ## Evidence Rules
 

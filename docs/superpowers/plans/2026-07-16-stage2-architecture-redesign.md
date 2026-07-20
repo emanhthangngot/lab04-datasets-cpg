@@ -23,7 +23,7 @@
 ### Task 1: Register and verify the official remote MCP
 
 **Files:**
-- Modify outside repository: `/home/pearspringmind/.codex/config.toml`
+- Modify outside repository: `/path/to/.codex/config.toml`
 - Inspect: `docs/superpowers/specs/2026-07-16-stage2-architecture-redesign.md`
 
 **Interfaces:**
@@ -57,7 +57,7 @@ Run:
 
 ```bash
 codex mcp get excalidraw
-rg -n 'mcp_servers\.excalidraw|https://mcp\.excalidraw\.com' /home/pearspringmind/.codex/config.toml
+rg -n 'mcp_servers\.excalidraw|https://mcp\.excalidraw\.com' /path/to/.codex/config.toml
 ```
 
 Expected: the server is enabled and its URL is exactly

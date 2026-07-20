@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Wait until the Kafka Connect consumer group has no lag.
-# TODO: Run this before stale cleanup in replay verification.
+# Run this before stale cleanup in replay verification.
 
 KAFKA_SERVICE="${KAFKA_SERVICE:-broker}"
 BOOTSTRAP="${KAFKA_BOOTSTRAP_INTERNAL:-broker:9092}"

@@ -37,8 +37,8 @@ The final GitHub Pages Jupyter Book is public. Before publishing, verify that
 notebooks, logs, and screenshots do not contain credentials, local secrets, or
 irrelevant personal data.
 
-## Hook And Agent Config
+## Local Tooling
 
-Project hooks in `.codex/hooks/` execute local code. Review hook diffs like
-source code. The doctor script validates syntax and checks for Lab04-specific
-context drift.
+Agent-local configuration is not required in a public clone. Review any local
+hooks or automation before running them, and use the tracked scripts under
+`scripts/` for repository validation.

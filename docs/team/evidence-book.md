@@ -96,12 +96,16 @@ Spec input to Tri:
 
 ## Stage 4: Publication Review
 
-Tasks:
+Stage 4 is no longer split by member. One executor follows the ordered
+[`stage4-final-publication`](../../openspec/changes/stage4-final-publication/tasks.md)
+checklist and uses this tracker only as Stage 1-3 evidence history.
+
+Final review gates:
 
 - [ ] Confirm GitHub Pages workflow has published the latest book from `main`.
 - [ ] Open the root Pages URL and every chapter.
 - [ ] Confirm repository links are visible from the book.
-- [ ] Confirm final Moodle URL with Tri.
+- [ ] Confirm the verified Pages root URL is the only Moodle value.
 
 Done when:
 
@@ -110,10 +114,8 @@ Done when:
 ## Latest Update
 
 Status: Stage 3 Task 1-6 executed chapters, replay evidence, strict manifest,
-reflection, and local Jupyter Book build are complete. Publication remains Stage 4.
-
-Next action: complete the Windows wrapper smoke check, record Stage 3 acceptance,
-then verify the published book in Stage 4.
+reflection, Windows acceptance, and local Jupyter Book build are approved.
+Publication workflow repair and live Pages verification remain Stage 4.
 
 Evidence links:
 

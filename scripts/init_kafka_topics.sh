@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Create all required Kafka topics explicitly inside the Kafka service.
-# TODO: Capture topic list output for notebook Task 3.
+# Capture topic list output for the Task 3 evidence chapter when regenerating evidence.
 
 KAFKA_SERVICE="${KAFKA_SERVICE:-broker}"
 BOOTSTRAP="${KAFKA_BOOTSTRAP_INTERNAL:-broker:9092}"

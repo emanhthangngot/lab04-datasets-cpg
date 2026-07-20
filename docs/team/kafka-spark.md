@@ -98,7 +98,9 @@ Spec input to Tri:
 
 ## Stage 4: Final Review
 
-Tasks:
+Stage 4 is performed by one sequential executor under the active publication
+checklist. The items below are evidence review gates, not a member-specific
+assignment:
 
 - [ ] Re-run assigned commands for final smoke check.
 - [ ] Confirm all Kafka/Spark evidence references still resolve.
@@ -106,7 +108,8 @@ Tasks:
 
 Done when:
 
-- Tri approves Kafka/Spark evidence for final Pages publication.
+- Kafka/Spark evidence matches the accepted manifest and the live Pages review
+  passes as part of the single Stage 4 acceptance.
 
 ## Latest Update
 

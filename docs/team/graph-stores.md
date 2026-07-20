@@ -100,7 +100,9 @@ Spec input to Tri:
 
 ## Stage 4: Final Review
 
-Tasks:
+Stage 4 is performed by one sequential executor under the active publication
+checklist. The items below are evidence review gates, not a member-specific
+assignment:
 
 - [ ] Re-run final Neo4j and MongoDB verification queries.
 - [ ] Confirm screenshots and query outputs still match final text.
@@ -108,7 +110,8 @@ Tasks:
 
 Done when:
 
-- Tri approves graph-store evidence for final Pages publication.
+- Graph-store evidence matches the accepted manifest and the live Pages review
+  passes as part of the single Stage 4 acceptance.
 
 ## Stage 2 Acceptance Update (2026-07-16)
 
