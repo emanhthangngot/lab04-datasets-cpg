@@ -345,11 +345,11 @@ def test_fixture_hash_helper_is_deterministic() -> None:
 
 
 def test_post_merge_owner_acceptance_is_normative() -> None:
-    change = PROJECT_ROOT / "openspec" / "changes" / "stage3-replay-hardening"
+    specs_root = PROJECT_ROOT / "openspec" / "specs"
     specs = {
-        "kafka": (change / "specs/kafka-spark/spec.md").read_text(),
-        "stores": (change / "specs/graph-stores/spec.md").read_text(),
-        "book": (change / "specs/evidence-book/spec.md").read_text(),
+        "kafka": (specs_root / "kafka-spark/spec.md").read_text(),
+        "stores": (specs_root / "graph-stores/spec.md").read_text(),
+        "book": (specs_root / "evidence-book/spec.md").read_text(),
     }
 
     assert "test/truc/stage3-windows-acceptance" in specs["kafka"]
@@ -363,7 +363,8 @@ def test_post_merge_owner_acceptance_is_normative() -> None:
 
 def test_post_merge_acceptance_order_and_archive_gate_are_documented() -> None:
     tasks = (
-        PROJECT_ROOT / "openspec/changes/stage3-replay-hardening/tasks.md"
+        PROJECT_ROOT
+        / "openspec/changes/archive/2026-07-20-stage3-replay-hardening/tasks.md"
     ).read_text()
     workplan = (PROJECT_ROOT / "docs/team/workplan.md").read_text()
 

@@ -1,12 +1,12 @@
 ## 1. Tri — Spec, Contracts, And Acceptance
 
-- [ ] 1.1 Validate and merge this OpenSpec change before implementation PRs.
+- [x] 1.1 Validate and merge this OpenSpec change before implementation PRs.
 - [x] 1.2 Add failing mutation-contract and strict manifest tests.
 - [x] 1.3 Implement `scripts/stage3_replay_manifest.py` with `write` and
   `validate` commands.
 - [x] 1.4 Add fail-fast checks for metrics, artifact hashes, screenshots,
   credentials, local paths, and pending markers.
-- [ ] 1.5 Review every owner tracker and archive the change only after all
+- [x] 1.5 Review every owner tracker and archive the change only after all
   acceptance gates pass.
 
 ## 2. Thanh — Neo4j And MongoDB Replay Stores
@@ -62,6 +62,6 @@
   manifest validation, notebook execution, and Jupyter Book build pass.
 - [x] 6.3 Source clone is clean and no credentials, private paths, or fabricated
   evidence are committed.
-- [ ] 6.4 After all three acceptance PRs merge, Tri reviews their tracker
+- [x] 6.4 After all three acceptance PRs merge, Tri reviews their tracker
   records, records Stage 3 acceptance, and archives this change. Main merge and
   Pages remain Stage 4.

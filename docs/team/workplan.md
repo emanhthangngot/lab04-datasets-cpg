@@ -83,9 +83,12 @@ source code, notebooks, screenshots, and meaningful commit history.
 - [x] Confirm screenshots are stored under `screenshots/`.
 - [x] Resolve the remaining Windows PowerShell/Docker Desktop smoke check before final freeze.
 - [x] Tuan book acceptance: post-merge acceptance PR approved 2026-07-20.
+- [x] Tri final acceptance: all owner PRs reviewed, final gates passed, and
+  Stage 3 accepted on 2026-07-20.
 
 Stage 3 change package:
-[`stage3-replay-hardening`](../../openspec/changes/stage3-replay-hardening/README.md).
+[`stage3-replay-hardening`](../../openspec/changes/archive/2026-07-20-stage3-replay-hardening/README.md)
+(archived after final acceptance).
 
 | Owner | Branch | Deliverable | Acceptance owner |
 |---|---|---|---|
@@ -106,6 +109,17 @@ Post-merge acceptance order:
 Each branch starts from the latest `origin/dev` and returns through a separate
 PR into `dev`. Tri records Stage 3 acceptance and archives OpenSpec only after
 all three acceptance PRs merge. Main merge and Pages remain Stage 4.
+
+Final Stage 3 acceptance recorded by Le Xuan Tri on 2026-07-20:
+
+- Truc Windows runtime acceptance: PR #15 merged.
+- Thanh store evidence acceptance: PR #17 merged.
+- Tuan book acceptance: PR #18 merged as `7f48c7c`.
+- Strict replay manifest: pass.
+- OpenSpec strict validation: 5/5 pass.
+- Full Python tests, Compose/connector validation, Bash syntax, and clean
+  Jupyter Book build: pass.
+- Stage 3 result: `APPROVED`. Stage 4 remains separate.
 
 ### Stage 4
 
