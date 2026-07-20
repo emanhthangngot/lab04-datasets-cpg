@@ -82,7 +82,7 @@ source code, notebooks, screenshots, and meaningful commit history.
 - [x] Confirm each task chapter has real executed output.
 - [x] Confirm screenshots are stored under `screenshots/`.
 - [x] Resolve the remaining Windows PowerShell/Docker Desktop smoke check before final freeze.
-- [x] Tuan book acceptance: `review/tuan/stage3-book-acceptance` — APPROVED 2026-07-20.
+- [x] Tuan book acceptance: post-merge acceptance PR approved 2026-07-20.
 
 Stage 3 change package:
 [`stage3-replay-hardening`](../../openspec/changes/stage3-replay-hardening/README.md).

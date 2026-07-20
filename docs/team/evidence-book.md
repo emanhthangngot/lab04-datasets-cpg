@@ -166,7 +166,9 @@ manifest, Neo4j and MongoDB images, replay narrative, and reflection agree with
 one another. Confirm the clean book build succeeds without live Docker services
 and that no generated `_build/` content is committed.
 
-Acceptance status: `APPROVED`
+Acceptance status: `APPROVED` or `BLOCKED`
+
+Recorded acceptance status: `APPROVED`
 
 ### Acceptance run: 2026-07-20
 
