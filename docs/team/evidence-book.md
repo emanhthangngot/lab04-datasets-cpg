@@ -168,6 +168,41 @@ and that no generated `_build/` content is committed.
 
 Acceptance status: `APPROVED` or `BLOCKED`
 
-For `BLOCKED`, include the failing command, exit code, broken chapter or link,
-and the relevant build log or artifact path. GitHub Pages publication remains a
-Stage 4 task after the accepted Stage 3 changes reach `main`.
+Recorded acceptance status: `APPROVED`
+
+### Acceptance run: 2026-07-20
+
+Branch: `review/tuan/stage3-book-acceptance`
+Started from: `dev` at commit `5fd94ed`
+
+| Command | Exit code | Result |
+|---|---:|---|
+| `python scripts/stage3_replay_manifest.py validate --root .` | 0 | `{"stage": 3, "status": "pass"}` |
+| `.\\scripts\\run_checks.ps1` | 0 | 129 passed, 1 skipped |
+| `.venv\\Scripts\\jupyter-book.exe clean book` | 0 | `_build` cleared |
+| `PYTHONUTF8=1 .venv\\Scripts\\jupyter-book.exe build book` | 0 | build succeeded, no warnings |
+
+Chapter verification (all six task chapters have executed outputs):
+
+| Chapter | Executed cells | Reflection | Screenshots |
+|---|:---:|:---:|:---:|
+| task1_repository.ipynb | ✓ | ✓ | — |
+| task2_parser.ipynb | ✓ | ✓ | — |
+| task3_kafka.ipynb | ✓ | ✓ | — |
+| task4_neo4j.ipynb | ✓ | ✓ | — |
+| task5_mongodb.ipynb | ✓ | ✓ | — |
+| task6_replay.ipynb | ✓ | ✓ | neo4j_after_cleanup.png, mongodb_after_replay.png |
+
+Task 6 strict manifest verification:
+
+- `stage3_replay_manifest.json` — status: **pass**, stage: 3
+- Content hash changed: `74ab1762…` → `6db67191…`
+- run_id changed: `2088754454f44aa2b4394aff0c565d49` → `stage3-replay-20260717T002053Z`
+- Kafka delta: nodes +23, edges +16, metadata +1, errors 0
+- Spark offsets: 5 → 5 (restart) → 6 (replay)
+- Neo4j stale deleted: nodes 3, edges 2; duplicates 0
+- MongoDB: 5 docs before = 5 docs after, 4 unchanged, 0 duplicates
+- Both UI screenshots (PNG) are valid and present
+
+No `_build/` content committed. Book builds cleanly from manifest without live
+Docker services.

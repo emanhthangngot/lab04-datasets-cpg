@@ -48,17 +48,17 @@
 - [x] 5.1 Truc opens `test/truc/stage3-windows-acceptance` from updated
   `origin/dev`, records the Windows Docker Desktop/Git Bash smoke result, and
   merges its tracker-only PR into `dev`.
-- [ ] 5.2 After 5.1 merges, Thanh opens
+- [x] 5.2 After 5.1 merges, Thanh opens
   `review/thanh/stage3-store-acceptance`, independently approves the committed
   store manifest/artifacts, and merges its tracker-only PR into `dev`.
-- [ ] 5.3 After 5.2 merges, Tuan opens `review/tuan/stage3-book-acceptance`,
+- [x] 5.3 After 5.2 merges, Tuan opens `review/tuan/stage3-book-acceptance`,
   approves the committed Task 1-6 book from a clean local build, and merges its
   tracker-only PR into `dev`.
 
 ## 6. Shared Final Gate
 
 - [x] 6.1 `openspec validate --all --strict` passes.
-- [ ] 6.2 Full Python tests, shell syntax, PowerShell syntax, Compose config,
+- [x] 6.2 Full Python tests, shell syntax, PowerShell syntax, Compose config,
   manifest validation, notebook execution, and Jupyter Book build pass.
 - [x] 6.3 Source clone is clean and no credentials, private paths, or fabricated
   evidence are committed.
