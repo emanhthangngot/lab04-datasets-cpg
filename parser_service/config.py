@@ -1,8 +1,8 @@
 """Runtime configuration for the Lab04 parser service.
 
-TODO: Extend validation when real deployment config stabilizes. The parser runs
-inside Docker Compose by default, so `broker:9092` is the normal bootstrap
-server. Use `KAFKA_BOOTSTRAP_EXTERNAL` only when deliberately running on host.
+The parser runs inside Docker Compose by default, so `broker:9092` is the
+normal bootstrap server. Deployment validation is intentionally limited to the
+lab contract. Use `KAFKA_BOOTSTRAP_EXTERNAL` only for deliberate host runs.
 """
 
 from __future__ import annotations
@@ -29,8 +29,8 @@ class ParserContext:
 def build_context(repo_root: Path, run_id: str | None = None) -> ParserContext:
     """Build parser context from environment and CLI inputs."""
 
-    # TODO: Replace unknown commit fallback with `git -C repo_root rev-parse HEAD`
-    # once clone workflow is guaranteed to exist in every run.
+    # Canonical runs supply COMMIT_SHA explicitly. The fallback keeps isolated
+    # local tests usable when clone metadata is intentionally absent.
     commit_sha = os.environ.get("COMMIT_SHA", "unknown")
     repo_name = os.environ.get("REPO_NAME", EXPECTED_REPO_NAME)
     if repo_name != EXPECTED_REPO_NAME:

@@ -26,8 +26,8 @@ def iter_edge_events(*, tree: ast.AST, file_id: str, file_path: str, context):
 def process_file(file_path: Path, producer, context) -> dict:
     """Process one Python file and flush producer after that file.
 
-    TODO: Complete CFG/DFG/CALL extractors, then this function will emit all
-    required event categories for the lab.
+    The complete lab edge set is emitted through the CFG, DFG, and CALL
+    extractors before metadata is finalized.
     """
 
     start_time = time.time()

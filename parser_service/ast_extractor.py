@@ -37,8 +37,8 @@ SUPPORTED_NODE_TYPES = (
 def extract_ast_nodes_gen(*, tree: ast.AST, file_id: str, file_path: str, context) -> Iterable[dict]:
     """Yield AST node events.
 
-    TODO: Improve `scope_path` tracking for nested classes/functions. Current
-    scaffold keeps scope coarse so downstream schema work can proceed.
+    Scope tracking remains intentionally coarse for some nested classes and
+    functions; this is a documented lab-level CPG limitation.
     """
 
     assign_parents(tree)

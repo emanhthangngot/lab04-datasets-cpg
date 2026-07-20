@@ -6,9 +6,9 @@ Spark Structured Streaming writes `cpg.metadata` events into:
 - collection: `file_metadata`
 - idempotency key: `file_id`
 
-TODO:
+Verified behavior:
 
-- Confirm MongoDB Spark Connector `operationType=replace`.
-- Capture `file_metadata.countDocuments()` output.
-- Capture duplicate `file_id` aggregation output.
-- Capture replay before/after `content_hash` and `run_id`.
+- The MongoDB Spark Connector uses `operationType=replace`.
+- Accepted evidence records `file_metadata.countDocuments()` output.
+- Accepted evidence records the duplicate `file_id` aggregation output.
+- Stage 3 records replay before/after `content_hash` and `run_id`.

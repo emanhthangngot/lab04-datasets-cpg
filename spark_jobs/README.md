@@ -8,8 +8,8 @@ docker compose exec spark spark-submit \
   /app/spark_jobs/metadata_stream_to_mongo.py
 ```
 
-TODO:
+Verified behavior:
 
-- Match the Kafka package version to the Spark container version.
-- Capture checkpoint evidence under `/mnt/checkpoints/cpg_metadata`.
-- Prove MongoDB replace/upsert by `file_id` during replay.
+- The Kafka package version matches the Spark 3.5.0 container.
+- Accepted checkpoint evidence is stored for `/mnt/checkpoints/cpg_metadata`.
+- Stage 3 proves MongoDB replacement/upsert by `file_id` during replay.

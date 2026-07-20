@@ -21,8 +21,8 @@ def utc_now() -> str:
 def common_fields(context: Any, file_id: str, file_path: str, event_time: str | None = None) -> dict:
     """Build common event fields.
 
-    TODO: Replace `Any` with ParserContext import if circular import concerns are
-    resolved by the final implementation.
+    `Any` avoids a runtime circular import with the configuration module while
+    callers still provide the validated ParserContext contract.
     """
 
     return {

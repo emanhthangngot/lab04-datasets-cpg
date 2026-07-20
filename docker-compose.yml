@@ -6,7 +6,7 @@ services:
     ports:
       - "29092:29092"
     environment:
-      # TODO: Keep parser in Compose by default. PLAINTEXT_HOST is retained only
+      # The parser stays in Compose by default. PLAINTEXT_HOST is retained only
       # for optional host debugging with KAFKA_BOOTSTRAP_EXTERNAL.
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
