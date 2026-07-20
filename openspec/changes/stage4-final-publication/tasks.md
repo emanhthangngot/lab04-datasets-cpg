@@ -67,8 +67,8 @@ parallel handoff is required.
 ## 6. Integrate Dev Into Main
 
 - [x] 6.1 Review commits unique to `main` and `dev` and simulate the final merge.
-- [ ] 6.2 Open a PR from `dev` into `main` with release commands and evidence.
-- [ ] 6.3 Review the complete PR diff; reject unrelated runtime or evidence
+- [x] 6.2 Open a PR from `dev` into `main` with release commands and evidence.
+- [x] 6.3 Review the complete PR diff; reject unrelated runtime or evidence
   changes.
 - [ ] 6.4 Merge normally without force-push, hard reset, or history replacement.
 - [ ] 6.5 Record the final `main` commit SHA.
