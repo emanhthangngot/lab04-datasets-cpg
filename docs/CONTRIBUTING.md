@@ -6,8 +6,8 @@ contain the source code, notebooks, screenshots, and meaningful commit history.
 
 ## Branch Flow
 
-- `main`: final publish branch. Pushes that change `book/`, `notebooks/`, or
-  `screenshots/` trigger GitHub Pages publication.
+- `main`: final publish branch. Pushes that change `book/`, `screenshots/`, the
+  locked requirements, or the publication workflow trigger GitHub Pages.
 - `dev`: team integration branch. Team members branch from `dev` and open pull
   requests back into `dev`.
 - Feature branches:
@@ -53,7 +53,7 @@ Avoid vague commits such as `update`, `fix`, `final`, or `misc`.
 
 - 23120099 - Le Xuan Tri is the only spec owner.
 - Other members do not create or edit specs.
-- Other members receive tasks from `docs/team/workplan.md`, implement from the
+- Other members receive tasks from [workplan.md](team/workplan.md), implement from the
   approved spec, and update their assigned progress tracker.
 - If a task is unclear, send the blocker and required decision to Tri before
   implementing.
@@ -68,10 +68,10 @@ Each pull request should include:
 - Screenshots or query outputs when the change affects Kafka, Neo4j, MongoDB,
   Spark, notebooks, or the Jupyter Book.
 - Updated progress tracker for the owner:
-  - Truc: `docs/team/kafka-spark.md`
-  - Thanh: `docs/team/graph-stores.md`
-  - Tuan: `docs/team/evidence-book.md`
-  - Tri: `docs/team/workplan.md`
+  - Truc: [kafka-spark.md](team/kafka-spark.md)
+  - Thanh: [graph-stores.md](team/graph-stores.md)
+  - Tuan: [evidence-book.md](team/evidence-book.md)
+  - Tri: [workplan.md](team/workplan.md)
 
 ## Local Checks
 
@@ -84,8 +84,15 @@ bash scripts/run_checks.sh
 Before final publication:
 
 ```bash
+python scripts/stage3_replay_manifest.py validate --root .
+jupyter-book clean book/
 jupyter-book build book/
+test -f book/_build/html/index.html
 ```
+
+Stage 4 is performed by one sequential executor. Publication completion is not
+recorded until the reviewed `dev` to `main` merge, workflow deployment, and live
+review of all book pages have passed.
 
 ## Evidence Rules
 

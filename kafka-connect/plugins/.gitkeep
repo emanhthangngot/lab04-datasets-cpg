@@ -1,3 +1,3 @@
 # Optional manual connector JAR mount point.
-# TODO: Put manually downloaded Kafka Connect plugins here only if
+# Put manually downloaded Kafka Connect plugins here only if
 # `confluent-hub install` is not available in your environment.

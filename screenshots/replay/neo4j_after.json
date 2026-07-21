@@ -1,0 +1,12 @@
+{
+  "explicit_nodes": 21419,
+  "placeholders": 1213,
+  "edges": 7969,
+  "target_nodes": 23,
+  "target_edges": 16,
+  "stale_nodes": 0,
+  "stale_edges": 0,
+  "old_run_entities": 0,
+  "duplicate_node_groups": 0,
+  "duplicate_edge_groups": 0
+}

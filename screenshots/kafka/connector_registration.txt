@@ -1,0 +1,21 @@
+{
+    "name": "cpg-neo4j-sink",
+    "config": {
+        "connector.class": "org.neo4j.connectors.kafka.sink.Neo4jConnector",
+        "tasks.max": "1",
+        "topics": "cpg.nodes,cpg.edges",
+        "key.converter": "org.apache.kafka.connect.storage.StringConverter",
+        "value.converter": "org.apache.kafka.connect.storage.StringConverter",
+        "value.converter.schemas.enable": "false",
+        "neo4j.uri": "neo4j://neo4j:7687",
+        "neo4j.authentication.type": "BASIC",
+        "neo4j.authentication.basic.username": "***REDACTED***",
+        "neo4j.cypher.topic.cpg.nodes": "WITH __value AS event MERGE (n:CPGNode {id: event.id}) ON CREATE SET n.created_at = event.event_time SET n += coalesce(event.properties, {}), n.file_id = event.file_id, n.file_path = event.file_path, n.repo = event.repo, n.commit_sha = event.commit_sha, n.run_id = event.run_id, n.node_type = event.node_type, n.scope_path = event.scope_path, n.lineno = event.lineno, n.col_offset = event.col_offset, n.end_lineno = event.end_lineno, n.end_col_offset = event.end_col_offset, n.placeholder = false, n.updated_at = event.event_time",
+        "neo4j.cypher.topic.cpg.edges": "WITH __value AS event MERGE (a:CPGNode {id: event.source_id}) ON CREATE SET a.placeholder = true, a.created_at = event.event_time MERGE (b:CPGNode {id: event.target_id}) ON CREATE SET b.placeholder = true, b.created_at = event.event_time MERGE (a)-[r:CPG_EDGE {id: event.id}]->(b) ON CREATE SET r.created_at = event.event_time SET r.edge_type = event.edge_type, r.file_id = event.file_id, r.file_path = event.file_path, r.repo = event.repo, r.commit_sha = event.commit_sha, r.run_id = event.run_id, r += coalesce(event.properties, {}), r.updated_at = event.event_time",
+        "neo4j.authentication.basic.password": "***REDACTED***",
+        "name": "cpg-neo4j-sink"
+    },
+    "tasks": [],
+    "type": "sink"
+}
+Connector registered or updated: cpg-neo4j-sink

@@ -1,5 +1,5 @@
 // MongoDB evidence queries for Lab04 metadata ingestion.
-// TODO: Run in mongosh after Spark has consumed cpg.metadata.
+// Run in mongosh after Spark has consumed cpg.metadata.
 
 db = db.getSiblingDB("cpg");
 

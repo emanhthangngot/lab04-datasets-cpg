@@ -11,7 +11,7 @@ from .ast_extractor import extract_ast_nodes_gen
 from .call_extractor import extract_call_edges_gen
 from .cfg_extractor import extract_cfg_edges_gen
 from .dfg_extractor import extract_dfg_edges_gen
-from .ids import make_file_id, normalize_relative_path
+from .ids import assign_parents, make_file_id, normalize_relative_path
 from .schemas import build_error_event, build_metadata_event
 
 
@@ -26,8 +26,8 @@ def iter_edge_events(*, tree: ast.AST, file_id: str, file_path: str, context):
 def process_file(file_path: Path, producer, context) -> dict:
     """Process one Python file and flush producer after that file.
 
-    TODO: Complete CFG/DFG/CALL extractors, then this function will emit all
-    required event categories for the lab.
+    The complete lab edge set is emitted through the CFG, DFG, and CALL
+    extractors before metadata is finalized.
     """
 
     start_time = time.time()
@@ -39,6 +39,7 @@ def process_file(file_path: Path, producer, context) -> dict:
         file_id = make_file_id(context.repo_name, relative_path)
         source = file_path.read_text(encoding="utf-8", errors="replace")
         tree = ast.parse(source, filename=relative_path)
+        assign_parents(tree)
 
         node_count = 0
         cfg_count = 0

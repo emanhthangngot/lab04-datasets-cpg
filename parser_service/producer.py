@@ -30,8 +30,8 @@ class DryRunProducer:
 def build_producer(bootstrap_servers: str, dry_run: bool = False):
     """Build a Kafka producer or dry-run producer.
 
-    TODO: In final runtime, prefer real Kafka producer and capture sample
-    messages in notebook 03.
+    Canonical runtime runs use the real Kafka producer; dry-run mode remains
+    available for isolated local tests.
     """
 
     if dry_run:

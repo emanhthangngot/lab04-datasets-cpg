@@ -5,7 +5,7 @@ from __future__ import annotations
 import ast
 from typing import Iterable
 
-from .ids import make_node_id
+from .ids import assign_parents, get_scope_path, make_node_id
 from .schemas import build_node_event
 
 
@@ -37,14 +37,16 @@ SUPPORTED_NODE_TYPES = (
 def extract_ast_nodes_gen(*, tree: ast.AST, file_id: str, file_path: str, context) -> Iterable[dict]:
     """Yield AST node events.
 
-    TODO: Improve `scope_path` tracking for nested classes/functions. Current
-    scaffold keeps scope coarse so downstream schema work can proceed.
+    Scope tracking remains intentionally coarse for some nested classes and
+    functions; this is a documented lab-level CPG limitation.
     """
+
+    assign_parents(tree)
 
     for node in ast.walk(tree):
         if not isinstance(node, SUPPORTED_NODE_TYPES):
             continue
-        scope_path = getattr(node, "name", "<module>") if not isinstance(node, ast.Module) else "<module>"
+        scope_path = get_scope_path(node)
         node_id = make_node_id(file_id, node, scope_path)
         yield build_node_event(
             context=context,

@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Clone the selected public repository for Lab04 evidence.
-# TODO: Capture the printed commit SHA in notebooks/task1_repository.md.
+# The caller records the printed commit SHA in the Task 1 evidence chapter.
 
 REPO_URL="${REPO_URL:-https://github.com/huggingface/datasets.git}"
 REPO_DIR="${REPO_DIR:-data/datasets}"

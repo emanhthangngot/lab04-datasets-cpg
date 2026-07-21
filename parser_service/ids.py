@@ -19,6 +19,60 @@ def normalize_relative_path(path: Path, repo_root: Path) -> str:
     return path.relative_to(repo_root).as_posix()
 
 
+def assign_parents(tree: ast.AST) -> None:
+    """Assign parent pointers and deterministic structural paths.
+
+    Structural paths follow AST field names and list indexes, for example
+    ``$.body[0].value``. They are unique within one parsed tree and stable when
+    the same source content is parsed again. The helper is idempotent, so each
+    extractor may safely call it before generating identifiers.
+    """
+
+    tree._cpg_path = "$"  # type: ignore[attr-defined]
+
+    def visit(parent: ast.AST) -> None:
+        parent_path = parent._cpg_path  # type: ignore[attr-defined]
+        for field_name, value in ast.iter_fields(parent):
+            if isinstance(value, ast.AST):
+                value._parent = parent  # type: ignore[attr-defined]
+                value._cpg_path = f"{parent_path}.{field_name}"  # type: ignore[attr-defined]
+                visit(value)
+            elif isinstance(value, list):
+                for index, child in enumerate(value):
+                    if not isinstance(child, ast.AST):
+                        continue
+                    child._parent = parent  # type: ignore[attr-defined]
+                    child._cpg_path = (  # type: ignore[attr-defined]
+                        f"{parent_path}.{field_name}[{index}]"
+                    )
+                    visit(child)
+
+    visit(tree)
+
+
+def get_scope_path(node: ast.AST) -> str:
+    """Return a fully-qualified scope path such as ``<module>.A.foo``.
+
+    Walks ``_parent`` pointers (set by :func:`assign_parents`) upward,
+    collecting class / function names.  Falls back to the node's own name
+    when parent pointers are absent.
+    """
+
+    parts: list[str] = []
+    curr = node
+    while curr is not None:
+        if isinstance(curr, ast.Module):
+            parts.append("<module>")
+            break
+        if isinstance(curr, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
+            parts.append(curr.name)
+        curr = getattr(curr, "_parent", None)
+    if not parts:
+        # Fallback when parent pointers were not assigned
+        return getattr(node, "name", "<module>")
+    return ".".join(reversed(parts))
+
+
 def make_file_id(repo_name: str, relative_path: str) -> str:
     """Stable file ID used as Kafka key and replay cleanup selector."""
 
@@ -47,18 +101,21 @@ def extract_assignment_target(node: ast.AST) -> str:
 
 
 def make_node_id(file_id: str, node: ast.AST, scope_path: str) -> str:
-    """Create a lab-level stable node ID.
-
-    TODO: Revisit ID strategy if extraction becomes function-level incremental.
-    """
+    """Create a unique, replay-stable ID from the node's structural path."""
 
     node_type = type(node).__name__
-    if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
-        raw = f"{file_id}:{scope_path}:{node_type}:{node.name}"
-    elif isinstance(node, (ast.Assign, ast.AnnAssign, ast.AugAssign)):
-        raw = f"{file_id}:{scope_path}:{node_type}:{extract_assignment_target(node)}:{getattr(node, 'lineno', -1)}"
-    else:
-        raw = f"{file_id}:{scope_path}:{node_type}:{getattr(node, 'lineno', -1)}:{getattr(node, 'col_offset', -1)}"
+    structural_path = getattr(node, "_cpg_path", None)
+    if structural_path is None:
+        raise ValueError(
+            "AST structural path is missing; call assign_parents(tree) before "
+            "generating node IDs"
+        )
+
+    # Keep scope_path in the public signature for extractor compatibility. The
+    # structural path already includes the node's exact location in the tree;
+    # scope remains an event property used for explanation and call resolution.
+    del scope_path
+    raw = f"{file_id}:{node_type}:{structural_path}"
     return short_hash(raw)
 
 

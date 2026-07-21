@@ -1,0 +1,10 @@
+{
+  "task": "Task 6 - Idempotent Replay Verification",
+  "run_date": "2026-07-17",
+  "result": "pass",
+  "source": "Stage 3 canonical run",
+  "screenshots": {
+    "neo4j_after_cleanup.png": "Neo4j Browser target run_id/count query",
+    "mongodb_after_replay.png": "Mongo Express target file_id filter"
+  }
+}

@@ -3,18 +3,31 @@ set -euo pipefail
 
 # Lightweight checks for scaffold and local Python logic.
 
-if [[ -x ".codex/scripts/doctor.sh" ]]; then
-  echo "==> Codex config"
+echo "==> Codex config"
+if [[ -f ".codex/scripts/doctor.sh" ]]; then
   bash .codex/scripts/doctor.sh
-  echo
 else
-  echo "==> Codex config"
   echo "Skipping .codex doctor; agent-local files are not required in public clones."
-  echo
 fi
+echo
+
+PYTHON=""
+for candidate in ".venv/bin/python" ".venv/Scripts/python.exe" python python3 /usr/bin/python; do
+  if [[ "$candidate" == */* && ! -x "$candidate" ]]; then
+    continue
+  fi
+  if ! command -v "$candidate" >/dev/null 2>&1 && [[ ! -x "$candidate" ]]; then
+    continue
+  fi
+  if "$candidate" -c 'import pytest' >/dev/null 2>&1; then
+    PYTHON="$candidate"
+    break
+  fi
+done
+: "${PYTHON:?Install pytest in one of the project Python environments before running checks}"
 
 echo "==> Python tests"
-python -m pytest
+"$PYTHON" -m pytest
 
 echo
 echo "==> Docker Compose syntax"
@@ -22,7 +35,7 @@ docker compose config >/dev/null
 
 echo
 echo "==> JSON connector config"
-python3 -m json.tool neo4j/sink_connector.json >/dev/null
+"$PYTHON" -m json.tool neo4j/sink_connector.json >/dev/null
 
 echo
 echo "Scaffold checks passed."

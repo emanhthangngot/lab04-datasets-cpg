@@ -18,8 +18,8 @@ EXCLUDED_PARTS = {
 def discover_python_files(repo_root: Path) -> list[Path]:
     """Return sorted `src/datasets/**/*.py` files, excluding non-core folders.
 
-    TODO: Capture total discovered and selected counts in notebook 01.
-    Do not exclude `src/datasets/utils`; it is core library code.
+    Task 1 records the total discovered and selected counts. Do not exclude
+    `src/datasets/utils`; it is core library code.
     """
 
     source_root = repo_root / "src" / "datasets"

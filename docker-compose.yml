@@ -6,7 +6,7 @@ services:
     ports:
       - "29092:29092"
     environment:
-      # TODO: Keep parser in Compose by default. PLAINTEXT_HOST is retained only
+      # The parser stays in Compose by default. PLAINTEXT_HOST is retained only
       # for optional host debugging with KAFKA_BOOTSTRAP_EXTERNAL.
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
@@ -20,6 +20,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: "false"
+      KAFKA_HEAP_OPTS: "-Xms256M -Xmx512M"
     healthcheck:
       test: ["CMD-SHELL", "kafka-topics --bootstrap-server broker:9092 --list >/dev/null 2>&1"]
       interval: 10s
@@ -50,6 +51,8 @@ services:
       CONNECT_VALUE_CONVERTER: org.apache.kafka.connect.json.JsonConverter
       CONNECT_VALUE_CONVERTER_SCHEMAS_ENABLE: "false"
       CONNECT_PLUGIN_PATH: /usr/share/java,/usr/share/confluent-hub-components,/plugins
+      # Keep the complete lab stack within the default Docker Desktop memory budget.
+      KAFKA_HEAP_OPTS: "-Xms256M -Xmx768M"
     volumes:
       - ./kafka-connect/plugins:/plugins
     healthcheck:
@@ -66,9 +69,10 @@ services:
       - "7687:7687"
     environment:
       NEO4J_AUTH: neo4j/password
-      # TODO: Tune heap if full huggingface/datasets ingestion is too large.
-      NEO4J_server_memory_heap_initial__size: 1G
-      NEO4J_server_memory_heap_max__size: 2G
+      # Five-file Stage 2 ingestion fits comfortably while leaving room for
+      # Kafka Connect, Spark, MongoDB, and the broker on a 4 GiB Docker VM.
+      NEO4J_server_memory_heap_initial__size: 512M
+      NEO4J_server_memory_heap_max__size: 1G
     volumes:
       - neo4j-data:/data
     healthcheck:
@@ -90,26 +94,55 @@ services:
       timeout: 5s
       retries: 12
 
+  # Evidence-only browser for a local, read-only MongoDB screenshot. The
+  # upstream image is deprecated and must never be used for deployment.
+  mongo-express:
+    image: mongo-express:1.0.2-20-alpine3.19
+    profiles: ["evidence-ui"]
+    depends_on:
+      mongo:
+        condition: service_healthy
+    ports:
+      - "127.0.0.1:8081:8081"
+    environment:
+      ME_CONFIG_MONGODB_URL: mongodb://mongo:27017/
+      ME_CONFIG_OPTIONS_READONLY: "true"
+      ME_CONFIG_BASICAUTH: "false"
+
+  spark-checkpoint-init:
+    image: docker.io/bitnamilegacy/spark:3.5.0
+    user: "0:0"
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["chown -R 1001:0 /mnt/checkpoints && chmod -R g+rwX /mnt/checkpoints"]
+    volumes:
+      - spark-checkpoints:/mnt/checkpoints
+    restart: "no"
+
   spark:
-    image: bitnami/spark:3.5.0
+    image: docker.io/bitnamilegacy/spark:3.5.0
     container_name: lab04-spark
     depends_on:
       broker:
         condition: service_healthy
       mongo:
         condition: service_healthy
+      spark-checkpoint-init:
+        condition: service_completed_successfully
     volumes:
       - ./:/app
       - spark-checkpoints:/mnt/checkpoints
     working_dir: /app
     environment:
-      SPARK_MODE: client
+      SPARK_MODE: master
 
   parser:
     build:
       context: .
       dockerfile: parser_service/Dockerfile
     container_name: lab04-parser
+    # The parser is a one-shot producer. Keep it out of a default `compose up`
+    # so the evidence runbook emits each sample batch exactly once.
+    profiles: ["manual"]
     depends_on:
       broker:
         condition: service_healthy

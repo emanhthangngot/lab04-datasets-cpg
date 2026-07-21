@@ -1,0 +1,8 @@
+__consumer_offsets
+_connect-configs
+_connect-offsets
+_connect-status
+cpg.edges
+cpg.errors
+cpg.metadata
+cpg.nodes

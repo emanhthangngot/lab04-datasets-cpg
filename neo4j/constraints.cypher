@@ -1,6 +1,6 @@
 // Lab04 Neo4j constraints.
-// TODO: Apply with:
-// docker compose exec -T neo4j cypher-shell -u neo4j -p password < neo4j/constraints.cypher
+// Apply with a locally supplied password:
+// docker compose exec -T neo4j cypher-shell -u neo4j -p '<local-lab-password>' < neo4j/constraints.cypher
 //
 // Keep only node uniqueness by default. Relationship uniqueness constraints are
 // intentionally omitted because they may not be supported in the lab setup.

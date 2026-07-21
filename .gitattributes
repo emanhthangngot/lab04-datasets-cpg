@@ -1,0 +1,4 @@
+screenshots/replay/*.json text eol=lf
+screenshots/replay/*.txt text eol=lf
+screenshots/replay/*.diff text eol=lf
+screenshots/replay/*.png binary

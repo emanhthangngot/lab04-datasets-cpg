@@ -1,5 +1,5 @@
 // Neo4j evidence queries for notebooks and Jupyter Book.
-// TODO: Run these after connector ingestion and after replay.
+// Run these after connector ingestion and after replay.
 
 MATCH (n:CPGNode) RETURN count(n) AS node_count;
 
