@@ -97,25 +97,40 @@ Spec input to Tri:
 ## Stage 4: Publication Review
 
 Stage 4 is no longer split by member. One executor follows the ordered
-[`stage4-final-publication`](../../openspec/changes/stage4-final-publication/tasks.md)
-checklist and uses this tracker only as Stage 1-3 evidence history.
+prepared Stage 4 publication archive at
+[`stage4-final-publication`](../../openspec/changes/archive/2026-07-21-stage4-final-publication/tasks.md)
+and uses this tracker only as Stage 1-3 evidence history.
 
 Final review gates:
 
-- [ ] Confirm GitHub Pages workflow has published the latest book from `main`.
-- [ ] Open the root Pages URL and every chapter.
-- [ ] Confirm repository links are visible from the book.
-- [ ] Confirm the verified Pages root URL is the only Moodle value.
+- [x] Confirm GitHub Pages published and live-reviewed release source `7ae8a832`.
+- [ ] Publish and live-review the current final contract/book update.
+- [x] Open the root Pages URL and every chapter.
+- [x] Confirm repository links are visible from the book.
+- [x] Confirm the verified Pages root URL is the only Moodle value.
 
 Done when:
 
 - Tri approves the GitHub Pages URL as the only Moodle submission value.
 
+Stage 4 publication review recorded 2026-07-21:
+
+- Live site https://emanhthangngot.github.io/lab04-datasets-cpg/ returns HTTP
+  200 for root, Architecture, Task 1-6, and Reflection.
+- Repository link on the live book targets
+  `https://github.com/emanhthangngot/lab04-datasets-cpg`.
+- Workflow run success:
+  https://github.com/emanhthangngot/lab04-datasets-cpg/actions/runs/29791146201
+- Moodle value remains exactly the Pages root URL (manual submit).
+
 ## Latest Update
 
-Status: Stage 3 Task 1-6 executed chapters, replay evidence, strict manifest,
-reflection, Windows acceptance, and local Jupyter Book build are approved.
-Publication workflow repair and live Pages verification remain Stage 4.
+Status: `PUBLICATION_UPDATE_PENDING`. Release source `7ae8a832` was successfully
+published and reviewed on 2026-07-21, but the current final contract/book update
+still requires deployment and repeated live acceptance. Stage 3 evidence is
+unchanged. Whole-assignment state remains incomplete until publication is current
+and the student submits the root URL to Moodle, then records the date and exact
+URL in `workplan.md`.
 
 Evidence links:
 

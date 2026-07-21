@@ -88,13 +88,27 @@ publication workflow.
 
 ### Live Acceptance Is Authoritative
 
-Local success is necessary but not sufficient. Stage 4 is complete only when
-the public root and all eight chapter pages load from GitHub Pages, navigation
-and assets work, repository links target `main`, and the deployed content
-matches the final main commit.
+Local success is necessary but not sufficient. `PUBLICATION_DEPLOYED` is true
+only when the public root and all eight chapter pages load from GitHub Pages,
+navigation and assets work, repository links target `main`, and the deployed
+content matches its named `main` source commit.
 
 Checklist items in `book/index.md` and team tracking documents remain unchecked
 until this live verification completes.
+
+### Publication And Submission Use Separate States
+
+`PUBLICATION_DEPLOYED` means a named `main` source commit is live and every page
+has passed acceptance. It is not whole-assignment completion.
+
+`SUBMISSION_RECORDED` requires a student to submit the exact verified root URL as
+the single Moodle text value, then record a checked item, submission date, and
+exact submitted URL. A screenshot or receipt is intentionally not required.
+
+`COMPLETE` requires both states. Book-affecting acceptance edits SHALL be merged,
+deployed, and live-reviewed before the final docs-only acceptance record is
+committed. The record SHALL distinguish the deployed source SHA from a later
+docs-only record SHA so that acceptance does not create a publication loop.
 
 ## Files Expected To Change
 
@@ -173,7 +187,8 @@ layout, and public-data safety.
 
 ## Completion Boundary
 
-Stage 4 ends after live acceptance is recorded and this change is archived.
+Technical publication may be archived after live acceptance is recorded, but
+the whole assignment remains incomplete until the Moodle record is filled.
 Moodle receives only:
 
 ```text

@@ -2,7 +2,7 @@
 
 This Jupyter Book is the final submission artifact for Lab04.
 
-Final Moodle submission URL:
+Verified URL to submit on Moodle:
 
 ```text
 https://emanhthangngot.github.io/lab04-datasets-cpg/
@@ -32,7 +32,11 @@ https://github.com/emanhthangngot/lab04-datasets-cpg
 - [x] Neo4j and MongoDB chapters link real query artifacts and duplicate checks.
 - [x] Task 1-5 reflections state what worked, what failed, and what was fixed.
 - [x] Task 6 contains executed replay evidence and the final reflection is complete.
-- [ ] The GitHub Pages build shows the latest content from `main`.
+- [x] The GitHub Pages publication mechanism is configured to publish the
+  committed book from `main`.
+
+Whole-assignment completion remains pending until a student submits the exact
+root URL to Moodle and records the submission date in the repository tracker.
 
 This page must not contain secrets, local credentials, or local-only paths in the
 final submission.

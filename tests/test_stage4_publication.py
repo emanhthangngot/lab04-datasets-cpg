@@ -7,6 +7,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = ROOT / ".github" / "workflows" / "publish-book.yml"
 BOOK = ROOT / "book"
+FINAL_SPEC = ROOT / "openspec" / "specs" / "final-publication" / "spec.md"
 
 
 def _notebook_source(name: str) -> str:
@@ -108,3 +109,125 @@ def test_public_book_uses_password_placeholder() -> None:
     assert "NEO4J_PASSWORD=<local-lab-password>" in architecture
     assert "NEO4J_PASSWORD=password" not in architecture
 
+
+def test_final_publication_spec_covers_every_task_chapter_contract() -> None:
+    spec = FINAL_SPEC.read_text(encoding="utf-8")
+
+    assert "Every Task Chapter Satisfies The Submission Rubric" in spec
+    for requirement in (
+        "approach and reasoning",
+        "real executed notebook output",
+        "database UI screenshot or embedded figure",
+        "ends with a brief reflection",
+        "what worked, what failed, and how the issue was resolved",
+        "run instructions",
+    ):
+        assert requirement in spec
+
+
+def test_final_publication_spec_covers_architecture_and_repository_contracts() -> None:
+    spec = FINAL_SPEC.read_text(encoding="utf-8")
+
+    assert "Architecture Diagram Is Grading-Ready" in spec
+    assert "Public Repository Is Submission-Complete" in spec
+    for requirement in (
+        "owned by the team",
+        "all source code written by the team",
+        "logical folder structure",
+        "meaningful incremental commit messages",
+        "clear code comments",
+        "necessary files, logs, and screenshots",
+    ):
+        assert requirement in spec
+
+
+def test_final_publication_spec_requires_moodle_submission_before_completion() -> None:
+    spec = FINAL_SPEC.read_text(encoding="utf-8")
+
+    assert "Publication, Submission, And Completion Are Distinct States" in spec
+    assert "PUBLICATION_DEPLOYED" in spec
+    assert "SUBMISSION_RECORDED" in spec
+    assert "COMPLETE" in spec
+    assert "submission date" in spec
+    assert "exact submitted root URL" in spec
+    assert "screenshot or receipt is not required" in spec
+
+
+def test_repository_records_moodle_as_pending_until_manual_submission() -> None:
+    workplan = (ROOT / "docs" / "team" / "workplan.md").read_text(encoding="utf-8")
+    index = (BOOK / "index.md").read_text(encoding="utf-8")
+
+    assert "- [ ] Submit only the Pages root URL to Moodle" in workplan
+    assert "- Status: `PENDING`" in workplan
+    assert "- Submission date: `PENDING`" in workplan
+    assert "- Exact submitted root URL: `PENDING`" in workplan
+    assert "whole assignment is not `COMPLETE`" in workplan
+    assert "Whole-assignment completion remains pending" in index
+
+
+def test_all_task_chapters_have_executed_outputs_and_closing_reflections() -> None:
+    chapters = (
+        "task1_repository.ipynb",
+        "task2_parser.ipynb",
+        "task3_kafka.ipynb",
+        "task4_neo4j.ipynb",
+        "task5_mongodb.ipynb",
+        "task6_replay.ipynb",
+    )
+
+    for chapter in chapters:
+        notebook = json.loads((BOOK / chapter).read_text(encoding="utf-8"))
+        source = "\n".join(
+            "".join(cell.get("source", [])) for cell in notebook["cells"]
+        ).lower()
+        executed = [
+            cell
+            for cell in notebook["cells"]
+            if cell["cell_type"] == "code"
+            and cell.get("execution_count") is not None
+            and cell.get("outputs")
+        ]
+
+        assert executed, f"{chapter} has no real executed output"
+        assert "## approach and reasoning" in source
+        assert "## reflection" in source
+        assert "command:" in source or ".sh" in source, (
+            f"{chapter} has no task run command"
+        )
+        assert "worked" in source
+        assert "failed" in source
+        assert "resolution" in source
+
+    for chapter in (
+        "task4_neo4j.ipynb",
+        "task5_mongodb.ipynb",
+        "task6_replay.ipynb",
+    ):
+        assert ".png" in _notebook_source(chapter), (
+            f"{chapter} has no applicable database UI figure"
+        )
+
+
+def test_all_task_chapters_use_consistent_evidence_format() -> None:
+    chapters = (
+        "task1_repository.ipynb",
+        "task2_parser.ipynb",
+        "task3_kafka.ipynb",
+        "task4_neo4j.ipynb",
+        "task5_mongodb.ipynb",
+        "task6_replay.ipynb",
+    )
+
+    for chapter in chapters:
+        source = _notebook_source(chapter)
+
+        assert "```{admonition} Evidence summary" in source
+        assert "## What this chapter proves" in source
+        assert "```{admonition} Closing reflection" in source
+
+    for chapter in (
+        "task4_neo4j.ipynb",
+        "task5_mongodb.ipynb",
+        "task6_replay.ipynb",
+    ):
+        assert "```{admonition} Database UI evidence" in _notebook_source(chapter)

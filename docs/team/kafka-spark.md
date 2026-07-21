@@ -98,13 +98,13 @@ Spec input to Tri:
 
 ## Stage 4: Final Review
 
-Stage 4 is performed by one sequential executor under the active publication
-checklist. The items below are evidence review gates, not a member-specific
-assignment:
+Stage 4 was performed by one sequential executor under the archived publication
+checklist. The items below are evidence review records, not a member-specific
+assignment or proof of Moodle submission:
 
-- [ ] Re-run assigned commands for final smoke check.
-- [ ] Confirm all Kafka/Spark evidence references still resolve.
-- [ ] Review Task 3 and Spark-related Task 5 text in the published book.
+- [x] Re-run assigned commands for final smoke check.
+- [x] Confirm all Kafka/Spark evidence references still resolve.
+- [x] Review Task 3 and Spark-related Task 5 text in the published book.
 
 Done when:
 

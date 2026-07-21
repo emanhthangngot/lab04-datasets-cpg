@@ -100,13 +100,13 @@ Spec input to Tri:
 
 ## Stage 4: Final Review
 
-Stage 4 is performed by one sequential executor under the active publication
-checklist. The items below are evidence review gates, not a member-specific
-assignment:
+Stage 4 was performed by one sequential executor under the archived publication
+checklist. The items below are evidence review records, not a member-specific
+assignment or proof of Moodle submission:
 
-- [ ] Re-run final Neo4j and MongoDB verification queries.
-- [ ] Confirm screenshots and query outputs still match final text.
-- [ ] Review Task 4, Task 5, and replay store evidence in the published book.
+- [x] Re-run final Neo4j and MongoDB verification queries.
+- [x] Confirm screenshots and query outputs still match final text.
+- [x] Review Task 4, Task 5, and replay store evidence in the published book.
 
 Done when:
 

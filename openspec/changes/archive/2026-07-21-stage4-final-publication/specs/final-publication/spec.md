@@ -2,6 +2,82 @@
 
 ## ADDED Requirements
 
+### Requirement: Every Task Chapter Satisfies The Submission Rubric
+
+Each Task 1-6 chapter SHALL be a sequential narrative that explains the team's
+approach and reasoning, contains real executed notebook output, presents the
+evidence required for that task, and ends with a brief reflection.
+
+#### Scenario: Final task-chapter audit
+
+- **WHEN** the six task chapters are reviewed before publication
+- **THEN** every chapter identifies its task and explains the approach and reasoning
+- **AND** every chapter contains real executed notebook output with meaningful
+  intermediate or final results
+- **AND** every chapter contains a relevant screenshot or embedded figure when
+  visual evidence is applicable to that task
+- **AND** the database tasks contain a database UI screenshot or embedded figure
+- **AND** every chapter ends with a brief reflection stating what worked, what failed, and how the issue was resolved
+- **AND** every chapter provides run instructions when its environment, language,
+  or tooling requires steps beyond the repository-wide instructions
+
+### Requirement: Architecture Diagram Is Grading-Ready
+
+The final book SHALL include a readable architecture diagram and explanation
+that accurately represents the implemented end-to-end data flows.
+
+#### Scenario: Architecture is reviewed
+
+- **WHEN** `/architecture.html` is opened on the live site
+- **THEN** the rendered architecture diagram is present and legible
+- **AND** it shows repository discovery and parsing into Kafka
+- **AND** it shows direct Kafka-to-Neo4j graph ingestion
+- **AND** it shows Kafka-to-Spark-to-MongoDB metadata ingestion
+- **AND** its labels and narrative agree with the implementation and evidence
+
+### Requirement: Public Repository Is Submission-Complete
+
+The public repository SHALL be owned by the team and contain all source code
+written by the team in a logical folder structure, with reviewable documentation
+and incremental history.
+
+#### Scenario: Public repository audit
+
+- **WHEN** the repository behind the Pages site is reviewed
+- **THEN** the repository is public and owned by the team
+- **AND** all source code written by the team is tracked
+- **AND** source and evidence use a logical folder structure
+- **AND** the history contains meaningful incremental commit messages
+- **AND** non-obvious implementation behavior has clear code comments
+- **AND** all necessary files, logs, and screenshots needed to verify the six
+  tasks are tracked or linked from the final book
+- **AND** public run instructions reproduce or inspect every task
+
+### Requirement: Publication, Submission, And Completion Are Distinct States
+
+The release record SHALL distinguish a deployed book from a submitted assignment.
+The whole assignment SHALL NOT be `COMPLETE` until the exact verified Pages root
+URL is submitted to Moodle and the manual submission record is filled.
+
+#### Scenario: Publication is live but Moodle is pending
+
+- **GIVEN** the final book source commit is deployed and live acceptance passes
+- **WHEN** the Moodle URL has not been submitted
+- **THEN** the state is `PUBLICATION_DEPLOYED`
+- **AND** the whole assignment remains incomplete
+
+#### Scenario: Moodle submission is recorded
+
+- **GIVEN** the verified Pages root URL is
+  `https://emanhthangngot.github.io/lab04-datasets-cpg/`
+- **WHEN** a student submits that exact value as the single Moodle text entry
+- **THEN** the state is `SUBMISSION_RECORDED`
+- **AND** the record contains a checked item, submission date, and exact submitted root URL
+- **AND** a screenshot or receipt is not required
+- **AND** no ZIP, PDF, Word document, chapter URL, or repository URL is submitted
+- **AND** the whole assignment becomes `COMPLETE` only after both
+  `PUBLICATION_DEPLOYED` and `SUBMISSION_RECORDED` are true
+
 ### Requirement: Stage 4 Has One Sequential Executor
 
 Stage 4 SHALL be performed by one executor using one ordered release checklist.
@@ -116,13 +192,13 @@ final Jupyter Book from the public repository.
 - **THEN** the workflow conclusion is `success`
 - **AND** the configured publication source contains the generated HTML
 - **AND** repository Pages settings serve the intended site
-- **AND** the deployed content corresponds to the final `main` commit
+- **AND** the deployed content corresponds to the named `main` source commit
 
 #### Scenario: Deployment is unavailable
 
 - **WHEN** the workflow fails, `gh-pages` is absent, Pages is disabled, or the
   root URL returns an error
-- **THEN** Stage 4 remains incomplete
+- **THEN** `PUBLICATION_DEPLOYED` remains false and the whole assignment is incomplete
 - **AND** no Moodle submission is made
 
 ### Requirement: Every Public Book Page Receives Live Acceptance
@@ -133,26 +209,30 @@ Reflection on the live Pages site.
 #### Scenario: Live site review
 
 - **WHEN** GitHub Pages reports a successful deployment
-- **THEN** the following paths return successfully: `/`, `/architecture.html`,
+- **THEN** the following paths return HTTP 200 after any same-site HTTPS redirect:
+  `/`, `/architecture.html`,
   `/task1_repository.html`, `/task2_parser.html`, `/task3_kafka.html`,
   `/task4_neo4j.html`, `/task5_mongodb.html`, `/task6_replay.html`, and
   `/reflection.html`
 - **AND** navigation, executed outputs, images, and repository links render
+- **AND** every required image and downloadable evidence asset returns HTTP 200
 - **AND** Task 1-6 narratives match the accepted evidence
 - **AND** no page exposes private data or broken local-only paths
 
-### Requirement: Completion Is Recorded Only After Live Acceptance
+### Requirement: Technical Publication Is Recorded Only After Live Acceptance
 
-Stage 4 checklists and submission records SHALL remain pending until every
-local, workflow, and live-site gate passes.
+The `PUBLICATION_DEPLOYED` record SHALL remain pending until every local,
+workflow, and live-site gate passes. The separate Moodle submission record SHALL
+remain pending until a student performs that action.
 
-#### Scenario: Final acceptance is recorded
+#### Scenario: Technical publication acceptance is recorded
 
 - **GIVEN** all live pages and assets pass review
-- **WHEN** the executor records Stage 4 completion
+- **WHEN** the executor records technical publication acceptance
 - **THEN** the Pages checklist in the book and workplan is checked
-- **AND** the workflow run URL, final main commit, deployment result, and review
+- **AND** the workflow run URL, deployed source commit, deployment result, and review
   date are recorded
 - **AND** this OpenSpec change is archived
 - **AND** the only Moodle value is
   `https://emanhthangngot.github.io/lab04-datasets-cpg/`
+- **AND** the whole assignment remains incomplete until `SUBMISSION_RECORDED`

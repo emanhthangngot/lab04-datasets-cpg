@@ -70,6 +70,12 @@ Stage 4.
 - Public instructions contain no broken repository paths or stale completion
   claims.
 - Task 1-6, Architecture, and Reflection build with executed evidence.
+- Every Task 1-6 chapter contains approach and reasoning, real executed output,
+  a relevant figure, an ending worked/failed/fixed reflection, and task-specific
+  run instructions where required.
+- The Architecture page contains a readable diagram that matches both streaming
+  routes, and the public repository contains all team source and verification
+  artifacts with meaningful incremental history.
 - Task 4 and Task 5 contain explicit, real database UI evidence or an accepted
   final-state image with accurate labeling.
 - The `dev -> main` PR preserves both histories and is merged without force.
@@ -78,6 +84,8 @@ Stage 4.
   required assets.
 - The public site exposes no credential, private path, token, or personal data.
 - The only Moodle submission value is the verified Pages root URL.
+- Whole-assignment state becomes `COMPLETE` only after the manual Moodle item,
+  submission date, and exact submitted root URL are recorded.
 
 ## Risks
 

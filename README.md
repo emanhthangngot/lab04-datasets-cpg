@@ -22,8 +22,13 @@ Spark must not sit between Kafka and Neo4j.
 
 The parser, streaming routes, graph and metadata stores, replay workflow, and
 six executed evidence chapters are complete. Stage 3 evidence is protected by a
-strict hash-validated manifest. Final GitHub Pages deployment remains the Stage
-4 release step.
+strict hash-validated manifest. Stage 4 publishes the final Jupyter Book from
+`main` to GitHub Pages through the repository workflow. Whole-assignment
+completion also requires a student to submit this exact root URL to Moodle:
+
+```text
+https://emanhthangngot.github.io/lab04-datasets-cpg/
+```
 
 Key implementation decisions are encoded in the repository:
 
@@ -117,30 +122,34 @@ Team workflow, branch rules, commit rules, and evidence requirements are in
 
 ## Specs And Release Checklist
 
-The accepted capability specifications and the active Stage 4 release checklist
-are stored under `openspec/`. Before changing the final publication, run:
+Accepted capability specifications live under `openspec/specs/`. The Stage 4
+technical publication record is prepared under `openspec/changes/archive/`;
+whole-assignment completion still requires the manual Moodle record. Before
+changing published content, run:
 
 ```bash
 git status --short
 bash scripts/run_checks.sh
 docker compose config
+python scripts/stage3_replay_manifest.py validate --root .
 ```
 
-Then read the accepted specs and active checklist:
+Then read the accepted specs:
 
 ```bash
 sed -n '1,220p' openspec/specs/parser-core/spec.md
 sed -n '1,220p' openspec/specs/kafka-spark/spec.md
 sed -n '1,220p' openspec/specs/graph-stores/spec.md
 sed -n '1,220p' openspec/specs/evidence-book/spec.md
-sed -n '1,220p' openspec/changes/stage4-final-publication/tasks.md
+sed -n '1,220p' openspec/specs/final-publication/spec.md
 ```
 
-Stage 4 uses one sequential executor for local checks, the reviewed `dev` to
-`main` release, deployment, and live acceptance. Earlier ownership records in
-`docs/team/` are retained as Stage 1-3 history.
+Stage 4 uses one sequential executor for local checks, final publication, and
+live acceptance. Earlier ownership records in `docs/team/` are retained as
+Stage 1-3 history. The Moodle submission value is only the verified Pages root
+URL.
 
-Use a short-lived branch from `dev`:
+Use a short-lived branch from `dev` for any post-release fix:
 
 ```bash
 git switch dev
@@ -190,7 +199,7 @@ Progress is tracked in:
 - `docs/team/graph-stores.md` for Neo4j/MongoDB store work.
 - `docs/team/evidence-book.md` for notebooks, screenshots, and Jupyter Book work.
 
-The final Moodle submission is the GitHub Pages root URL:
+The only value to submit on Moodle is the GitHub Pages root URL:
 
 ```text
 https://emanhthangngot.github.io/lab04-datasets-cpg/
