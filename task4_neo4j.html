@@ -220,7 +220,7 @@
 <li class="toctree-l1"><a class="reference internal" href="task3_kafka.html">Task 3 — Kafka topics and event contract</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Task 4 — Direct Kafka-to-Neo4j ingestion</a></li>
 <li class="toctree-l1"><a class="reference internal" href="task5_mongodb.html">Task 5 — Spark metadata stream to MongoDB</a></li>
-<li class="toctree-l1"><a class="reference internal" href="task6_replay.html">Task 6 — Idempotent Replay Verification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="task6_replay.html">Task 6 — Idempotent replay verification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reflection.html">Reflection</a></li>
 </ul>
 
@@ -382,6 +382,8 @@
             </div>
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#approach-and-reasoning">Approach and reasoning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-this-chapter-proves">What this chapter proves</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#final-database-ui-evidence">Final database UI evidence</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reflection">Reflection</a></li>
 </ul>
@@ -397,7 +399,59 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="task-4-direct-kafka-to-neo4j-ingestion">
 <h1>Task 4 — Direct Kafka-to-Neo4j ingestion<a class="headerlink" href="#task-4-direct-kafka-to-neo4j-ingestion" title="Link to this heading">#</a></h1>
-<p>Evidence run metadata is read from <code class="docutils literal notranslate"><span class="pre">screenshots/stage2_manifest.json</span></code>. Command: <code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/capture_store_evidence.sh</span></code>. Kafka Connect uses <code class="docutils literal notranslate"><span class="pre">org.neo4j.connectors.kafka.sink.Neo4jConnector</span></code>; Spark is deliberately absent from this graph route. Raw query output: <a class="reference download internal" download="" href="_downloads/5ff920e50d7923a540c1d562b17cceb5/node_count.txt"><span class="xref download myst"><code class="docutils literal notranslate"><span class="pre">node_count.txt</span></code></span></a>.</p>
+<div class="note admonition">
+<p class="admonition-title">Evidence summary</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Evidence source</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">screenshots/stage2_manifest.json</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Command</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/capture_store_evidence.sh</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Sink</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">org.neo4j.connectors.kafka.sink.Neo4jConnector</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Route</p></td>
+<td><p>Kafka Connect writes graph data directly to Neo4j; Spark is deliberately absent from this path.</p></td>
+</tr>
+<tr class="row-even"><td><p>Raw query output</p></td>
+<td><p><a class="reference download internal" download="" href="_downloads/5ff920e50d7923a540c1d562b17cceb5/node_count.txt"><span class="xref download myst"><code class="docutils literal notranslate"><span class="pre">node_count.txt</span></code></span></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="approach-and-reasoning">
+<h2>Approach and reasoning<a class="headerlink" href="#approach-and-reasoning" title="Link to this heading">#</a></h2>
+<p>Command: <code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/capture_store_evidence.sh</span></code>. The graph route uses Kafka Connect to consume node and edge topics and upsert directly into Neo4j. This keeps graph ingestion separate from the Spark metadata stream and makes the architecture boundary visible in the evidence.</p>
+</section>
+<section id="what-this-chapter-proves">
+<h2>What this chapter proves<a class="headerlink" href="#what-this-chapter-proves" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Requirement</p></th>
+<th class="head"><p>Evidence in this chapter</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Direct Kafka-to-Neo4j path</p></td>
+<td><p>The configured connector class and route are stated explicitly.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Graph materialization</p></td>
+<td><p>The executed output reports node, relationship, and placeholder counts.</p></td>
+</tr>
+<tr class="row-even"><td><p>UI-backed final state</p></td>
+<td><p>The replay screenshot shows the final Neo4j Browser state after stale cleanup.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
@@ -423,14 +477,66 @@ duplicate node/edge groups: 0 / 0
 </div>
 </div>
 </div>
+</section>
 <section id="final-database-ui-evidence">
 <h2>Final database UI evidence<a class="headerlink" href="#final-database-ui-evidence" title="Link to this heading">#</a></h2>
-<p>The image below is real Neo4j Browser evidence from the canonical Stage 3 replay final state, after stale cleanup. Command/query: target <code class="docutils literal notranslate"><span class="pre">run_id</span></code> and graph count query. Run date: <code class="docutils literal notranslate"><span class="pre">2026-07-17</span></code>. Result: <code class="docutils literal notranslate"><span class="pre">pass</span></code>. The screenshot is labeled as replay final state rather than as the earlier Stage 2 baseline. Its values are backed by <code class="docutils literal notranslate"><span class="pre">screenshots/replay/neo4j_after.json</span></code> and the strict replay manifest.</p>
+<div class="important admonition">
+<p class="admonition-title">Database UI evidence</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Tool</p></td>
+<td><p>Neo4j Browser</p></td>
+</tr>
+<tr class="row-odd"><td><p>Phase represented</p></td>
+<td><p>Canonical Stage 3 replay final state after stale cleanup.</p></td>
+</tr>
+<tr class="row-even"><td><p>Command/query</p></td>
+<td><p>Target <code class="docutils literal notranslate"><span class="pre">run_id</span></code> and graph count query.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Run date</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2026-07-17</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Result</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">pass</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Backing artifacts</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">screenshots/replay/neo4j_after.json</span></code>; strict replay manifest.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p><img alt="Neo4j Browser final state after Stage 3 replay cleanup" src="_images/neo4j_after_cleanup.png" /></p>
 </section>
 <section id="reflection">
 <h2>Reflection<a class="headerlink" href="#reflection" title="Link to this heading">#</a></h2>
-<p><strong>Worked:</strong> the Stage 2 connector reached <code class="docutils literal notranslate"><span class="pre">RUNNING</span></code>, upserted 21,415 explicit nodes and 7,968 relationships, and created 1,213 deterministic unresolved-call placeholders. <strong>Failed:</strong> that clean run had query artifacts but no dedicated Neo4j Browser capture. <strong>Resolution:</strong> the canonical Stage 3 replay captured a real, hash-validated Neo4j Browser final-state image after stale cleanup; it is presented above with its actual phase and does not replace the Stage 2 counts.</p>
+<div class="tip admonition">
+<p class="admonition-title">Closing reflection</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Point</p></th>
+<th class="head"><p>Result</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Worked</p></td>
+<td><p>The Stage 2 connector reached <code class="docutils literal notranslate"><span class="pre">RUNNING</span></code>, upserted 21,415 explicit nodes and 7,968 relationships, and created 1,213 deterministic unresolved-call placeholders.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Failed</p></td>
+<td><p>That clean run had query artifacts but no dedicated Neo4j Browser capture.</p></td>
+</tr>
+<tr class="row-even"><td><p>Resolution</p></td>
+<td><p>The canonical Stage 3 replay captured a real, hash-validated Neo4j Browser final-state image after stale cleanup; it is presented above with its actual phase and does not replace the Stage 2 counts.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </section>
 </section>
 
@@ -500,6 +606,8 @@ duplicate node/edge groups: 0 / 0
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#approach-and-reasoning">Approach and reasoning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-this-chapter-proves">What this chapter proves</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#final-database-ui-evidence">Final database UI evidence</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reflection">Reflection</a></li>
 </ul>

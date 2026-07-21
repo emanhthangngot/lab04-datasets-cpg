@@ -220,7 +220,7 @@
 <li class="toctree-l1"><a class="reference internal" href="task3_kafka.html">Task 3 — Kafka topics and event contract</a></li>
 <li class="toctree-l1"><a class="reference internal" href="task4_neo4j.html">Task 4 — Direct Kafka-to-Neo4j ingestion</a></li>
 <li class="toctree-l1"><a class="reference internal" href="task5_mongodb.html">Task 5 — Spark metadata stream to MongoDB</a></li>
-<li class="toctree-l1"><a class="reference internal" href="task6_replay.html">Task 6 — Idempotent Replay Verification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="task6_replay.html">Task 6 — Idempotent replay verification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reflection.html">Reflection</a></li>
 </ul>
 
@@ -382,6 +382,8 @@
             </div>
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#approach-and-reasoning">Approach and reasoning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-this-chapter-proves">What this chapter proves</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reflection">Reflection</a></li>
 </ul>
             </nav>
@@ -396,7 +398,56 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="task-1-repository-discovery">
 <h1>Task 1 — Repository discovery<a class="headerlink" href="#task-1-repository-discovery" title="Link to this heading">#</a></h1>
-<p>Evidence run metadata is read from <code class="docutils literal notranslate"><span class="pre">screenshots/stage2_manifest.json</span></code>. Command: <code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/run_stage2_evidence.sh</span></code>. The shallow clone is pinned to dataset commit <code class="docutils literal notranslate"><span class="pre">41adfd0f9ee9ba3a6b4f719d5b551c5b19ae45e2</span></code>.</p>
+<div class="note admonition">
+<p class="admonition-title">Evidence summary</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Evidence source</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">screenshots/stage2_manifest.json</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Command</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/run_stage2_evidence.sh</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Dataset commit</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">41adfd0f9ee9ba3a6b4f719d5b551c5b19ae45e2</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Build behavior</p></td>
+<td><p>Offline; the public book renders captured notebook output.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="approach-and-reasoning">
+<h2>Approach and reasoning<a class="headerlink" href="#approach-and-reasoning" title="Link to this heading">#</a></h2>
+<p>Command: <code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/run_stage2_evidence.sh</span></code>. The runbook shallow-clones the dataset repository, resolves the real 40-character commit SHA, and records the selected Python files from <code class="docutils literal notranslate"><span class="pre">src/</span></code> and <code class="docutils literal notranslate"><span class="pre">tests/</span></code>. The notebook reads the captured manifest instead of needing a live clone during publication.</p>
+</section>
+<section id="what-this-chapter-proves">
+<h2>What this chapter proves<a class="headerlink" href="#what-this-chapter-proves" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Requirement</p></th>
+<th class="head"><p>Evidence in this chapter</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Repository discovery</p></td>
+<td><p>The executed cell prints total Python files and selected <code class="docutils literal notranslate"><span class="pre">src</span></code>/<code class="docutils literal notranslate"><span class="pre">tests</span></code> files.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Dataset provenance</p></td>
+<td><p>The output includes the pinned dataset commit SHA.</p></td>
+</tr>
+<tr class="row-even"><td><p>Reproducible publication</p></td>
+<td><p>The Jupyter Book build can render the saved output without network or service access.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
@@ -422,9 +473,31 @@ sample: [&#39;src/datasets/__init__.py&#39;, &#39;src/datasets/arrow_dataset.py&
 </div>
 </div>
 </div>
+</section>
 <section id="reflection">
 <h2>Reflection<a class="headerlink" href="#reflection" title="Link to this heading">#</a></h2>
-<p><strong>Worked:</strong> the runbook reused a shallow clone and resolved its real 40-character commit SHA before parsing. <strong>Failed:</strong> earlier evidence used <code class="docutils literal notranslate"><span class="pre">commit_sha=unknown</span></code>, so it could not prove dataset provenance. <strong>Resolution:</strong> both parser invocations now receive the resolved SHA and evidence validation rejects unknown or mixed commits.</p>
+<div class="tip admonition">
+<p class="admonition-title">Closing reflection</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Point</p></th>
+<th class="head"><p>Result</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Worked</p></td>
+<td><p>The runbook reused a shallow clone and resolved its real 40-character commit SHA before parsing.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Failed</p></td>
+<td><p>Earlier evidence used <code class="docutils literal notranslate"><span class="pre">commit_sha=unknown</span></code>, so it could not prove dataset provenance.</p></td>
+</tr>
+<tr class="row-even"><td><p>Resolution</p></td>
+<td><p>Both parser invocations now receive the resolved SHA, and evidence validation rejects unknown or mixed commits.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </section>
 </section>
 
@@ -494,6 +567,8 @@ sample: [&#39;src/datasets/__init__.py&#39;, &#39;src/datasets/arrow_dataset.py&
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#approach-and-reasoning">Approach and reasoning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-this-chapter-proves">What this chapter proves</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reflection">Reflection</a></li>
 </ul>
   </nav></div>

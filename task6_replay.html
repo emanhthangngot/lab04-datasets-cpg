@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-    <title>Task 6 — Idempotent Replay Verification &#8212; Lab04 CPG Streaming</title>
+    <title>Task 6 — Idempotent replay verification &#8212; Lab04 CPG Streaming</title>
   
   
   
@@ -220,7 +220,7 @@
 <li class="toctree-l1"><a class="reference internal" href="task3_kafka.html">Task 3 — Kafka topics and event contract</a></li>
 <li class="toctree-l1"><a class="reference internal" href="task4_neo4j.html">Task 4 — Direct Kafka-to-Neo4j ingestion</a></li>
 <li class="toctree-l1"><a class="reference internal" href="task5_mongodb.html">Task 5 — Spark metadata stream to MongoDB</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Task 6 — Idempotent Replay Verification</a></li>
+<li class="toctree-l1 current active"><a class="current reference internal" href="#">Task 6 — Idempotent replay verification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reflection.html">Reflection</a></li>
 </ul>
 
@@ -372,7 +372,7 @@
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Task 6 — Idempotent Replay Verification</h1>
+    <h1>Task 6 — Idempotent replay verification</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -382,6 +382,8 @@
             </div>
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#approach-and-reasoning">Approach and reasoning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-this-chapter-proves">What this chapter proves</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modified-file-and-run-identity">Modified file and run identity</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#kafka-and-spark-checkpoint-proof">Kafka and Spark checkpoint proof</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#neo4j-cleanup-and-mongodb-replacement">Neo4j cleanup and MongoDB replacement</a></li>
@@ -399,8 +401,57 @@
                 <article class="bd-article">
                   
   <section class="tex2jax_ignore mathjax_ignore" id="task-6-idempotent-replay-verification">
-<h1>Task 6 — Idempotent Replay Verification<a class="headerlink" href="#task-6-idempotent-replay-verification" title="Link to this heading">#</a></h1>
-<p>The canonical Stage 3 workflow rebuilds the five-file baseline, restarts Spark with the existing checkpoint, modifies only <code class="docutils literal notranslate"><span class="pre">src/datasets/__init__.py</span></code>, replays that file with a new <code class="docutils literal notranslate"><span class="pre">run_id</span></code>, waits for Kafka Connect and Spark, removes stale graph entities, and validates the final stores. The cells below consume the strict manifest created by <code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/finalize_stage3_evidence.sh</span></code>; they never connect to live services during a Pages build.</p>
+<h1>Task 6 — Idempotent replay verification<a class="headerlink" href="#task-6-idempotent-replay-verification" title="Link to this heading">#</a></h1>
+<div class="note admonition">
+<p class="admonition-title">Evidence summary</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Evidence source</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">screenshots/replay/stage3_replay_manifest.json</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Command</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/finalize_stage3_evidence.sh</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Replay target</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">src/datasets/__init__.py</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Publication behavior</p></td>
+<td><p>The cells consume captured artifacts and never connect to live services during a Pages build.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="approach-and-reasoning">
+<h2>Approach and reasoning<a class="headerlink" href="#approach-and-reasoning" title="Link to this heading">#</a></h2>
+<p>Command: <code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/finalize_stage3_evidence.sh</span></code>. The canonical Stage 3 workflow rebuilds the five-file baseline, restarts Spark with the existing checkpoint, modifies only <code class="docutils literal notranslate"><span class="pre">src/datasets/__init__.py</span></code>, replays that file with a new <code class="docutils literal notranslate"><span class="pre">run_id</span></code>, waits for Kafka Connect and Spark, removes stale graph entities, and validates the final stores. The notebook reads the strict replay manifest so the public book stays deterministic.</p>
+</section>
+<section id="what-this-chapter-proves">
+<h2>What this chapter proves<a class="headerlink" href="#what-this-chapter-proves" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Requirement</p></th>
+<th class="head"><p>Evidence in this chapter</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Idempotent replay</p></td>
+<td><p>The executed cells compare baseline, replay, and final-state artifacts.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Checkpoint reuse</p></td>
+<td><p>Kafka/Spark checkpoint output is shown from the captured run.</p></td>
+</tr>
+<tr class="row-even"><td><p>Store convergence</p></td>
+<td><p>Neo4j cleanup and MongoDB replacement are validated with JSON artifacts and UI screenshots.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
@@ -422,8 +473,10 @@ captured_at: 2026-07-17T00:20:53Z
 </div>
 </div>
 </div>
+</section>
 <section id="modified-file-and-run-identity">
 <h2>Modified file and run identity<a class="headerlink" href="#modified-file-and-run-identity" title="Link to this heading">#</a></h2>
+<p>This section pins the replay to one baseline file and one replay <code class="docutils literal notranslate"><span class="pre">run_id</span></code>, so the later store checks can distinguish expected append-log repetition from duplicate database state.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">source</span> <span class="o">=</span> <span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;source&#39;</span><span class="p">]</span>
@@ -449,6 +502,7 @@ run_id: 2088754454f44aa2b4394aff0c565d49 -&gt; stage3-replay-20260717T002053Z
 </section>
 <section id="kafka-and-spark-checkpoint-proof">
 <h2>Kafka and Spark checkpoint proof<a class="headerlink" href="#kafka-and-spark-checkpoint-proof" title="Link to this heading">#</a></h2>
+<p>The captured checkpoint evidence shows that replay uses the persisted Spark checkpoint instead of starting a fresh metadata stream from scratch.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Kafka replay delta:&#39;</span><span class="p">,</span> <span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;kafka&#39;</span><span class="p">][</span><span class="s1">&#39;delta&#39;</span><span class="p">])</span>
@@ -468,6 +522,7 @@ Spark metadata offsets: 5 -&gt; 5 -&gt; 6
 </section>
 <section id="neo4j-cleanup-and-mongodb-replacement">
 <h2>Neo4j cleanup and MongoDB replacement<a class="headerlink" href="#neo4j-cleanup-and-mongodb-replacement" title="Link to this heading">#</a></h2>
+<p>The final checks verify convergence after replay: stale graph entities are removed in Neo4j, while MongoDB keeps the current metadata document for the replayed <code class="docutils literal notranslate"><span class="pre">file_id</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">neo4j</span> <span class="o">=</span> <span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;neo4j&#39;</span><span class="p">]</span>
@@ -494,6 +549,28 @@ MongoDB documents: 5 -&gt; 5 ; unchanged: 4
 </section>
 <section id="database-ui-evidence">
 <h2>Database UI evidence<a class="headerlink" href="#database-ui-evidence" title="Link to this heading">#</a></h2>
+<div class="important admonition">
+<p class="admonition-title">Database UI evidence</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Store</p></th>
+<th class="head"><p>UI artifact</p></th>
+<th class="head"><p>Meaning</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Neo4j</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">neo4j_after_cleanup.png</span></code></p></td>
+<td><p>Final graph state after stale cleanup.</p></td>
+</tr>
+<tr class="row-odd"><td><p>MongoDB</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">mongodb_after_replay.png</span></code></p></td>
+<td><p>Final metadata document after replacement.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p>Neo4j Browser after stale cleanup:</p>
 <p><img alt="Neo4j replay state" src="_images/neo4j_after_cleanup.png" /></p>
 <p>Mongo Express after metadata replacement:</p>
@@ -501,7 +578,31 @@ MongoDB documents: 5 -&gt; 5 ; unchanged: 4
 </section>
 <section id="reflection">
 <h2>Reflection<a class="headerlink" href="#reflection" title="Link to this heading">#</a></h2>
-<p><strong>What worked:</strong> deterministic file-level replay, Kafka Connect <code class="docutils literal notranslate"><span class="pre">MERGE</span></code>, MongoDB replacement by <code class="docutils literal notranslate"><span class="pre">file_id</span></code>, and the persisted Spark checkpoint form one auditable idempotency chain. <strong>What failed during design review:</strong> the original script selected <code class="docutils literal notranslate"><span class="pre">config.py</span></code>, which was absent from the five-file baseline, and treated expected Kafka replay events as invalid duplicate IDs. <strong>Resolution:</strong> the canonical target is now a baseline file, Kafka append-log repetition is measured separately from store duplication, and cleanup runs only after connector lag reaches zero. <strong>Limitation:</strong> structural AST IDs may change after edits, so correctness still depends on file-scoped stale cleanup rather than a production-grade semantic diff.</p>
+<div class="tip admonition">
+<p class="admonition-title">Closing reflection</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Point</p></th>
+<th class="head"><p>Result</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Worked</p></td>
+<td><p>Deterministic file-level replay, Kafka Connect <code class="docutils literal notranslate"><span class="pre">MERGE</span></code>, MongoDB replacement by <code class="docutils literal notranslate"><span class="pre">file_id</span></code>, and the persisted Spark checkpoint form one auditable idempotency chain.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Failed</p></td>
+<td><p>The original script selected <code class="docutils literal notranslate"><span class="pre">config.py</span></code>, which was absent from the five-file baseline, and treated expected Kafka replay events as invalid duplicate IDs.</p></td>
+</tr>
+<tr class="row-even"><td><p>Resolution</p></td>
+<td><p>The canonical target is now a baseline file, Kafka append-log repetition is measured separately from store duplication, and cleanup runs only after connector lag reaches zero.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Limitation</p></td>
+<td><p>Structural AST IDs may change after edits, so correctness still depends on file-scoped stale cleanup rather than a production-grade semantic diff.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </section>
 </section>
 
@@ -571,6 +672,8 @@ MongoDB documents: 5 -&gt; 5 ; unchanged: 4
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#approach-and-reasoning">Approach and reasoning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-this-chapter-proves">What this chapter proves</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#modified-file-and-run-identity">Modified file and run identity</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#kafka-and-spark-checkpoint-proof">Kafka and Spark checkpoint proof</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#neo4j-cleanup-and-mongodb-replacement">Neo4j cleanup and MongoDB replacement</a></li>

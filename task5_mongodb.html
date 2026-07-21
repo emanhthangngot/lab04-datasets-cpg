@@ -64,7 +64,7 @@
     <script>DOCUMENTATION_OPTIONS.search_as_you_type = false;</script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Task 6 — Idempotent Replay Verification" href="task6_replay.html" />
+    <link rel="next" title="Task 6 — Idempotent replay verification" href="task6_replay.html" />
     <link rel="prev" title="Task 4 — Direct Kafka-to-Neo4j ingestion" href="task4_neo4j.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
@@ -220,7 +220,7 @@
 <li class="toctree-l1"><a class="reference internal" href="task3_kafka.html">Task 3 — Kafka topics and event contract</a></li>
 <li class="toctree-l1"><a class="reference internal" href="task4_neo4j.html">Task 4 — Direct Kafka-to-Neo4j ingestion</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Task 5 — Spark metadata stream to MongoDB</a></li>
-<li class="toctree-l1"><a class="reference internal" href="task6_replay.html">Task 6 — Idempotent Replay Verification</a></li>
+<li class="toctree-l1"><a class="reference internal" href="task6_replay.html">Task 6 — Idempotent replay verification</a></li>
 <li class="toctree-l1"><a class="reference internal" href="reflection.html">Reflection</a></li>
 </ul>
 
@@ -382,6 +382,8 @@
             </div>
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#approach-and-reasoning">Approach and reasoning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-this-chapter-proves">What this chapter proves</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#final-database-ui-evidence">Final database UI evidence</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reflection">Reflection</a></li>
 </ul>
@@ -397,7 +399,59 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="task-5-spark-metadata-stream-to-mongodb">
 <h1>Task 5 — Spark metadata stream to MongoDB<a class="headerlink" href="#task-5-spark-metadata-stream-to-mongodb" title="Link to this heading">#</a></h1>
-<p>Evidence run metadata is read from <code class="docutils literal notranslate"><span class="pre">screenshots/stage2_manifest.json</span></code>. Commands: <code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/capture_spark_evidence.sh</span></code> and <code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/capture_store_evidence.sh</span></code>. Spark consumes only <code class="docutils literal notranslate"><span class="pre">cpg.metadata</span></code>, checkpoints the Kafka offset, and upserts by <code class="docutils literal notranslate"><span class="pre">file_id</span></code>. Raw query output: <a class="reference download internal" download="" href="_downloads/97cbac32afb1da7c43c36619ebec3efc/metadata_evidence.txt"><span class="xref download myst"><code class="docutils literal notranslate"><span class="pre">metadata_evidence.txt</span></code></span></a>.</p>
+<div class="note admonition">
+<p class="admonition-title">Evidence summary</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Evidence source</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">screenshots/stage2_manifest.json</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Commands</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/capture_spark_evidence.sh</span></code>; <code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/capture_store_evidence.sh</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Stream</p></td>
+<td><p>Spark consumes only <code class="docutils literal notranslate"><span class="pre">cpg.metadata</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Storage contract</p></td>
+<td><p>MongoDB upserts by <code class="docutils literal notranslate"><span class="pre">file_id</span></code> with checkpointed Kafka offsets.</p></td>
+</tr>
+<tr class="row-even"><td><p>Raw query output</p></td>
+<td><p><a class="reference download internal" download="" href="_downloads/97cbac32afb1da7c43c36619ebec3efc/metadata_evidence.txt"><span class="xref download myst"><code class="docutils literal notranslate"><span class="pre">metadata_evidence.txt</span></code></span></a></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<section id="approach-and-reasoning">
+<h2>Approach and reasoning<a class="headerlink" href="#approach-and-reasoning" title="Link to this heading">#</a></h2>
+<p>Commands: <code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/capture_spark_evidence.sh</span></code> and <code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/capture_store_evidence.sh</span></code>. Spark owns the metadata path only: it reads <code class="docutils literal notranslate"><span class="pre">cpg.metadata</span></code>, persists checkpoint state, and writes one MongoDB document per <code class="docutils literal notranslate"><span class="pre">file_id</span></code>. That separation keeps metadata processing independent from the Neo4j graph connector.</p>
+</section>
+<section id="what-this-chapter-proves">
+<h2>What this chapter proves<a class="headerlink" href="#what-this-chapter-proves" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Requirement</p></th>
+<th class="head"><p>Evidence in this chapter</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Spark metadata stream</p></td>
+<td><p>The executed output records Spark offset and metadata document counts.</p></td>
+</tr>
+<tr class="row-odd"><td><p>MongoDB upsert behavior</p></td>
+<td><p>The chapter states the <code class="docutils literal notranslate"><span class="pre">file_id</span></code> replacement key and shows the final document.</p></td>
+</tr>
+<tr class="row-even"><td><p>UI-backed final state</p></td>
+<td><p>The Mongo Express screenshot shows the replay final state after replacement.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
@@ -424,14 +478,66 @@ completed micro-batch: 0
 </div>
 </div>
 </div>
+</section>
 <section id="final-database-ui-evidence">
 <h2>Final database UI evidence<a class="headerlink" href="#final-database-ui-evidence" title="Link to this heading">#</a></h2>
-<p>The image below is real Mongo Express evidence from the canonical Stage 3 replay final state, after metadata replacement. UI action/query: filter the target <code class="docutils literal notranslate"><span class="pre">file_id</span></code>. Run date: <code class="docutils literal notranslate"><span class="pre">2026-07-17</span></code>. Result: <code class="docutils literal notranslate"><span class="pre">pass</span></code>. The screenshot is labeled as replay final state rather than as the earlier Stage 2 baseline. Its document values are backed by <code class="docutils literal notranslate"><span class="pre">screenshots/replay/mongodb_after_replay.json</span></code> and the strict replay manifest.</p>
+<div class="important admonition">
+<p class="admonition-title">Database UI evidence</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Field</p></th>
+<th class="head"><p>Value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Tool</p></td>
+<td><p>Mongo Express</p></td>
+</tr>
+<tr class="row-odd"><td><p>Phase represented</p></td>
+<td><p>Canonical Stage 3 replay final state after metadata replacement.</p></td>
+</tr>
+<tr class="row-even"><td><p>UI action/query</p></td>
+<td><p>Filter the target <code class="docutils literal notranslate"><span class="pre">file_id</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Run date</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2026-07-17</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>Result</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">pass</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>Backing artifacts</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">screenshots/replay/mongodb_after_replay.json</span></code>; strict replay manifest.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 <p><img alt="Mongo Express final document after Stage 3 replay" src="_images/mongodb_after_replay.png" /></p>
 </section>
 <section id="reflection">
 <h2>Reflection<a class="headerlink" href="#reflection" title="Link to this heading">#</a></h2>
-<p><strong>Worked:</strong> Spark committed offset 5 and MongoDB contained five unique metadata documents with the exact repository and dataset commit. <strong>Failed:</strong> that clean run had MongoDB query artifacts but no dedicated Mongo Express capture. <strong>Resolution:</strong> the canonical Stage 3 replay captured a real, hash-validated Mongo Express final-state image after replacement; it is presented above with its actual phase. Replay/idempotence remains Task 6, not a Stage 2 claim.</p>
+<div class="tip admonition">
+<p class="admonition-title">Closing reflection</p>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Point</p></th>
+<th class="head"><p>Result</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Worked</p></td>
+<td><p>Spark committed offset 5 and MongoDB contained five unique metadata documents with the exact repository and dataset commit.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Failed</p></td>
+<td><p>That clean run had MongoDB query artifacts but no dedicated Mongo Express capture.</p></td>
+</tr>
+<tr class="row-even"><td><p>Resolution</p></td>
+<td><p>The canonical Stage 3 replay captured a real, hash-validated Mongo Express final-state image after replacement; it is presented above with its actual phase. Replay/idempotence remains Task 6, not a Stage 2 claim.</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
 </section>
 </section>
 
@@ -479,7 +585,7 @@ completed micro-batch: 0
        title="next page">
       <div class="prev-next-info">
         <p class="prev-next-subtitle">next</p>
-        <p class="prev-next-title">Task 6 — Idempotent Replay Verification</p>
+        <p class="prev-next-title">Task 6 — Idempotent replay verification</p>
       </div>
       <i class="fa-solid fa-angle-right"></i>
     </a>
@@ -501,6 +607,8 @@ completed micro-batch: 0
   </div>
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#approach-and-reasoning">Approach and reasoning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-this-chapter-proves">What this chapter proves</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#final-database-ui-evidence">Final database UI evidence</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reflection">Reflection</a></li>
 </ul>
