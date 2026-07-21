@@ -108,6 +108,19 @@ Acceptance record for section 7:
 - Pages source: branch `gh-pages`, path `/`, status `built`, HTTPS enforced
 - Public root URL: https://emanhthangngot.github.io/lab04-datasets-cpg/ → HTTP 200
 
+Current update deployment record:
+
+- Source commit on `main`: `ebf9100e266a8352d7a292fd138aeb02649f9246`
+- Commit method: user-authorized direct `main` push after local review and
+  validation.
+- Workflow run: https://github.com/emanhthangngot/lab04-datasets-cpg/actions/runs/29794123254
+  (`Build and Publish Jupyter Book`, conclusion `success`, head `ebf9100`)
+- Pages deploy run: https://github.com/emanhthangngot/lab04-datasets-cpg/actions/runs/29794146923
+  (conclusion `success`)
+- Publication branch: `gh-pages` (`9207d48e8e45f5365abd241b795ba5a1fb43e71a`)
+- Pages source: branch `gh-pages`, path `/`, status `built`, public `true`
+- Public root URL: https://emanhthangngot.github.io/lab04-datasets-cpg/ → HTTP 200
+
 ## 8. Perform Live Site Acceptance
 
 - [x] 8.1 Open the root index page.
@@ -142,6 +155,24 @@ return HTTP 200. Repository link targets
 `https://github.com/emanhthangngot/lab04-datasets-cpg`. No private home-directory
 paths or literal lab passwords observed on live pages.
 
+Current update live acceptance (reviewed 2026-07-21):
+
+| Path | HTTP | Notes |
+|---|---:|---|
+| `/` | 200 | Deliverable checklist + Moodle URL present |
+| `/architecture.html` | 200 | Architecture page loads |
+| `/task1_repository.html` | 200 | New evidence-summary format loads |
+| `/task2_parser.html` | 200 | Parser evidence page loads |
+| `/task3_kafka.html` | 200 | Kafka evidence page loads |
+| `/task4_neo4j.html` | 200 | Neo4j evidence page loads |
+| `/task5_mongodb.html` | 200 | MongoDB evidence page loads |
+| `/task6_replay.html` | 200 | Replay evidence page loads |
+| `/reflection.html` | 200 | Reflection page loads |
+
+Asset checks: `_images/neo4j_after_cleanup.png`,
+`_images/mongodb_after_replay.png`, and `_images/stage2_pipeline.png` all
+return HTTP 200.
+
 ## 9. Record Completion And Submission
 
 - [x] 9.1 Update `book/index.md` only after the live Pages review passes.
@@ -152,9 +183,10 @@ paths or literal lab passwords observed on live pages.
   member-specific Stage 4 ownership.
 - [x] 9.4 Re-run OpenSpec, tests, manifest, book build, and public-safety gates
   after acceptance-record edits.
-- [ ] 9.5 Commit the prepared archive and book-affecting acceptance/spec edits
-  through a reviewed branch, deploy that source commit, and repeat live
-  acceptance before finalizing the archive record.
+- [x] 9.5 Commit the prepared archive and book-affecting acceptance/spec edits,
+  deploy that source commit, and repeat live acceptance before finalizing the
+  archive record. User requested and authorized direct `main` push rather than a
+  reviewed branch; local review and validation were completed before push.
 - [ ] 9.6 Submit exactly the verified Pages root URL to Moodle; do not submit a
   ZIP, PDF, Word document, chapter URL, or repository URL.
 - [ ] 9.7 Record the checked Moodle item, submission date, and exact submitted
@@ -174,7 +206,8 @@ https://emanhthangngot.github.io/lab04-datasets-cpg/
   any live page fails. (All publication and live-page gates passed before
   acceptance recording.)
 - [x] 10.2 Fix publication failures through reviewed follow-up commits/PRs; do
-  not rewrite `main` history. (Release used normal PR #19 merge only.)
+  not rewrite `main` history. (Initial release used normal PR #19 merge; current
+  final update used a user-authorized direct `main` push with no force-push.)
 - [x] 10.3 Stop on evidence mismatch; do not edit constants or fabricate output.
   (No evidence regeneration; Stage 3 hashes unchanged.)
 - [x] 10.4 Rebuild and republish after any secret, broken asset, or content fix.

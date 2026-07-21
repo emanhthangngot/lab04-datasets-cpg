@@ -38,7 +38,7 @@ Remove premature whole-assignment completion claims and preserve verified deploy
 ## Completion Record
 
 Completed locally on 2026-07-21. README, book index, team trackers, and the
-archived Stage 4 checklist consistently identify `7ae8a832` as the previously
-verified publication source and the current state as
-`PUBLICATION_UPDATE_PENDING`. Moodle status, submission date, and exact URL
-remain `PENDING`.
+archived Stage 4 checklist consistently separate technical publication from
+Moodle submission. After the later `main` deployment, the current state is
+`PUBLICATION_DEPLOYED`; Moodle status, submission date, and exact URL remain
+`PENDING`.

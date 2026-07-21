@@ -129,6 +129,7 @@ Stage 4 follows the single-executor checklist in
 
 - [x] Run local checks and `jupyter-book build book/`.
 - [x] Merge `dev` into `main`.
+- [x] Push the final Stage 4 contract/book update to `main`.
 - [x] Confirm GitHub Pages workflow passes.
 - [x] Open every chapter from the Pages URL.
 - [ ] Submit only the Pages root URL to Moodle (manual student action).
@@ -136,24 +137,23 @@ Stage 4 follows the single-executor checklist in
 
 Stage 4 technical publication acceptance recorded on 2026-07-21:
 
-- Verified publication source commit: `7ae8a832b5da0976dc5b89ff93081618fe0ae382`
-  (PR #19, normal merge, no force-push).
+- Verified publication source commit: `ebf9100e266a8352d7a292fd138aeb02649f9246`
+  (user-authorized direct `main` push after local review and validation).
 - Publication workflow:
-  https://github.com/emanhthangngot/lab04-datasets-cpg/actions/runs/29791146201
+  https://github.com/emanhthangngot/lab04-datasets-cpg/actions/runs/29794123254
   — conclusion `success`.
 - Pages deployment:
-  https://github.com/emanhthangngot/lab04-datasets-cpg/actions/runs/29791256702
+  https://github.com/emanhthangngot/lab04-datasets-cpg/actions/runs/29794146923
   — conclusion `success`; source `gh-pages` `/`.
+- Publication branch: `gh-pages`
+  (`9207d48e8e45f5365abd241b795ba5a1fb43e71a`).
 - Live root URL:
   https://emanhthangngot.github.io/lab04-datasets-cpg/ — HTTP 200 for root,
   Architecture, Task 1-6, and Reflection; store UI images load.
 - Local recheck after acceptance-record edits: Python tests, OpenSpec strict
   validation, Stage 3 manifest, and scaffold checks pass.
-- Current Stage 4 state: `PUBLICATION_UPDATE_PENDING`. Release source `7ae8a832`
-  was deployed and live-reviewed, but the current final contract/book edits must
-  be committed, deployed, and live-reviewed before `PUBLICATION_DEPLOYED` can be
-  restored. Moodle remains manual; the whole assignment is not `COMPLETE` until
-  both Moodle items above are checked.
+- Current Stage 4 state: `PUBLICATION_DEPLOYED`. Moodle remains manual; the
+  whole assignment is not `COMPLETE` until both Moodle items above are checked.
 
 Moodle submission record (fill only after the student submits):
 
@@ -165,10 +165,10 @@ Moodle submission record (fill only after the student submits):
 
 | Area | Owner | Status | Next Checkpoint |
 |---|---|---|---|
-| Parser/schema/specs | Tri | Schema v1.0 unchanged; `PUBLICATION_UPDATE_PENDING` | Deploy current update, then Moodle |
-| Kafka/Spark | Truc | Stage 3 runtime accepted; current book update pending deployment | Deploy current update, then Moodle |
-| Neo4j/MongoDB | Thanh | Stage 3 stores accepted; current book update pending deployment | Deploy current update, then Moodle |
-| Evidence/Jupyter Book | Tuan | Prior release live-reviewed; current book update pending | Deploy and repeat live review |
+| Parser/schema/specs | Tri | Schema v1.0 unchanged; `PUBLICATION_DEPLOYED` | Moodle submission |
+| Kafka/Spark | Truc | Stage 3 runtime accepted; final book deployed | Moodle submission |
+| Neo4j/MongoDB | Thanh | Stage 3 stores accepted; final book deployed | Moodle submission |
+| Evidence/Jupyter Book | Tuan | Final book live-reviewed | Moodle submission |
 
 ## Blocker Policy
 

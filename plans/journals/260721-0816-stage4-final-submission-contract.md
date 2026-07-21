@@ -10,8 +10,9 @@ session: stage4-final-submission-contract
 The session strengthened Stage 4 so the final-publication capability is
 self-contained against the Lab04 submission rubric. The work preserved accepted
 Stage 1-3 runtime, schema, counts, and manifest-backed evidence while correcting
-premature completion language. This is a chronological work record, not proof
-that the current changes have been deployed or submitted.
+premature completion language. This is a chronological work record; later
+entries record the deployment update while Moodle remains a separate manual
+submission gate.
 
 ## What Happened
 
@@ -28,10 +29,10 @@ that the current changes have been deployed or submitted.
 - Added `## Approach and reasoning` sections to all six executed task notebooks
   so the book content satisfies the newly explicit contract without changing
   accepted evidence or runtime behavior.
-- Reconciled README, book index, and team trackers. They now identify
-  `7ae8a832` as the previously verified publication source, label the current
-  state `PUBLICATION_UPDATE_PENDING`, and keep Moodle status, date, and exact URL
-  as `PENDING`.
+- Reconciled README, book index, and team trackers. They initially identified
+  `7ae8a832` as the previously verified publication source, kept the new update
+  undeployed until live review, and kept Moodle status, date, and exact URL as
+  `PENDING`.
 - Archived the prepared Stage 4 change and promoted its canonical specification,
   while leaving the archive checklist's deployment/live-review and Moodle steps
   unchecked.
@@ -51,6 +52,12 @@ that the current changes have been deployed or submitted.
 - AgentWiki publishing was skipped: neither `agentwiki` nor `agent-wiki` CLI is
   available on this shell PATH, and no available AgentWiki MCP integration was
   identified for this session.
+- After user authorization, the prepared final contract/book update was pushed
+  directly to `main` as
+  `ebf9100e266a8352d7a292fd138aeb02649f9246`, published by workflow run
+  `29794123254`, deployed by Pages run `29794146923`, and live-reviewed at the
+  Pages root URL. Root, Architecture, Task 1-6, Reflection, and required images
+  returned HTTP 200.
 
 ## Reflection
 
@@ -65,19 +72,13 @@ reintroduce the circular publication claim that the review identified.
 | Decision | Rationale | Impact |
 |---|---|---|
 | Use `PUBLICATION_DEPLOYED`, `SUBMISSION_RECORDED`, and `COMPLETE` as distinct states | A live book, a Moodle submission, and whole-assignment completion are different facts | Prevents a successful Pages run from implying Moodle submission or completion |
-| Keep the current state `PUBLICATION_UPDATE_PENDING` | The verified deployment used `7ae8a832`; the current contract/book edits have not been deployed and live-reviewed | All current records remain truthful and task 9.5 stays open |
+| Move the current state to `PUBLICATION_DEPLOYED` after push/deploy/live review | Source `ebf9100e266a8352d7a292fd138aeb02649f9246` is deployed and HTTP-reviewed | Task 9.5 is closed; Moodle remains the only completion blocker |
 | Require Moodle checkbox, submission date, and exact root URL, but no screenshot/receipt | This is the accepted minimal durable record for the manual student action | Avoids invented evidence while preserving an explicit completion gate |
 | Preserve Stage 1-3 evidence and runtime contracts | The task was submission-contract hardening, not runtime redesign | No accepted hashes, counts, schemas, or store behavior changed |
 | Require a reviewed commit, deployment, and repeated live acceptance after book-affecting edits | Prior live review cannot validate content created afterward | Completion remains blocked on a new external publication cycle |
 
 ## Next Steps
 
-- Commit the prepared changes through a reviewed branch without rewriting
-  history; record the resulting source commit.
-- Deploy that exact source commit and repeat live acceptance for the root,
-  Architecture, Task 1-6, Reflection, navigation, and required assets.
-- Only after successful deployment/live review, restore
-  `PUBLICATION_DEPLOYED` and finalize the technical archive record.
 - Have a student submit exactly
   `https://emanhthangngot.github.io/lab04-datasets-cpg/` to Moodle.
 - Record the Moodle checkbox, submission date, and exact submitted root URL;
@@ -85,6 +86,4 @@ reintroduce the circular publication claim that the review identified.
 
 ## Unresolved Questions
 
-- What commit SHA and workflow/deployment run will verify the current prepared
-  update?
 - On what date will the student submit the Pages root URL to Moodle?

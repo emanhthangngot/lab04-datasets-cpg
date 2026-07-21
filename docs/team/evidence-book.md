@@ -104,7 +104,8 @@ and uses this tracker only as Stage 1-3 evidence history.
 Final review gates:
 
 - [x] Confirm GitHub Pages published and live-reviewed release source `7ae8a832`.
-- [ ] Publish and live-review the current final contract/book update.
+- [x] Publish and live-review the current final contract/book update
+  (`ebf9100e266a8352d7a292fd138aeb02649f9246`).
 - [x] Open the root Pages URL and every chapter.
 - [x] Confirm repository links are visible from the book.
 - [x] Confirm the verified Pages root URL is the only Moodle value.
@@ -120,17 +121,18 @@ Stage 4 publication review recorded 2026-07-21:
 - Repository link on the live book targets
   `https://github.com/emanhthangngot/lab04-datasets-cpg`.
 - Workflow run success:
-  https://github.com/emanhthangngot/lab04-datasets-cpg/actions/runs/29791146201
+  https://github.com/emanhthangngot/lab04-datasets-cpg/actions/runs/29794123254
+- Pages deploy success:
+  https://github.com/emanhthangngot/lab04-datasets-cpg/actions/runs/29794146923
 - Moodle value remains exactly the Pages root URL (manual submit).
 
 ## Latest Update
 
-Status: `PUBLICATION_UPDATE_PENDING`. Release source `7ae8a832` was successfully
-published and reviewed on 2026-07-21, but the current final contract/book update
-still requires deployment and repeated live acceptance. Stage 3 evidence is
-unchanged. Whole-assignment state remains incomplete until publication is current
-and the student submits the root URL to Moodle, then records the date and exact
-URL in `workplan.md`.
+Status: `PUBLICATION_DEPLOYED`. Final source
+`ebf9100e266a8352d7a292fd138aeb02649f9246` was published and reviewed on
+2026-07-21. Stage 3 evidence is unchanged. Whole-assignment state remains
+incomplete until the student submits the root URL to Moodle, then records the
+date and exact URL in `workplan.md`.
 
 Evidence links:
 

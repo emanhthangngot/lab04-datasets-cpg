@@ -28,7 +28,7 @@ Strengthen the final-publication capability, tests, and acceptance records while
 |---|-------|--------|
 | 1 | [Phase 1: Tests and contract gaps](./phase-01-start.md) | Completed |
 | 2 | [Phase 2: Align acceptance records](./phase-02-align-acceptance-records.md) | Completed |
-| 3 | [Phase 3: Verify and review](./phase-03-strengthen-stage-4-contract.md) | In progress (external actions pending) |
+| 3 | [Phase 3: Verify and review](./phase-03-strengthen-stage-4-contract.md) | In progress (Moodle pending) |
 
 ## Success Criteria
 
@@ -40,16 +40,13 @@ Strengthen the final-publication capability, tests, and acceptance records while
 
 ## Progress
 
-Local implementation and validation are complete. The overall plan remains
-`in-progress` because the current source has not completed archived task 9.5
-(reviewed commit, deployment, and repeated live acceptance), and Moodle tasks
-9.6-9.8 require a student action and submission record.
+Local implementation, publication, and live review are complete. The overall
+plan remains `in-progress` because Moodle tasks 9.6-9.8 require a student action
+and submission record.
 
 ## Remaining Blockers
 
-1. Publish the current prepared changes through a reviewed branch, record the
-   deployed source commit, and repeat the nine-page/asset live review.
-2. Submit exactly `https://emanhthangngot.github.io/lab04-datasets-cpg/` to
+1. Submit exactly `https://emanhthangngot.github.io/lab04-datasets-cpg/` to
    Moodle and record the checked item, submission date, and exact URL.
 
 <!-- slug: complete-stage-4-final-submission-contract -->

@@ -7,18 +7,17 @@ Overall status: **IN PROGRESS**
 
 - Phase 1 is complete: Stage 4 contract gaps are covered by focused regression
   tests and the canonical specification has a concrete Purpose.
-- Phase 2 is complete: acceptance records consistently distinguish the prior
-  verified publication (`7ae8a832`) from the current unpublished update, and
-  Moodle remains pending.
-- Phase 3 local gates are complete, but the phase remains in progress while
-  external deployment/live review and Moodle actions are outstanding.
+- Phase 2 is complete: acceptance records consistently distinguish technical
+  publication from Moodle submission.
+- Phase 3 publication gates are complete for source
+  `ebf9100e266a8352d7a292fd138aeb02649f9246`; Moodle remains pending.
 
 ## Verification
 
 | Gate | Result |
 |---|---|
-| Focused Stage 4 tests | 11 passed |
-| Full Python tests | 141 passed |
+| Focused Stage 4 tests | 12 passed |
+| Full Python tests | 142 passed |
 | OpenSpec strict validation | 5 passed, 0 failed |
 | Stage 3 replay manifest | pass |
 | Scaffold checks | pass |
@@ -28,8 +27,8 @@ Overall status: **IN PROGRESS**
 
 ## Remaining External Work
 
-- [ ] Archived task 9.5: commit the prepared changes through a reviewed branch,
-  deploy that exact source commit, and repeat live acceptance.
+- [x] Archived task 9.5: commit the prepared changes, deploy that exact source
+  commit, and repeat live acceptance.
 - [ ] Archived task 9.6: submit exactly
   `https://emanhthangngot.github.io/lab04-datasets-cpg/` to Moodle.
 - [ ] Archived task 9.7: record the checked Moodle item, submission date, and
@@ -39,7 +38,5 @@ Overall status: **IN PROGRESS**
 
 ## Blockers
 
-The current working-tree content cannot be called deployed or live-reviewed
-until task 9.5 is performed. Moodle submission requires the student and is not
-automated or inferred from the presence of the URL. Accordingly, neither the
-plan nor Phase 3 is marked complete.
+Moodle submission requires the student and is not automated or inferred from the
+presence of the URL. Accordingly, the whole assignment is not marked `COMPLETE`.
