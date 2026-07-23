@@ -24,10 +24,13 @@ def test_publication_workflow_is_pinned_and_fail_fast() -> None:
     assert "test -f book/_build/html/index.html" in source
     assert source.count("peaceiris/actions-gh-pages@v4") == 1
 
+    tests = source.index("python -m pytest")
+    evidence = source.index("stage2_evidence_manifest.py validate")
+    replay = source.index("stage3_replay_manifest.py validate")
     build = source.index("jupyter-book build book/")
     html_gate = source.index("test -f book/_build/html/index.html")
     deploy = source.index("peaceiris/actions-gh-pages@v4")
-    assert build < html_gate < deploy
+    assert tests < evidence < replay < build < html_gate < deploy
 
 
 def test_publication_workflow_watches_only_tracked_inputs() -> None:
@@ -108,6 +111,19 @@ def test_public_book_uses_password_placeholder() -> None:
 
     assert "NEO4J_PASSWORD=<local-lab-password>" in architecture
     assert "NEO4J_PASSWORD=password" not in architecture
+
+
+def test_architecture_explicitly_shows_required_routes_and_correct_ports() -> None:
+    architecture = (BOOK / "architecture.md").read_text(encoding="utf-8")
+    diagram = (BOOK / "_static" / "cpg_pipeline.svg").read_text(encoding="utf-8")
+
+    assert "_static/cpg_pipeline.svg" in architecture
+    assert "Kafka Connect" in diagram
+    assert "Neo4j Sink Connector" in diagram
+    assert "Structured Streaming" in diagram
+    assert "cpg.nodes" in diagram and "cpg.edges" in diagram
+    assert "cpg.metadata" in diagram and "cpg.errors" in diagram
+    assert "`29092` host / `9092` Compose" in architecture
 
 
 def test_final_publication_spec_covers_every_task_chapter_contract() -> None:

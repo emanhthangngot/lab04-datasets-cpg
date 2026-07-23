@@ -3,7 +3,7 @@
 ## Purpose
 
 Define the runtime behavior owned by Truc: Kafka topics, Kafka Connect plugin
-readiness, Kafka sample evidence, and Spark metadata streaming into MongoDB.
+readiness, full-repository Kafka evidence, and Spark metadata streaming into MongoDB.
 ## Requirements
 ### Requirement: Kafka Topics Are Explicit
 
@@ -70,6 +70,8 @@ The runtime SHALL capture evidence that can be copied into the Jupyter Book.
 - THEN each sample shows `schema_version`, `event_time`, `file_id`, and
   `file_path`
 - AND node/edge samples show `properties` as a JSON object
+- AND the complete metadata capture contains exactly one event per discovered
+  source file
 
 ### Requirement: Checkpoint Restart Proves Resume
 
@@ -78,12 +80,13 @@ emitting the replay event.
 
 #### Scenario: Unchanged offsets are skipped
 
-- **GIVEN** Kafka metadata end offset and Spark checkpoint offset are both 5
+- **GIVEN** Kafka metadata end offset and Spark checkpoint offset both equal
+  the discovered source-file count
 - **WHEN** Spark restarts with `/mnt/checkpoints/cpg_metadata`
-- **THEN** its checkpoint remains at offset 5 before replay
-- **AND** the five MongoDB documents remain unchanged
+- **THEN** its checkpoint remains at that baseline offset before replay
+- **AND** all MongoDB documents remain unchanged
 - **WHEN** one replay metadata event is emitted
-- **THEN** Kafka and Spark metadata offsets both advance to 6
+- **THEN** Kafka and Spark metadata offsets both advance by exactly one
 
 ### Requirement: Kafka Replay Is Distinguished From Store Duplication
 
@@ -92,8 +95,8 @@ unique IDs for pre-cleanup persistence and zero duplicate groups in stores.
 
 #### Scenario: Replay topic deltas
 
-- **WHEN** the modified target emits 23 node, 16 edge, and 1 metadata event
-- **THEN** total topic counts advance by exactly those values
+- **WHEN** the modified target emits its current node/edge totals and one metadata event
+- **THEN** total topic counts advance by exactly those dynamic values
 - **AND** `cpg.errors` does not advance
 - **AND** repeated graph IDs across runs do not fail the connector wait gate
 - **AND** cleanup cannot start before connector lag is zero
@@ -108,8 +111,8 @@ Desktop and Git Bash. The smoke run SHALL NOT replace canonical replay evidence.
 #### Scenario: Windows wrapper acceptance PR
 
 - **WHEN** `scripts/run_stage3_evidence.ps1` completes with exit code 0
-- **THEN** the acceptance record reports Spark offsets `5 -> 5 -> 6`
-- **AND** Kafka deltas are 23 nodes, 16 edges, 1 metadata, and 0 errors
+- **THEN** the acceptance record reports offsets `N -> N -> N+1`
+- **AND** Kafka deltas match the replayed file metadata, with 1 metadata and 0 errors
 - **AND** the record confirms the password was not printed and the target source was restored
 - **AND** Truc opens a tracker-only acceptance PR into `dev` with `APPROVED`
 - **AND** a failed run records a blocker without marking the gate complete

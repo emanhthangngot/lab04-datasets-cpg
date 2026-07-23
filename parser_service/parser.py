@@ -33,10 +33,10 @@ def process_file(file_path: Path, producer, context) -> dict:
     start_time = time.time()
     source = ""
     tree = None
+    relative_path = normalize_relative_path(file_path, context.repo_root)
+    file_id = make_file_id(context.repo_name, relative_path)
 
     try:
-        relative_path = normalize_relative_path(file_path, context.repo_root)
-        file_id = make_file_id(context.repo_name, relative_path)
         source = file_path.read_text(encoding="utf-8", errors="replace")
         tree = ast.parse(source, filename=relative_path)
         assign_parents(tree)
@@ -80,9 +80,7 @@ def process_file(file_path: Path, producer, context) -> dict:
         producer.flush(timeout=30)
         return metadata
 
-    except SyntaxError as error:
-        relative_path = str(file_path)
-        file_id = make_file_id(context.repo_name, relative_path)
+    except Exception as error:
         error_event = build_error_event(
             context=context, file_id=file_id, file_path=relative_path, error=error
         )

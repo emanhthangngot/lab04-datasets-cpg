@@ -5,41 +5,47 @@ from __future__ import annotations
 import ast
 from typing import Iterable
 
-from .ids import assign_parents, get_scope_path, make_node_id
+from .ids import assign_parents, get_scope_path, make_function_exit_id, make_node_id
 from .schemas import build_node_event
 
 
+# Semantic AST records that may participate in the CPG. Marker-only nodes such
+# as ast.Load and ast.Add are deliberately excluded because they carry no
+# independent source location and are represented by their parent properties.
 SUPPORTED_NODE_TYPES = (
     ast.Module,
-    ast.Import,
-    ast.ImportFrom,
-    ast.ClassDef,
-    ast.FunctionDef,
-    ast.AsyncFunctionDef,
-    ast.Assign,
-    ast.AnnAssign,
-    ast.AugAssign,
-    ast.Return,
-    ast.If,
-    ast.For,
-    ast.While,
-    ast.Try,
-    ast.With,
-    ast.Call,
-    ast.Name,
-    ast.Attribute,
-    ast.Constant,
-    ast.BinOp,
-    ast.Compare,
+    ast.stmt,
+    ast.expr,
+    ast.comprehension,
+    ast.keyword,
+    ast.arg,
+    ast.alias,
+    ast.arguments,
+    ast.withitem,
+    ast.ExceptHandler,
+    ast.match_case,
+    ast.pattern,
+    ast.TypeIgnore,
 )
 
 
-def extract_ast_nodes_gen(*, tree: ast.AST, file_id: str, file_path: str, context) -> Iterable[dict]:
-    """Yield AST node events.
+def _node_properties(node: ast.AST) -> dict:
+    """Return compact explanatory properties without embedding source text."""
 
-    Scope tracking remains intentionally coarse for some nested classes and
-    functions; this is a documented lab-level CPG limitation.
-    """
+    properties = {}
+    for field in ("name", "id", "arg", "attr", "module"):
+        value = getattr(node, field, None)
+        if isinstance(value, str):
+            properties[field] = value
+    if isinstance(node, ast.Constant) and isinstance(
+        node.value, (str, int, float, bool, type(None))
+    ):
+        properties["value"] = node.value
+    return properties
+
+
+def extract_ast_nodes_gen(*, tree: ast.AST, file_id: str, file_path: str, context) -> Iterable[dict]:
+    """Yield semantic AST nodes plus one synthetic exit node per function."""
 
     assign_parents(tree)
 
@@ -59,5 +65,20 @@ def extract_ast_nodes_gen(*, tree: ast.AST, file_id: str, file_path: str, contex
             col_offset=getattr(node, "col_offset", None),
             end_lineno=getattr(node, "end_lineno", None),
             end_col_offset=getattr(node, "end_col_offset", None),
-            properties={"name": getattr(node, "name", None)} if hasattr(node, "name") else {},
+            properties=_node_properties(node),
         )
+
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            yield build_node_event(
+                context=context,
+                file_id=file_id,
+                file_path=file_path,
+                node_id=make_function_exit_id(file_id, node),
+                node_type="FunctionExit",
+                scope_path=get_scope_path(node),
+                lineno=getattr(node, "end_lineno", None),
+                col_offset=getattr(node, "end_col_offset", None),
+                end_lineno=getattr(node, "end_lineno", None),
+                end_col_offset=getattr(node, "end_col_offset", None),
+                properties={"synthetic": True, "function": node.name},
+            )

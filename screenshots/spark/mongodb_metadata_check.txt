@@ -1,21 +1,21 @@
-file_metadata count: 5
+file_metadata count: 138
 sample document:
 {
-  _id: ObjectId('6a5975bce180297d291694f9'),
+  _id: ObjectId('6a61bba91f1048cf3efe5cc6'),
   schema_version: '1.0',
-  event_time: '2026-07-17T00:21:51.529Z',
+  event_time: '2026-07-23T06:58:37.001Z',
   repo: 'huggingface/datasets',
   commit_sha: '41adfd0f9ee9ba3a6b4f719d5b551c5b19ae45e2',
-  run_id: '2088754454f44aa2b4394aff0c565d49',
-  file_id: '6c39568a6a11c430',
-  file_path: 'src/datasets/__init__.py',
-  file_size: Long('1635'),
-  content_hash: '74ab176247c9ba61e09843280c18cf3a9ac690403a5d35411a75d097db721939',
-  num_ast_nodes: Long('19'),
-  num_cfg_edges: Long('15'),
-  num_dfg_edges: Long('0'),
-  num_call_edges: Long('0'),
-  num_total_edges: Long('15'),
-  parse_duration_ms: Long('2'),
+  run_id: '8c3efe458b3b43eaa1399d7740848d3f',
+  file_id: '16e9e0abc22af726',
+  file_path: 'src/datasets/packaged_modules/text/text.py',
+  file_size: Long('6862'),
+  content_hash: '4f0ad7aa6bfdf82b1c7999dc7dfc9cc0a8b606b76fcdf2dbe0c29142d153b943',
+  num_ast_nodes: Long('502'),
+  num_cfg_edges: Long('82'),
+  num_dfg_edges: Long('42'),
+  num_call_edges: Long('44'),
+  num_total_edges: Long('168'),
+  parse_duration_ms: Long('142'),
   status: 'success'
 }

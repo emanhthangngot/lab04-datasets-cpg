@@ -19,8 +19,20 @@ def test_kafka_capture_uses_topic_specific_sample_counts() -> None:
     assert '--max-messages "$sample_count"' in source
     assert 'capture_samples cpg.nodes "$SAMPLE_COUNT"' in source
     assert 'capture_samples cpg.edges "$SAMPLE_COUNT"' in source
-    assert "capture_samples cpg.metadata 5" in source
+    assert 'capture_samples cpg.metadata "$METADATA_CAPTURE_COUNT"' in source
+    assert "METADATA_CAPTURE_COUNT:?" in source
     assert "capture_samples cpg.errors 1" in source
+
+
+def test_stage2_runtime_processes_the_full_discovered_repository() -> None:
+    source = (ROOT / "scripts" / "run_stage2_evidence.sh").read_text()
+
+    assert "discover_python_files" in source
+    assert 'export EXPECTED_MONGO_COUNT="$EXPECTED_FILE_COUNT"' in source
+    assert 'export METADATA_CAPTURE_COUNT="$EXPECTED_FILE_COUNT"' in source
+    assert "--mode full" in source
+    assert "--mode sample" not in source
+    assert "printenv REPO_NAME | tail -n 1" in source
 
 
 def test_mongo_express_profile_is_isolated_and_read_only() -> None:
@@ -150,10 +162,12 @@ def test_build_manifest_derives_metrics_and_artifact_hashes(tmp_path: Path) -> N
         pipeline_commit="b" * 40,
         dataset_commit=commit_sha,
         captured_at="2026-07-16T07:05:00Z",
+        expected_file_count=5,
     )
 
     assert manifest["run"]["parser_run_id"] == "parser-run"
     assert manifest["run"]["error_run_id"] == "error-run"
+    assert manifest["run"]["files_processed"] == 5
     assert manifest["metrics"]["kafka"] == {
         "node_events": 15,
         "unique_node_ids": 15,
@@ -172,6 +186,20 @@ def test_build_manifest_derives_metrics_and_artifact_hashes(tmp_path: Path) -> N
     assert manifest["metrics"]["spark"]["metadata_offset"] == 5
     assert manifest["artifacts"]
     assert all(len(artifact["sha256"]) == 64 for artifact in manifest["artifacts"])
+
+
+def test_build_manifest_rejects_partial_repository_evidence(tmp_path: Path) -> None:
+    commit_sha = "a" * 40
+    _write_stage2_fixture(tmp_path, commit_sha)
+
+    with pytest.raises(manifest_tool.EvidenceError, match="discovered source-file count"):
+        manifest_tool.build_manifest(
+            tmp_path,
+            pipeline_commit="b" * 40,
+            dataset_commit=commit_sha,
+            captured_at="2026-07-16T07:05:00Z",
+            expected_file_count=223,
+        )
 
 
 def test_build_manifest_rejects_unknown_commit_sha(tmp_path: Path) -> None:

@@ -14,8 +14,6 @@ from typing import Any
 REPLAY_RELATIVE = Path("screenshots/replay")
 MANIFEST_NAME = "stage3_replay_manifest.json"
 TARGET_FILE = "src/datasets/__init__.py"
-TARGET_FILE_ID = "6c39568a6a11c430"
-DATASET_COMMIT = "41adfd0f9ee9ba3a6b4f719d5b551c5b19ae45e2"
 
 JSON_ARTIFACTS = (
     "run_metadata.json",
@@ -37,54 +35,6 @@ TEXT_ARTIFACTS = ("source_patch.diff", "neo4j_cleanup.txt")
 PNG_ARTIFACTS = ("neo4j_after_cleanup.png", "mongodb_after_replay.png")
 REQUIRED_ARTIFACTS = JSON_ARTIFACTS + TEXT_ARTIFACTS + PNG_ARTIFACTS
 CANONICAL_TEXT_ARTIFACTS = frozenset(JSON_ARTIFACTS + TEXT_ARTIFACTS)
-
-EXPECTED_KAFKA_BEFORE = {
-    "cpg.nodes": 21415,
-    "cpg.edges": 7968,
-    "cpg.metadata": 5,
-    "cpg.errors": 1,
-    "unique_node_ids": 21415,
-    "unique_edge_ids": 7968,
-}
-EXPECTED_KAFKA_AFTER = {
-    "cpg.nodes": 21438,
-    "cpg.edges": 7984,
-    "cpg.metadata": 6,
-    "cpg.errors": 1,
-    "unique_node_ids": 21422,
-    "unique_edge_ids": 7971,
-}
-EXPECTED_NEO4J_BEFORE = {
-    "explicit_nodes": 21415,
-    "placeholders": 1213,
-    "edges": 7968,
-    "target_nodes": 19,
-    "target_edges": 15,
-    "duplicate_node_groups": 0,
-    "duplicate_edge_groups": 0,
-}
-EXPECTED_NEO4J_PRE_CLEANUP = {
-    "explicit_nodes": 21422,
-    "placeholders": 1213,
-    "edges": 7971,
-    "target_nodes": 26,
-    "target_edges": 18,
-    "stale_nodes": 3,
-    "stale_edges": 2,
-}
-EXPECTED_NEO4J_AFTER = {
-    "explicit_nodes": 21419,
-    "placeholders": 1213,
-    "edges": 7969,
-    "target_nodes": 23,
-    "target_edges": 16,
-    "stale_nodes": 0,
-    "stale_edges": 0,
-    "old_run_entities": 0,
-    "duplicate_node_groups": 0,
-    "duplicate_edge_groups": 0,
-}
-
 
 class EvidenceError(ValueError):
     """Raised when replay evidence cannot support a Stage 3 pass claim."""
@@ -145,20 +95,28 @@ def _check_artifacts(replay: Path) -> None:
 
 def _validate_mongodb(
     before: dict[str, Any], restarted: dict[str, Any], after: dict[str, Any], run: dict[str, Any]
-) -> int:
+) -> tuple[int, int, dict[str, Any]]:
+    baseline_documents = before.get("documents_by_file_id")
+    _require(isinstance(baseline_documents, dict), "MongoDB baseline file map invalid")
+    expected_documents = len(baseline_documents)
+    _require(expected_documents > 0, "MongoDB baseline must contain metadata documents")
+
     for label, payload in (
         ("MongoDB before", before),
         ("MongoDB after restart", restarted),
         ("MongoDB after replay", after),
     ):
-        _require_exact(payload.get("documents"), 5, f"{label} document count")
+        _require_exact(payload.get("documents"), expected_documents, f"{label} document count")
         _require_exact(
             payload.get("duplicate_file_id_groups"), 0, f"{label} duplicate file_id groups"
         )
         documents = payload.get("documents_by_file_id")
-        _require(isinstance(documents, dict) and len(documents) == 5, f"{label} file map invalid")
+        _require(
+            isinstance(documents, dict) and len(documents) == expected_documents,
+            f"{label} file map invalid",
+        )
 
-    baseline = before["documents_by_file_id"]
+    baseline = baseline_documents
     _require_exact(restarted["documents_by_file_id"], baseline, "MongoDB checkpoint restart")
     replayed = after["documents_by_file_id"]
     file_id = run["file_id"]
@@ -184,8 +142,8 @@ def _validate_mongodb(
             replayed.get(current_file_id), baseline_document, f"unchanged MongoDB file {current_file_id}"
         )
         unchanged += 1
-    _require_exact(unchanged, 4, "unchanged MongoDB document count")
-    return unchanged
+    _require_exact(unchanged, expected_documents - 1, "unchanged MongoDB document count")
+    return unchanged, expected_documents, replayed[file_id]
 
 
 def _build_manifest(root: Path) -> dict[str, Any]:
@@ -194,10 +152,12 @@ def _build_manifest(root: Path) -> dict[str, Any]:
     data = {name: _read_json(replay / name) for name in JSON_ARTIFACTS}
     run = data["run_metadata.json"]
 
-    _require_exact(run.get("dataset_commit"), DATASET_COMMIT, "dataset commit")
     _require_exact(run.get("dataset_repo"), "huggingface/datasets", "dataset repo")
     _require_exact(run.get("target_file"), TARGET_FILE, "replay target")
-    _require_exact(run.get("file_id"), TARGET_FILE_ID, "replay file_id")
+    _require(
+        bool(re.fullmatch(r"[0-9a-f]{16}", str(run.get("file_id", "")))),
+        "invalid replay file_id",
+    )
     _require(bool(run.get("source_restored")), "source was not restored")
     _require(
         run.get("baseline_run_id") and run.get("replay_run_id")
@@ -209,18 +169,33 @@ def _build_manifest(root: Path) -> dict[str, Any]:
     for key in ("before_content_hash", "after_content_hash"):
         _require(bool(re.fullmatch(r"[0-9a-f]{64}", str(run.get(key, "")))), f"invalid {key}")
 
+    unchanged_documents, document_count, _replay_document = _validate_mongodb(
+        data["mongodb_before.json"],
+        data["mongodb_after_restart.json"],
+        data["mongodb_after_replay.json"],
+        run,
+    )
+
     kafka_before = data["kafka_offsets_before.json"]
     kafka_after = data["kafka_offsets_after.json"]
     kafka_graph_counts = data["kafka_graph_counts_after.json"]
-    _require_exact(kafka_before, EXPECTED_KAFKA_BEFORE, "Kafka baseline")
-    _require_exact(kafka_after, EXPECTED_KAFKA_AFTER, "Kafka replay")
+    required_kafka = {
+        "cpg.nodes",
+        "cpg.edges",
+        "cpg.metadata",
+        "cpg.errors",
+        "unique_node_ids",
+        "unique_edge_ids",
+    }
+    _require_exact(set(kafka_before), required_kafka, "Kafka baseline fields")
+    _require_exact(set(kafka_after), required_kafka, "Kafka replay fields")
     _require_exact(
         kafka_graph_counts,
         {
-            "node_events": 21438,
-            "unique_node_ids": 21422,
-            "edge_events": 7984,
-            "unique_edge_ids": 7971,
+            "node_events": kafka_after["cpg.nodes"],
+            "unique_node_ids": kafka_after["unique_node_ids"],
+            "edge_events": kafka_after["cpg.edges"],
+            "unique_edge_ids": kafka_after["unique_edge_ids"],
         },
         "Kafka replay graph counts",
     )
@@ -228,38 +203,72 @@ def _build_manifest(root: Path) -> dict[str, Any]:
         topic: kafka_after[topic] - kafka_before[topic]
         for topic in ("cpg.nodes", "cpg.edges", "cpg.metadata", "cpg.errors")
     }
-    _require_exact(
-        kafka_delta,
-        {"cpg.nodes": 23, "cpg.edges": 16, "cpg.metadata": 1, "cpg.errors": 0},
-        "Kafka replay delta",
-    )
+    _require_exact(kafka_delta["cpg.metadata"], 1, "Kafka metadata replay delta")
+    _require_exact(kafka_delta["cpg.errors"], 0, "Kafka error replay delta")
+    _require(kafka_delta["cpg.nodes"] > 0, "Kafka replay emitted no node events")
+    _require(kafka_delta["cpg.edges"] >= 0, "Kafka edge replay delta is invalid")
+    _require(kafka_after["unique_node_ids"] >= kafka_before["unique_node_ids"], "unique nodes regressed")
+    _require(kafka_after["unique_edge_ids"] >= kafka_before["unique_edge_ids"], "unique edges regressed")
 
     spark_before = data["spark_checkpoint_before.json"]
     spark_restarted = data["spark_checkpoint_after_restart.json"]
     spark_after = data["spark_checkpoint_after_replay.json"]
-    _require_exact(spark_before.get("metadata_offset"), 5, "Spark baseline checkpoint")
-    _require_exact(spark_restarted.get("metadata_offset"), 5, "Spark restart checkpoint")
-    _require_exact(spark_after.get("metadata_offset"), 6, "Spark replay checkpoint")
+    baseline_offset = kafka_before["cpg.metadata"]
+    _require_exact(baseline_offset, document_count, "baseline metadata/document count")
+    _require_exact(
+        spark_before.get("metadata_offset"), baseline_offset, "Spark baseline checkpoint"
+    )
+    _require_exact(
+        spark_restarted.get("metadata_offset"), baseline_offset, "Spark restart checkpoint"
+    )
+    _require_exact(
+        spark_after.get("metadata_offset"), baseline_offset + 1, "Spark replay checkpoint"
+    )
 
     neo4j_before = data["neo4j_before.json"]
     neo4j_pre = data["neo4j_pre_cleanup.json"]
     neo4j_after = data["neo4j_after.json"]
-    _require_exact(neo4j_before, EXPECTED_NEO4J_BEFORE, "Neo4j baseline")
-    _require_exact(neo4j_pre, EXPECTED_NEO4J_PRE_CLEANUP, "Neo4j pre-cleanup")
-    _require_exact(neo4j_after, EXPECTED_NEO4J_AFTER, "Neo4j final")
+    _require_exact(neo4j_before.get("duplicate_node_groups"), 0, "baseline duplicate nodes")
+    _require_exact(neo4j_before.get("duplicate_edge_groups"), 0, "baseline duplicate edges")
+    _require_exact(
+        neo4j_before.get("explicit_nodes"), kafka_before["unique_node_ids"], "baseline Neo4j nodes"
+    )
+    _require_exact(neo4j_before.get("edges"), kafka_before["unique_edge_ids"], "baseline Neo4j edges")
+    _require_exact(
+        neo4j_pre.get("explicit_nodes"), kafka_after["unique_node_ids"], "pre-cleanup Neo4j nodes"
+    )
+    _require_exact(neo4j_pre.get("edges"), kafka_after["unique_edge_ids"], "pre-cleanup Neo4j edges")
+    _require_exact(
+        neo4j_after.get("target_nodes"), kafka_delta["cpg.nodes"], "final target nodes"
+    )
+    _require_exact(
+        neo4j_after.get("target_edges"), kafka_delta["cpg.edges"], "final target edges"
+    )
+    _require_exact(
+        neo4j_after.get("explicit_nodes"),
+        neo4j_pre["explicit_nodes"] - neo4j_pre["stale_nodes"],
+        "final Neo4j node cleanup",
+    )
+    _require_exact(
+        neo4j_after.get("edges"),
+        neo4j_pre["edges"] - neo4j_pre["stale_edges"],
+        "final Neo4j edge cleanup",
+    )
+    for key in ("stale_nodes", "stale_edges", "old_run_entities", "duplicate_node_groups", "duplicate_edge_groups"):
+        _require_exact(neo4j_after.get(key), 0, f"final Neo4j {key}")
+    _require_exact(
+        neo4j_after.get("placeholders"), neo4j_before.get("placeholders"), "placeholder count"
+    )
 
     cleanup_text = (replay / "neo4j_cleanup.txt").read_text(encoding="utf-8")
     edge_match = re.search(r"stale_edges_deleted=(\d+)", cleanup_text)
     node_match = re.search(r"stale_nodes_deleted=(\d+)", cleanup_text)
     _require(bool(edge_match and node_match), "Neo4j cleanup counts are missing")
     stale_deleted = {"nodes": int(node_match.group(1)), "edges": int(edge_match.group(1))}
-    _require_exact(stale_deleted, {"nodes": 3, "edges": 2}, "Neo4j stale deletion")
-
-    unchanged_documents = _validate_mongodb(
-        data["mongodb_before.json"],
-        data["mongodb_after_restart.json"],
-        data["mongodb_after_replay.json"],
-        run,
+    _require_exact(
+        stale_deleted,
+        {"nodes": neo4j_pre["stale_nodes"], "edges": neo4j_pre["stale_edges"]},
+        "Neo4j stale deletion",
     )
 
     metadata = data["evidence_metadata.json"]
@@ -300,9 +309,9 @@ def _build_manifest(root: Path) -> dict[str, Any]:
             "delta": kafka_delta,
         },
         "spark": {
-            "metadata_offset_before": 5,
-            "metadata_offset_after_restart": 5,
-            "metadata_offset_after_replay": 6,
+            "metadata_offset_before": baseline_offset,
+            "metadata_offset_after_restart": baseline_offset,
+            "metadata_offset_after_replay": baseline_offset + 1,
             "completed_batch_before": spark_before.get("completed_batch"),
             "completed_batch_after_restart": spark_restarted.get("completed_batch"),
             "completed_batch_after_replay": spark_after.get("completed_batch"),
@@ -314,9 +323,9 @@ def _build_manifest(root: Path) -> dict[str, Any]:
             "stale_deleted": stale_deleted,
         },
         "mongodb": {
-            "documents_before": 5,
-            "documents_after_restart": 5,
-            "documents_after_replay": 5,
+            "documents_before": document_count,
+            "documents_after_restart": document_count,
+            "documents_after_replay": document_count,
             "unchanged_documents": unchanged_documents,
             "duplicate_file_id_groups": 0,
         },

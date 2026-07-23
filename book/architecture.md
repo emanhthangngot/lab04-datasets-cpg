@@ -1,20 +1,24 @@
 # Architecture
 
-![Stage 2 CPG streaming architecture](_static/stage2_pipeline.png)
+![Full-repository CPG streaming architecture](_static/cpg_pipeline.svg)
 
-The editable source is [`stage2_pipeline.excalidraw`](_static/stage2_pipeline.excalidraw). It records the same dataset and pipeline route as `screenshots/stage2_manifest.json`; the exact capture time and artifact hashes remain in that validated manifest.
+The diagram is an editable SVG stored with the book. It explicitly shows the
+Neo4j Kafka Connector and the independent Spark metadata route.
 
 ## Why the routes are separate
 
 `cpg.nodes` and `cpg.edges` go directly from Kafka Connect to Neo4j. Spark is not between Kafka and Neo4j because the Neo4j sink already provides the required direct, idempotent graph upserts. Adding Spark there would create an unnecessary transformation and checkpoint layer.
 
-Only `cpg.metadata` goes through Spark Structured Streaming. Spark validates and reshapes file summaries, commits Kafka offset 5, and upserts five documents into MongoDB by `file_id`. `cpg.errors` is retained as an observable failure/evidence stream.
+Only `cpg.metadata` goes through Spark Structured Streaming. Spark validates
+file summaries, resumes from its checkpoint, and upserts exactly one document
+per discovered source file into MongoDB by `file_id`. `cpg.errors` is retained
+as an observable failure/evidence stream.
 
 ## Services and local ports
 
 | Service | Compose role | Local port |
 |---|---|---:|
-| Kafka broker | Four CPG topics | `9092` |
+| Kafka broker | Four CPG topics | `29092` host / `9092` Compose |
 | Kafka Connect | Neo4j sink REST API | `8083` |
 | Neo4j | Browser / Bolt | `7474` / `7687` |
 | MongoDB | Metadata store | `27017` |

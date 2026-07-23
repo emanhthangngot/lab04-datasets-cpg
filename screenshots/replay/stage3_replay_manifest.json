@@ -1,104 +1,104 @@
 {
   "artifacts": {
-    "screenshots/replay/evidence_metadata.json": "28b5ae207e254f4e64b85412567751d9f93dfade349494e2506a23ec906c52de",
-    "screenshots/replay/kafka_graph_counts_after.json": "0e1cb1e2175bce71622c2e0a7e91cd7dd72c233c30e64cf2af97670b5aeb3794",
-    "screenshots/replay/kafka_offsets_after.json": "ee0488286bf4b6333c50201cb2f3df456c3018dfde84a83530b323eb56eb2d18",
-    "screenshots/replay/kafka_offsets_before.json": "c78e380af35e701602063a97276b7735306ce6114631e08829f4de1bbbd190db",
-    "screenshots/replay/mongodb_after_replay.json": "f78e012aadd40c2b8ebfd347af259ba8c7bca44e0cc5e5347bbc8cfd1f498830",
-    "screenshots/replay/mongodb_after_replay.png": "4073b13640a2797fb13103847c3e8a6523d087ac6bd7286d75364ca063059821",
-    "screenshots/replay/mongodb_after_restart.json": "5cc2dbbd39c345847d4c61fdae9dd66b79e4ddf02c6288739acf94aefddfea73",
-    "screenshots/replay/mongodb_before.json": "5cc2dbbd39c345847d4c61fdae9dd66b79e4ddf02c6288739acf94aefddfea73",
-    "screenshots/replay/neo4j_after.json": "740da29836408d2a3b0b47e42e5a580e81d524071d3b8894d579427b3a36ab40",
-    "screenshots/replay/neo4j_after_cleanup.png": "13ddc51e81da0e9ad4b39b54002996312a9e061ceacc29a8bcb56e0837410e7d",
-    "screenshots/replay/neo4j_before.json": "2121ea64ed78f757605ade90d2a2cf43a80aa164ce7acaa0975bc5575f17806e",
-    "screenshots/replay/neo4j_cleanup.txt": "c4c2e6f28860cda67c98d4e9c7d8f51abaa4210a5aebde7edad8000040e5c27a",
-    "screenshots/replay/neo4j_pre_cleanup.json": "aa8e332bc5234c444abb9134bc0f8d29200e134b8ee3517037c0d29cb631feab",
-    "screenshots/replay/run_metadata.json": "61cd9d81c8aa37152f1cf33a214045fe76c4bc8ebdff5b4733f8e3cb52546a75",
-    "screenshots/replay/source_patch.diff": "72c601a8d401f7a8862922e9928f4ff6c0a302b09b2678bfb1b7b30d5266d382",
-    "screenshots/replay/spark_checkpoint_after_replay.json": "ec7322878e73d5498489d79db5a26c81f069341454df0d6155bd658560cbc51a",
-    "screenshots/replay/spark_checkpoint_after_restart.json": "70a4b732dbb6d1ef75330eaf3cfae3a856c1f599688dec02b9552d8b34fcace3",
-    "screenshots/replay/spark_checkpoint_before.json": "70a4b732dbb6d1ef75330eaf3cfae3a856c1f599688dec02b9552d8b34fcace3"
+    "screenshots/replay/evidence_metadata.json": "386938aa141153b554dbe34db1fce08fd5ba27cf3b183be8416d0a3121e6cbd4",
+    "screenshots/replay/kafka_graph_counts_after.json": "4a8e35e17e7147524e8fbb73f4548055284f29a96b484687bc81a77ac45b4871",
+    "screenshots/replay/kafka_offsets_after.json": "29812f05eb6b393119d2be748d127ad0073d3237a5ff4b6c66a432160f42b678",
+    "screenshots/replay/kafka_offsets_before.json": "8e424fd6bac9e979a3d34832f61b98975c43c37319d025fa42b1862c82ce2124",
+    "screenshots/replay/mongodb_after_replay.json": "49024f82cca54c9bfba484d53bad61c734db6ee5a1b66bce0c400dab4132b927",
+    "screenshots/replay/mongodb_after_replay.png": "03784e82982458fcaf97c211e6ea66391c76c8e3b0f786baa38ca8b2ef2aef5e",
+    "screenshots/replay/mongodb_after_restart.json": "e7876ad0547310e15e9336dd3c39854e280e5f87fd4e479719f180f2878f3d98",
+    "screenshots/replay/mongodb_before.json": "e7876ad0547310e15e9336dd3c39854e280e5f87fd4e479719f180f2878f3d98",
+    "screenshots/replay/neo4j_after.json": "264b8a3122218a83b5a3b44c7f911aa16f35805a459d1c0f7c238009886d0040",
+    "screenshots/replay/neo4j_after_cleanup.png": "7e8df9fbb81d77b24589e45dcd38dac1cec420f9186cb39a9474d662b4aa0602",
+    "screenshots/replay/neo4j_before.json": "657d80f94c4467babeb32684ccb83a7ee06e70dd3509190b65b45e30dc810016",
+    "screenshots/replay/neo4j_cleanup.txt": "b357062ecd5eed30115da721c34d4afda43957f53b438f40ff7901f553b89781",
+    "screenshots/replay/neo4j_pre_cleanup.json": "022d4f86c1d8218452848024136436bcee8630ef5f0889da60aec4974b874ea3",
+    "screenshots/replay/run_metadata.json": "40914db6259e53a671b714c8d33cc44646b9ec4cf98a5057d6e46ed78e206057",
+    "screenshots/replay/source_patch.diff": "f517333761f26ace128bfbb28b0d89a2799226144f070c7c85d9e59b68288663",
+    "screenshots/replay/spark_checkpoint_after_replay.json": "b173dce2cdbb54c5d25256559c214bd332cebae850547d23079430d03786b659",
+    "screenshots/replay/spark_checkpoint_after_restart.json": "bd8c2c3adf07587e5ec56279c07f88a69189c1990d268815e7e5935f3a026c4a",
+    "screenshots/replay/spark_checkpoint_before.json": "bd8c2c3adf07587e5ec56279c07f88a69189c1990d268815e7e5935f3a026c4a"
   },
   "kafka": {
     "after": {
-      "cpg.edges": 7984,
+      "cpg.edges": 38157,
       "cpg.errors": 1,
-      "cpg.metadata": 6,
-      "cpg.nodes": 21438,
-      "unique_edge_ids": 7971,
-      "unique_node_ids": 21422
+      "cpg.metadata": 139,
+      "cpg.nodes": 133324,
+      "unique_edge_ids": 38144,
+      "unique_node_ids": 133288
     },
     "before": {
-      "cpg.edges": 7968,
+      "cpg.edges": 38141,
       "cpg.errors": 1,
-      "cpg.metadata": 5,
-      "cpg.nodes": 21415,
-      "unique_edge_ids": 7968,
-      "unique_node_ids": 21415
+      "cpg.metadata": 138,
+      "cpg.nodes": 133263,
+      "unique_edge_ids": 38141,
+      "unique_node_ids": 133263
     },
     "delta": {
       "cpg.edges": 16,
       "cpg.errors": 0,
       "cpg.metadata": 1,
-      "cpg.nodes": 23
+      "cpg.nodes": 61
     },
     "graph_counts_after": {
-      "edge_events": 7984,
-      "node_events": 21438,
-      "unique_edge_ids": 7971,
-      "unique_node_ids": 21422
+      "edge_events": 38157,
+      "node_events": 133324,
+      "unique_edge_ids": 38144,
+      "unique_node_ids": 133288
     }
   },
   "mongodb": {
-    "documents_after_replay": 5,
-    "documents_after_restart": 5,
-    "documents_before": 5,
+    "documents_after_replay": 138,
+    "documents_after_restart": 138,
+    "documents_before": 138,
     "duplicate_file_id_groups": 0,
-    "unchanged_documents": 4
+    "unchanged_documents": 137
   },
   "neo4j": {
     "after": {
       "duplicate_edge_groups": 0,
       "duplicate_node_groups": 0,
-      "edges": 7969,
-      "explicit_nodes": 21419,
+      "edges": 38142,
+      "explicit_nodes": 133267,
       "old_run_entities": 0,
-      "placeholders": 1213,
+      "placeholders": 1935,
       "stale_edges": 0,
       "stale_nodes": 0,
       "target_edges": 16,
-      "target_nodes": 23
+      "target_nodes": 61
     },
     "before": {
       "duplicate_edge_groups": 0,
       "duplicate_node_groups": 0,
-      "edges": 7968,
-      "explicit_nodes": 21415,
-      "placeholders": 1213,
+      "edges": 38141,
+      "explicit_nodes": 133263,
+      "placeholders": 1935,
       "target_edges": 15,
-      "target_nodes": 19
+      "target_nodes": 57
     },
     "pre_cleanup": {
-      "edges": 7971,
-      "explicit_nodes": 21422,
-      "placeholders": 1213,
+      "edges": 38144,
+      "explicit_nodes": 133288,
+      "placeholders": 1935,
       "stale_edges": 2,
-      "stale_nodes": 3,
+      "stale_nodes": 21,
       "target_edges": 18,
-      "target_nodes": 26
+      "target_nodes": 82
     },
     "stale_deleted": {
       "edges": 2,
-      "nodes": 3
+      "nodes": 21
     }
   },
   "run": {
-    "baseline_run_id": "2088754454f44aa2b4394aff0c565d49",
-    "captured_at": "2026-07-17T00:20:53Z",
+    "baseline_run_id": "8c3efe458b3b43eaa1399d7740848d3f",
+    "captured_at": "2026-07-23T06:56:48Z",
     "dataset_commit": "41adfd0f9ee9ba3a6b4f719d5b551c5b19ae45e2",
     "dataset_repo": "huggingface/datasets",
-    "pipeline_commit": "844339e630b674e8cb49de6aea7cdc213ad30eed",
-    "replay_run_id": "stage3-replay-20260717T002053Z"
+    "pipeline_commit": "dc8302084e4cac111b912ca5f2e662c30b794a50",
+    "replay_run_id": "stage3-replay-20260723T065648Z"
   },
   "schema_version": "1.0",
   "source": {
@@ -109,12 +109,12 @@
     "target_file": "src/datasets/__init__.py"
   },
   "spark": {
-    "completed_batch_after_replay": 1,
-    "completed_batch_after_restart": 0,
-    "completed_batch_before": 0,
-    "metadata_offset_after_replay": 6,
-    "metadata_offset_after_restart": 5,
-    "metadata_offset_before": 5
+    "completed_batch_after_replay": 2,
+    "completed_batch_after_restart": 1,
+    "completed_batch_before": 1,
+    "metadata_offset_after_replay": 139,
+    "metadata_offset_after_restart": 138,
+    "metadata_offset_before": 138
   },
   "stage": 3,
   "status": "pass"

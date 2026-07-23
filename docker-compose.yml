@@ -68,7 +68,7 @@ services:
       - "7474:7474"
       - "7687:7687"
     environment:
-      NEO4J_AUTH: neo4j/password
+      NEO4J_AUTH: "neo4j/${NEO4J_PASSWORD:-password}"
       # Five-file Stage 2 ingestion fits comfortably while leaving room for
       # Kafka Connect, Spark, MongoDB, and the broker on a 4 GiB Docker VM.
       NEO4J_server_memory_heap_initial__size: 512M
@@ -141,7 +141,7 @@ services:
       dockerfile: parser_service/Dockerfile
     container_name: lab04-parser
     # The parser is a one-shot producer. Keep it out of a default `compose up`
-    # so the evidence runbook emits each sample batch exactly once.
+    # so the evidence runbook emits the repository batch exactly once.
     profiles: ["manual"]
     depends_on:
       broker:

@@ -11,7 +11,8 @@ import sys
 
 from pyspark.sql import SparkSession
 from pyspark import StorageLevel
-from pyspark.sql.functions import col, from_json
+from pyspark.sql import Window
+from pyspark.sql.functions import col, from_json, row_number
 from pyspark.sql.types import LongType, StringType, StructType
 
 # ---------------------------------------------------------------------------
@@ -81,8 +82,14 @@ raw = (
     .load()
 )
 
-metadata_df = raw.select(from_json(col("value").cast("string"), schema).alias("data")).select(
-    "data.*"
+metadata_df = (
+    raw.select(
+        from_json(col("value").cast("string"), schema).alias("data"),
+        col("partition").alias("_kafka_partition"),
+        col("offset").alias("_kafka_offset"),
+    )
+    .select("data.*", "_kafka_partition", "_kafka_offset")
+    .filter(col("file_id").isNotNull() & (col("status") == "success"))
 )
 
 
@@ -94,14 +101,27 @@ def write_batch(batch_df, batch_id):
 
     batch_df = batch_df.persist(StorageLevel.MEMORY_AND_DISK)
     try:
-        row_count = batch_df.count()
+        latest_per_file = (
+            batch_df.withColumn(
+                "_row_number",
+                row_number().over(
+                    Window.partitionBy("file_id").orderBy(
+                        col("_kafka_offset").desc(),
+                        col("_kafka_partition").desc(),
+                    )
+                ),
+            )
+            .filter(col("_row_number") == 1)
+            .drop("_row_number", "_kafka_partition", "_kafka_offset")
+        )
+        row_count = latest_per_file.count()
         if row_count == 0:
             return
 
         print(f"[Batch {batch_id}] Writing {row_count} metadata document(s) to MongoDB")
 
         (
-            batch_df.write.format("mongodb")
+            latest_per_file.write.format("mongodb")
             .mode("append")
             .option("spark.mongodb.write.database", MONGO_DATABASE)
             .option("spark.mongodb.write.collection", MONGO_COLLECTION)

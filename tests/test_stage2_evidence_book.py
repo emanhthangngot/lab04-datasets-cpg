@@ -35,16 +35,17 @@ def test_duplicate_task_1_to_5_notebooks_are_removed() -> None:
 def test_store_chapters_reference_real_evidence() -> None:
     neo4j = json.dumps(_notebook(4, "neo4j"))
     mongodb = json.dumps(_notebook(5, "mongodb"))
+    manifest = json.loads((ROOT / "screenshots" / "stage2_manifest.json").read_text())
     assert "node_count.txt" in neo4j
-    assert "22628" in neo4j
+    assert str(manifest["metrics"]["neo4j"]["total_nodes"]) in neo4j
     assert "metadata_evidence.txt" in mongodb
-    assert "5" in mongodb
+    assert str(manifest["metrics"]["mongodb"]["documents"]) in mongodb
 
 
 def test_architecture_page_embeds_editable_diagram_and_explains_routes() -> None:
     source = (BOOK / "architecture.md").read_text()
-    assert "_static/stage2_pipeline.png" in source
-    assert "stage2_pipeline.excalidraw" in source
+    assert "_static/cpg_pipeline.svg" in source
+    assert (BOOK / "_static" / "cpg_pipeline.svg").is_file()
     assert "Spark is not between Kafka and Neo4j" in source
     assert "Pending" not in source
 

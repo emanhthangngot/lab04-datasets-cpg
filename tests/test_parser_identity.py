@@ -8,7 +8,7 @@ from parser_service.parser import process_file
 from parser_service.producer import DryRunProducer
 
 
-def test_five_file_sample_emits_unique_node_and_edge_ids() -> None:
+def test_discovered_subset_emits_unique_node_and_edge_ids() -> None:
     repo_root = Path("data/datasets").resolve()
     if not (repo_root / "src" / "datasets").is_dir():
         pytest.skip("huggingface/datasets clone is not available")

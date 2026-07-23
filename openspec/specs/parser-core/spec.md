@@ -24,6 +24,17 @@ The parser MUST generate deterministic identifiers for all node and edge events,
 - THEN the generated IDs are stable across multiple runs
 - AND edge IDs are stable hashes of their source ID, target ID, and edge type
 
+### Requirement: Every Internal Edge Endpoint Is Materialized
+
+Every CFG, DFG, and resolved-call endpoint MUST have a corresponding emitted
+node event. Only unresolved external calls MAY target placeholder nodes.
+
+#### Scenario: Internal endpoint audit
+- GIVEN every discovered source file has been parsed
+- WHEN all internal edge source and target IDs are compared with emitted node IDs
+- THEN the missing internal endpoint set is empty
+- AND every function has one deterministic synthetic `FunctionExit` node
+
 ### Requirement: Control Flow Graph (CFG) Extraction
 
 The parser SHALL construct control flow edges between statements inside the same scope.
@@ -70,16 +81,16 @@ The parser MUST calculate `num_total_edges` explicitly.
 ### Requirement: Canonical Modified-File Replay
 
 The parser replay SHALL process only the accepted baseline file
-`src/datasets/__init__.py` with stable `file_id` `6c39568a6a11c430`, the exact
-dataset commit, and a new non-empty `run_id`.
+`src/datasets/__init__.py` with a stable file ID derived from repository and
+path, the exact dataset commit, and a new non-empty `run_id`.
 
 #### Scenario: Deterministic source mutation
 
 - **WHEN** the Stage 3 runbook replaces the accepted version assignment with
   the annotated replay version and `LAB04_REPLAY_MARKER`
 - **THEN** the file content hash differs from the baseline hash
-- **AND** parser metadata reports 23 AST nodes and 16 total edges instead of
-  19 AST nodes and 15 total edges
+- **AND** parser metadata reports the complete semantic AST and current total
+  edge counts for the modified source
 - **AND** the replay emits one metadata event for that file only
 
 #### Scenario: Source restoration

@@ -14,6 +14,7 @@ KAFKA_SERVICE="${KAFKA_SERVICE:-broker}"
 BOOTSTRAP="${KAFKA_BOOTSTRAP_INTERNAL:-broker:9092}"
 EVIDENCE_DIR="screenshots/kafka"
 SAMPLE_COUNT="${SAMPLE_COUNT:-3}"
+: "${METADATA_CAPTURE_COUNT:?Set METADATA_CAPTURE_COUNT to the discovered source-file count}"
 : "${EXPECTED_COMMIT_SHA:?Set EXPECTED_COMMIT_SHA to the cloned dataset Git SHA}"
 
 if [[ -x ".venv/Scripts/python.exe" ]]; then
@@ -117,7 +118,7 @@ else:
 
 capture_samples cpg.nodes "$SAMPLE_COUNT"
 capture_samples cpg.edges "$SAMPLE_COUNT"
-capture_samples cpg.metadata 5
+capture_samples cpg.metadata "$METADATA_CAPTURE_COUNT"
 capture_samples cpg.errors 1
 
 # --------------------------------------------------------------------------

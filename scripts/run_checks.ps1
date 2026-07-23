@@ -42,9 +42,7 @@ Set-Location -LiteralPath $repoRoot
 
 $python = Get-PythonCommand
 $env:PYTHONUTF8 = "1"
-$env:TMP = $repoRoot.Path
-$env:TEMP = $repoRoot.Path
-$env:TMPDIR = $repoRoot.Path
+$pytestBaseTemp = Join-Path ([System.IO.Path]::GetTempPath()) "lab04-pytest-$PID"
 
 Write-Host "==> Codex config"
 $doctorScript = Join-Path $repoRoot ".codex\scripts\doctor.sh"
@@ -66,11 +64,17 @@ else {
 Write-Host ""
 
 Invoke-Step "Python tests" {
-    & $python -m pytest
+    & $python -m pytest --basetemp $pytestBaseTemp -p no:cacheprovider
 }
 
 Invoke-Step "Docker Compose syntax" {
-    & docker compose config *> $null
+    $standaloneCompose = Get-Command docker-compose -ErrorAction SilentlyContinue
+    if ($null -ne $standaloneCompose) {
+        & $standaloneCompose.Source config *> $null
+    }
+    else {
+        & docker compose config *> $null
+    }
 }
 
 Invoke-Step "JSON connector config" {

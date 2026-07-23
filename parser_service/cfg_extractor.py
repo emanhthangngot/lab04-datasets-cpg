@@ -5,7 +5,13 @@ from __future__ import annotations
 import ast
 from typing import Iterable
 
-from .ids import assign_parents, get_scope_path, make_edge_id, make_node_id
+from .ids import (
+    assign_parents,
+    get_scope_path,
+    make_edge_id,
+    make_function_exit_id,
+    make_node_id,
+)
 from .schemas import build_edge_event
 
 
@@ -44,6 +50,15 @@ def _statement_lists(tree: ast.AST) -> Iterable[list[ast.stmt]]:
         orelse = getattr(node, "orelse", None)
         if isinstance(orelse, list) and orelse:
             yield orelse
+
+
+def _enclosing_function(node: ast.AST) -> ast.FunctionDef | ast.AsyncFunctionDef | None:
+    current = getattr(node, "_parent", None)
+    while current is not None:
+        if isinstance(current, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            return current
+        current = getattr(current, "_parent", None)
+    return None
 
 
 def extract_cfg_edges_gen(*, tree: ast.AST, file_id: str, file_path: str, context) -> Iterable[dict]:
@@ -103,8 +118,11 @@ def extract_cfg_edges_gen(*, tree: ast.AST, file_id: str, file_path: str, contex
                     context=context,
                 )
         elif isinstance(node, ast.Return):
+            function = _enclosing_function(node)
+            if function is None:
+                continue
             source_id = _node_id(file_id, node)
-            target_id = f"{file_id}:function_exit"
+            target_id = make_function_exit_id(file_id, function)
             yield build_edge_event(
                 context=context,
                 file_id=file_id,
@@ -113,6 +131,10 @@ def extract_cfg_edges_gen(*, tree: ast.AST, file_id: str, file_path: str, contex
                 source_id=source_id,
                 target_id=target_id,
                 edge_type="CFG_RETURN",
-                properties={"extractor": "cfg", "target": "function_exit"},
+                properties={
+                    "extractor": "cfg",
+                    "target": "function_exit",
+                    "function": function.name,
+                },
             )
 

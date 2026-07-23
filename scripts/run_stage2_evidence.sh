@@ -68,9 +68,24 @@ fi
 export EXPECTED_COMMIT_SHA="$DATASET_COMMIT_SHA"
 echo "Dataset commit SHA verified: $DATASET_COMMIT_SHA"
 
+EXPECTED_FILE_COUNT="$(
+  "$PYTHON" -c '
+from pathlib import Path
+from parser_service.discover import discover_python_files
+print(len(discover_python_files(Path("data/datasets").resolve())))
+'
+)"
+if ! [[ "$EXPECTED_FILE_COUNT" =~ ^[1-9][0-9]*$ ]]; then
+  echo "ERROR: invalid discovered Python file count: $EXPECTED_FILE_COUNT" >&2
+  exit 1
+fi
+export EXPECTED_MONGO_COUNT="$EXPECTED_FILE_COUNT"
+export METADATA_CAPTURE_COUNT="$EXPECTED_FILE_COUNT"
+echo "Full parser scope verified: $EXPECTED_FILE_COUNT Python files"
+
 echo ">>> Verifying parser repository identity"
 ACTUAL_REPO_NAME="$(
-  docker compose run --rm parser printenv REPO_NAME | tr -d '\r'
+  docker compose run --rm parser printenv REPO_NAME | tail -n 1 | tr -d '\r'
 )"
 if [ "$ACTUAL_REPO_NAME" != "$EXPECTED_REPO_NAME" ]; then
   echo "ERROR: parser REPO_NAME must be $EXPECTED_REPO_NAME, got $ACTUAL_REPO_NAME" >&2
@@ -125,12 +140,12 @@ bash scripts/capture_spark_evidence.sh &
 SPARK_PID=$!
 
 # --------------------------------------------------------------------------
-# Step 7: Run parser in sample mode
+# Step 7: Run parser across every discovered source file
 # --------------------------------------------------------------------------
-echo ">>> Step 7a: Run parser (sample mode - 5 files)"
+echo ">>> Step 7a: Run parser (full repository - $EXPECTED_FILE_COUNT files)"
 docker compose run --rm -e REPO_NAME="$EXPECTED_REPO_NAME" \
   -e COMMIT_SHA="$DATASET_COMMIT_SHA" parser \
-  python -m parser_service.main --repo data/datasets --mode sample
+  python -m parser_service.main --repo data/datasets --mode full
 
 # --------------------------------------------------------------------------
 # Step 7b: Parse intentionally broken file to generate cpg.errors event
@@ -201,7 +216,8 @@ echo ">>> Building and validating Stage 2 evidence manifest"
   --root . \
   --pipeline-commit "$PIPELINE_COMMIT_SHA" \
   --dataset-commit "$DATASET_COMMIT_SHA" \
-  --captured-at "$CAPTURED_AT"
+  --captured-at "$CAPTURED_AT" \
+  --expected-file-count "$EXPECTED_FILE_COUNT"
 "$PYTHON" scripts/stage2_evidence_manifest.py validate --root .
 echo "Stage 2 evidence manifest validated."
 
