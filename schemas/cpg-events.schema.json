@@ -51,29 +51,8 @@
     },
     "nodeType": {
       "type": "string",
-      "enum": [
-        "Module",
-        "Import",
-        "ImportFrom",
-        "ClassDef",
-        "FunctionDef",
-        "AsyncFunctionDef",
-        "Assign",
-        "AnnAssign",
-        "AugAssign",
-        "Return",
-        "If",
-        "For",
-        "While",
-        "Try",
-        "With",
-        "Call",
-        "Name",
-        "Attribute",
-        "Constant",
-        "BinOp",
-        "Compare"
-      ]
+      "minLength": 1,
+      "description": "Python AST class name or the synthetic FunctionExit type."
     },
     "edgeType": {
       "type": "string",

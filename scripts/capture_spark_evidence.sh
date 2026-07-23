@@ -18,7 +18,7 @@ CHECKPOINT_PATH="/mnt/checkpoints/cpg_metadata"
 WAIT_SECONDS="${SPARK_WAIT_SECONDS:-30}"
 COMMIT_WAIT_SECONDS="${SPARK_COMMIT_WAIT_SECONDS:-60}"
 MONGO_WAIT_SECONDS="${SPARK_MONGO_WAIT_SECONDS:-60}"
-EXPECTED_MONGO_COUNT="${EXPECTED_MONGO_COUNT:-5}"
+: "${EXPECTED_MONGO_COUNT:?Set EXPECTED_MONGO_COUNT to the discovered source-file count}"
 
 if [[ -x ".venv/Scripts/python.exe" ]]; then
   PYTHON=".venv/Scripts/python.exe"

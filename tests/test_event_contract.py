@@ -4,6 +4,7 @@ import re
 from pathlib import Path
 
 from parser_service.ast_extractor import extract_ast_nodes_gen
+from parser_service.parser import iter_edge_events
 from parser_service.ids import make_edge_id, make_external_target_id
 from parser_service.schemas import (
     build_edge_event,
@@ -185,6 +186,9 @@ def test_mongodb_writer_uses_connector_10_replace_options() -> None:
     assert 'option("spark.mongodb.write.idFieldList", "file_id")' in spark_source
     assert 'option("operationType", "replace")' not in spark_source
     assert 'option("idFieldList", "file_id")' not in spark_source
+    assert 'Window.partitionBy("file_id")' in spark_source
+    assert 'col("_kafka_offset").desc()' in spark_source
+    assert 'col("file_id").isNotNull()' in spark_source
 
 
 def test_neo4j_connector_references_only_schema_fields() -> None:
@@ -267,6 +271,45 @@ def test_internal_edges_reference_emitted_node_ids(tmp_path: Path) -> None:
 
     assert edge["source_id"] in nodes
     assert edge["target_id"] in nodes
+
+
+def test_extracted_internal_edges_reference_emitted_nodes(tmp_path: Path) -> None:
+    """CFG/DFG endpoints must never rely on anonymous Neo4j placeholders."""
+
+    context = DummyContext(repo_root=tmp_path)
+    tree = ast.parse(
+        "def transform(value):\n"
+        "    result = value + 1\n"
+        "    print(result)\n"
+        "    return result\n"
+    )
+    nodes = list(
+        extract_ast_nodes_gen(
+            tree=tree,
+            file_id="file",
+            file_path="src/datasets/example.py",
+            context=context,
+        )
+    )
+    edges = list(
+        iter_edge_events(
+            tree=tree,
+            file_id="file",
+            file_path="src/datasets/example.py",
+            context=context,
+        )
+    )
+    node_ids = {node["id"] for node in nodes}
+
+    missing = {
+        edge[field]
+        for edge in edges
+        for field in ("source_id", "target_id")
+        if edge[field] not in node_ids and not edge[field].startswith("external:")
+    }
+
+    assert not missing
+    assert any(node["node_type"] == "FunctionExit" for node in nodes)
 
 
 def test_ast_node_events_are_deterministic_except_event_time(tmp_path: Path) -> None:

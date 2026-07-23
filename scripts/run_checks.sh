@@ -31,7 +31,14 @@ echo "==> Python tests"
 
 echo
 echo "==> Docker Compose syntax"
-docker compose config >/dev/null
+if docker compose version >/dev/null 2>&1; then
+  docker compose config >/dev/null
+elif command -v docker-compose >/dev/null 2>&1; then
+  docker-compose config >/dev/null
+else
+  echo "Docker Compose is not installed" >&2
+  exit 1
+fi
 
 echo
 echo "==> JSON connector config"

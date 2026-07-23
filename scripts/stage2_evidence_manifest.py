@@ -104,6 +104,7 @@ def build_manifest(
     pipeline_commit: str,
     dataset_commit: str,
     captured_at: str,
+    expected_file_count: int | None = None,
 ) -> dict[str, Any]:
     """Build a validated Stage 2 manifest from sanitized evidence artifacts."""
 
@@ -130,8 +131,13 @@ def build_manifest(
         raise EvidenceError(
             f"unexpected commit_sha values: {sorted(repr(value) for value in commit_shas)}"
         )
-    if len(samples["metadata"]) != 5:
-        raise EvidenceError("Stage 2 requires exactly 5 metadata events")
+    if not samples["metadata"]:
+        raise EvidenceError("Stage 2 requires at least one metadata event")
+    if expected_file_count is not None and len(samples["metadata"]) != expected_file_count:
+        raise EvidenceError(
+            "metadata event count does not match discovered source-file count: "
+            f"expected {expected_file_count}, got {len(samples['metadata'])}"
+        )
     if len(samples["errors"]) != 1:
         raise EvidenceError("Stage 2 requires exactly 1 parser error event")
 
@@ -177,11 +183,14 @@ def build_manifest(
         "unique_file_paths": _extract_int(mongo_text, "unique file_path count"),
         "duplicate_file_id_groups": 0,
     }
-    if set(mongo_metrics.values()) != {0, 5} or any(
-        mongo_metrics[key] != 5
+    metadata_count = len(samples["metadata"])
+    if mongo_metrics["duplicate_file_id_groups"] != 0 or any(
+        mongo_metrics[key] != metadata_count
         for key in ("documents", "unique_file_ids", "unique_file_paths")
     ):
-        raise EvidenceError("MongoDB evidence does not contain five unique metadata documents")
+        raise EvidenceError(
+            "MongoDB evidence does not contain one unique document per metadata event"
+        )
     if f'"{EXPECTED_REPO}"' not in mongo_text or not re.search(r"duplicate file_id check ---\s*\[\]", mongo_text):
         raise EvidenceError("MongoDB repository or duplicate evidence is invalid")
 
@@ -207,6 +216,11 @@ def build_manifest(
             "dataset_commit": dataset_commit,
             "parser_run_id": parser_run_id,
             "error_run_id": error_run_id,
+            **(
+                {"files_processed": expected_file_count}
+                if expected_file_count is not None
+                else {}
+            ),
         },
         "metrics": {
             "kafka": {
@@ -234,12 +248,14 @@ def write_manifest(
     pipeline_commit: str,
     dataset_commit: str,
     captured_at: str,
+    expected_file_count: int | None = None,
 ) -> dict[str, Any]:
     manifest = build_manifest(
         root,
         pipeline_commit=pipeline_commit,
         dataset_commit=dataset_commit,
         captured_at=captured_at,
+        expected_file_count=expected_file_count,
     )
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -256,6 +272,7 @@ def validate_manifest(root: Path, manifest_path: Path) -> dict[str, Any]:
         pipeline_commit=manifest["run"]["pipeline_commit"],
         dataset_commit=manifest["run"]["dataset_commit"],
         captured_at=manifest["run"]["captured_at"],
+        expected_file_count=manifest["run"].get("files_processed"),
     )
     if rebuilt != manifest:
         raise EvidenceError("Stage 2 manifest does not match current evidence metrics")
@@ -270,6 +287,7 @@ def main() -> None:
     parser.add_argument("--pipeline-commit")
     parser.add_argument("--dataset-commit")
     parser.add_argument("--captured-at")
+    parser.add_argument("--expected-file-count", type=int)
     args = parser.parse_args()
     output = args.output if args.output.is_absolute() else args.root / args.output
 
@@ -292,6 +310,7 @@ def main() -> None:
                 pipeline_commit=args.pipeline_commit,
                 dataset_commit=args.dataset_commit,
                 captured_at=args.captured_at,
+                expected_file_count=args.expected_file_count,
             )
         else:
             validate_manifest(args.root, output)

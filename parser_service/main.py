@@ -14,7 +14,7 @@ from .producer import build_producer
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Lab04 incremental CPG parser")
     parser.add_argument("--repo", required=True, help="Path to cloned repository")
-    parser.add_argument("--mode", choices=["full", "sample", "file"], default="sample")
+    parser.add_argument("--mode", choices=["full", "sample", "file"], default="full")
     parser.add_argument("--file", help="File path for --mode file")
     parser.add_argument("--dry-run", action="store_true", help="Do not connect to Kafka")
     return parser.parse_args()

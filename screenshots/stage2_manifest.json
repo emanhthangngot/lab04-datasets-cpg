@@ -221,7 +221,7 @@
       "command": "bash scripts/capture_spark_evidence.sh",
       "path": "screenshots/spark/spark_stream.log",
       "result": "pass",
-      "sha256": "e76c5835d7a83430f3fdf31345d71ae54954adc45f98691743a2e52c707d9bac",
+      "sha256": "327a7368985d187b47344bd936f488c066b9a8fcfb12947fb3a030c96b5248eb",
       "source": "Stage 2 clean run",
       "task": 5
     },

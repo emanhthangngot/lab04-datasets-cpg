@@ -13,7 +13,6 @@ fi
 
 TARGET_RELATIVE="src/datasets/__init__.py"
 TARGET_FILE="data/datasets/$TARGET_RELATIVE"
-FILE_ID="6c39568a6a11c430"
 EXPECTED_DATASET_COMMIT="41adfd0f9ee9ba3a6b4f719d5b551c5b19ae45e2"
 EVIDENCE_DIR="screenshots/replay"
 PIPELINE_COMMIT="$(git rev-parse HEAD)"
@@ -49,6 +48,13 @@ elif command -v python >/dev/null 2>&1; then
 else
   PYTHON="/usr/bin/python"
 fi
+
+FILE_ID="$(
+  "$PYTHON" -c '
+from parser_service.ids import make_file_id
+print(make_file_id("huggingface/datasets", "src/datasets/__init__.py"))
+'
+)"
 
 mkdir -p "$EVIDENCE_DIR"
 rm -f \
@@ -86,6 +92,14 @@ if [[ -n "$(git -C data/datasets status --porcelain)" ]]; then
   exit 1
 fi
 "$PYTHON" scripts/stage2_evidence_manifest.py validate --root .
+BASELINE_METADATA_OFFSET="$(
+  "$PYTHON" -c '
+import json
+manifest = json.load(open("screenshots/stage2_manifest.json", encoding="utf-8"))
+print(manifest["metrics"]["kafka"]["metadata_events"])
+'
+)"
+REPLAY_METADATA_OFFSET=$((BASELINE_METADATA_OFFSET + 1))
 
 ORIGINAL_TARGET="$(mktemp)"
 cp "$TARGET_FILE" "$ORIGINAL_TARGET"
@@ -105,7 +119,8 @@ print(matches[0]["run_id"], matches[0]["content_hash"])
 
 export FILE_ID BASELINE_RUN_ID REPLAY_RUN_ID
 echo "=== Capture baseline runtime and stores ==="
-EXPECTED_METADATA_OFFSET=5 bash scripts/capture_replay_runtime_evidence.sh before
+EXPECTED_METADATA_OFFSET="$BASELINE_METADATA_OFFSET" \
+  bash scripts/capture_replay_runtime_evidence.sh before
 bash scripts/capture_replay_store_evidence.sh before
 
 echo "=== Restart Spark with the Stage 2 checkpoint ==="
@@ -115,7 +130,8 @@ docker compose exec -d spark sh -c \
     --packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.0,org.mongodb.spark:mongo-spark-connector_2.12:10.3.0 \
     /app/spark_jobs/metadata_stream_to_mongo.py \
     > /tmp/stage3_metadata_stream.log 2>&1"
-EXPECTED_METADATA_OFFSET=5 bash scripts/capture_replay_runtime_evidence.sh after-restart
+EXPECTED_METADATA_OFFSET="$BASELINE_METADATA_OFFSET" \
+  bash scripts/capture_replay_runtime_evidence.sh after-restart
 bash scripts/capture_replay_store_evidence.sh after-restart
 
 echo "=== Apply deterministic replay mutation ==="
@@ -162,7 +178,8 @@ REQUIRE_UNIQUE_EVENT_IDS=false \
 GRAPH_COUNTS_FILE="screenshots/replay/kafka_graph_counts_after.json" \
 EXPECTED_COMMIT_SHA="$DATASET_COMMIT" \
 bash scripts/wait_neo4j_connector_idle.sh
-EXPECTED_METADATA_OFFSET=6 bash scripts/capture_replay_runtime_evidence.sh after-replay
+EXPECTED_METADATA_OFFSET="$REPLAY_METADATA_OFFSET" \
+  bash scripts/capture_replay_runtime_evidence.sh after-replay
 
 bash scripts/capture_replay_store_evidence.sh pre-cleanup
 read -r STALE_NODES STALE_EDGES <<< "$(

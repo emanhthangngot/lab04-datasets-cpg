@@ -6,6 +6,7 @@ set -euo pipefail
 NEO4J_EVIDENCE_DIR="screenshots/neo4j"
 MONGO_EVIDENCE_DIR="screenshots/mongodb"
 EXPECTED_REPO_NAME="huggingface/datasets"
+: "${EXPECTED_MONGO_COUNT:?Set EXPECTED_MONGO_COUNT to the discovered source-file count}"
 mkdir -p "$NEO4J_EVIDENCE_DIR" "$MONGO_EVIDENCE_DIR"
 
 docker compose exec -T neo4j cypher-shell -u neo4j -p "$NEO4J_PASSWORD" \
@@ -63,8 +64,10 @@ MONGO_ACCEPTANCE="$(docker compose exec -T mongo mongosh --quiet --eval '
   ].join(" "));
 ' | tr -d '\r')"
 read -r MONGO_COUNT UNIQUE_FILE_IDS UNIQUE_FILE_PATHS REPO_VALUES <<< "$MONGO_ACCEPTANCE"
-if [ "$MONGO_COUNT" != "5" ] || [ "$UNIQUE_FILE_IDS" != "5" ] || \
-   [ "$UNIQUE_FILE_PATHS" != "5" ] || [ "$REPO_VALUES" != "$EXPECTED_REPO_NAME" ]; then
+if [ "$MONGO_COUNT" != "$EXPECTED_MONGO_COUNT" ] || \
+   [ "$UNIQUE_FILE_IDS" != "$EXPECTED_MONGO_COUNT" ] || \
+   [ "$UNIQUE_FILE_PATHS" != "$EXPECTED_MONGO_COUNT" ] || \
+   [ "$REPO_VALUES" != "$EXPECTED_REPO_NAME" ]; then
   echo "ERROR: MongoDB acceptance failed: $MONGO_ACCEPTANCE" >&2
   exit 1
 fi

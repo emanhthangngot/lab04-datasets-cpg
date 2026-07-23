@@ -353,8 +353,8 @@ def test_post_merge_owner_acceptance_is_normative() -> None:
     }
 
     assert "test/truc/stage3-windows-acceptance" in specs["kafka"]
-    assert "5 -> 5 -> 6" in specs["kafka"]
-    assert "23 nodes, 16 edges, 1 metadata, and 0 errors" in specs["kafka"]
+    assert "N -> N -> N+1" in specs["kafka"]
+    assert "deltas match the replayed file metadata" in specs["kafka"]
     assert "review/thanh/stage3-store-acceptance" in specs["stores"]
     assert "must not alter expected counts" in specs["stores"].lower()
     assert "review/tuan/stage3-book-acceptance" in specs["book"]

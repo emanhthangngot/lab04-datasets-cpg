@@ -119,6 +119,18 @@ def make_node_id(file_id: str, node: ast.AST, scope_path: str) -> str:
     return short_hash(raw)
 
 
+def make_function_exit_id(file_id: str, function: ast.AST) -> str:
+    """Create the stable synthetic exit-node ID for one function scope."""
+
+    structural_path = getattr(function, "_cpg_path", None)
+    if structural_path is None:
+        raise ValueError(
+            "AST structural path is missing; call assign_parents(tree) before "
+            "generating function-exit IDs"
+        )
+    return short_hash(f"{file_id}:FunctionExit:{structural_path}")
+
+
 def make_edge_id(source_id: str, target_id: str, edge_type: str) -> str:
     """Create a stable edge ID from endpoints and type."""
 
