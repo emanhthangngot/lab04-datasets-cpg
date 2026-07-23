@@ -85,7 +85,7 @@ echo "Full parser scope verified: $EXPECTED_FILE_COUNT Python files"
 
 echo ">>> Verifying parser repository identity"
 ACTUAL_REPO_NAME="$(
-  docker compose run --rm parser printenv REPO_NAME | tr -d '\r'
+  docker compose run --rm parser printenv REPO_NAME | tail -n 1 | tr -d '\r'
 )"
 if [ "$ACTUAL_REPO_NAME" != "$EXPECTED_REPO_NAME" ]; then
   echo "ERROR: parser REPO_NAME must be $EXPECTED_REPO_NAME, got $ACTUAL_REPO_NAME" >&2

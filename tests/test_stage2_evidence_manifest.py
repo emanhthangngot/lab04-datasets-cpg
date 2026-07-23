@@ -32,6 +32,7 @@ def test_stage2_runtime_processes_the_full_discovered_repository() -> None:
     assert 'export METADATA_CAPTURE_COUNT="$EXPECTED_FILE_COUNT"' in source
     assert "--mode full" in source
     assert "--mode sample" not in source
+    assert "printenv REPO_NAME | tail -n 1" in source
 
 
 def test_mongo_express_profile_is_isolated_and_read_only() -> None:
