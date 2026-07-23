@@ -1,8 +1,8 @@
 {
-  "cpg.nodes": 21415,
-  "cpg.edges": 7968,
-  "cpg.metadata": 5,
+  "cpg.nodes": 133263,
+  "cpg.edges": 38141,
+  "cpg.metadata": 138,
   "cpg.errors": 1,
-  "unique_node_ids": 21415,
-  "unique_edge_ids": 7968
+  "unique_node_ids": 133263,
+  "unique_edge_ids": 38141
 }

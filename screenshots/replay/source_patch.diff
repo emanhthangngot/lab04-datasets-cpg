@@ -1,6 +1,6 @@
 --- a/src/datasets/__init__.py
 +++ b/src/datasets/__init__.py
-@@ -15 +15,2 @@
+@@ -16 +16,2 @@
 -__version__ = "5.0.1.dev0"
 +__version__: str = "5.0.1.dev0+lab04-replay"
 +LAB04_REPLAY_MARKER = "replay_v2"
