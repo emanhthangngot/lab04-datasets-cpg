@@ -1,0 +1,81 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="620" viewBox="0 0 1200 620" role="img" aria-labelledby="title desc">
+  <title id="title">Lab04 full-repository CPG streaming architecture</title>
+  <desc id="desc">The pinned huggingface datasets repository is parsed file by file. Four Kafka topics route graph events through Kafka Connect to Neo4j, metadata through Spark Structured Streaming to MongoDB, and errors to evidence logs.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#2457a7"/>
+    </marker>
+    <style>
+      .box { stroke-width: 2.5; rx: 16; ry: 16; }
+      .source { fill: #e8f2ff; stroke: #3478c8; }
+      .compute { fill: #eee9ff; stroke: #7254c7; }
+      .broker { fill: #fff3cf; stroke: #d28a00; }
+      .store { fill: #e3f8ec; stroke: #26925a; }
+      .error { fill: #ffe6e6; stroke: #c84646; }
+      .line { fill: none; stroke: #2457a7; stroke-width: 3; marker-end: url(#arrow); }
+      .dash { fill: none; stroke: #667085; stroke-width: 2; stroke-dasharray: 7 5; marker-end: url(#arrow); }
+      .title { font: 700 28px sans-serif; fill: #17233d; }
+      .label { font: 700 20px sans-serif; fill: #17233d; text-anchor: middle; }
+      .small { font: 15px sans-serif; fill: #344054; text-anchor: middle; }
+      .topic { font: 600 15px monospace; fill: #2457a7; }
+    </style>
+  </defs>
+
+  <text x="40" y="45" class="title">Full-repository incremental CPG streaming</text>
+  <text x="40" y="74" class="small" text-anchor="start">Pinned dataset commit • stable file/node/edge IDs • schema 1.0 • replay-safe stores</text>
+
+  <rect x="40" y="220" width="190" height="120" class="box source"/>
+  <text x="135" y="265" class="label">Repository</text>
+  <text x="135" y="293" class="small">shallow clone</text>
+  <text x="135" y="317" class="small">all discovered core .py files</text>
+
+  <rect x="285" y="200" width="210" height="160" class="box compute"/>
+  <text x="390" y="245" class="label">Parser Service</text>
+  <text x="390" y="275" class="small">one file at a time</text>
+  <text x="390" y="302" class="small">AST • CFG • DFG • CALL</text>
+  <text x="390" y="329" class="small">stable IDs + event time</text>
+
+  <rect x="550" y="175" width="205" height="210" class="box broker"/>
+  <text x="652" y="218" class="label">Apache Kafka</text>
+  <text x="575" y="260" class="topic">cpg.nodes</text>
+  <text x="575" y="292" class="topic">cpg.edges</text>
+  <text x="575" y="324" class="topic">cpg.metadata</text>
+  <text x="575" y="356" class="topic">cpg.errors</text>
+
+  <rect x="815" y="105" width="180" height="100" class="box compute"/>
+  <text x="905" y="146" class="label">Kafka Connect</text>
+  <text x="905" y="176" class="small">Neo4j Sink Connector</text>
+
+  <rect x="815" y="245" width="180" height="100" class="box compute"/>
+  <text x="905" y="286" class="label">Spark</text>
+  <text x="905" y="316" class="small">Structured Streaming</text>
+
+  <rect x="815" y="405" width="180" height="90" class="box error"/>
+  <text x="905" y="445" class="label">Error evidence</text>
+  <text x="905" y="473" class="small">observable failed parses</text>
+
+  <rect x="1045" y="105" width="125" height="100" class="box store"/>
+  <text x="1107" y="148" class="label">Neo4j</text>
+  <text x="1107" y="177" class="small">graph topology</text>
+
+  <rect x="1045" y="245" width="125" height="100" class="box store"/>
+  <text x="1107" y="288" class="label">MongoDB</text>
+  <text x="1107" y="317" class="small">file metadata</text>
+
+  <path d="M230 280 H285" class="line"/>
+  <path d="M495 280 H550" class="line"/>
+  <path d="M755 245 C785 245 785 155 815 155" class="line"/>
+  <path d="M995 155 H1045" class="line"/>
+  <path d="M755 315 C785 315 785 295 815 295" class="line"/>
+  <path d="M995 295 H1045" class="line"/>
+  <path d="M755 355 C785 355 785 450 815 450" class="line"/>
+
+  <text x="770" y="125" class="small" text-anchor="start">nodes + edges</text>
+  <text x="770" y="292" class="small" text-anchor="start">metadata</text>
+  <text x="770" y="430" class="small" text-anchor="start">errors</text>
+
+  <rect x="285" y="535" width="710" height="55" class="box source"/>
+  <text x="640" y="558" class="small">Replay one modified file → append Kafka events → MongoDB replace by file_id</text>
+  <text x="640" y="580" class="small">→ Neo4j MERGE + file/run-scoped stale cleanup → Spark resumes from checkpoint</text>
+  <path d="M905 495 V535" class="dash"/>
+</svg>

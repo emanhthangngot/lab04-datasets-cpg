@@ -398,12 +398,16 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="architecture">
 <h1>Architecture<a class="headerlink" href="#architecture" title="Link to this heading">#</a></h1>
-<p><img alt="Stage 2 CPG streaming architecture" src="_images/stage2_pipeline.png" /></p>
-<p>The editable source is <a class="reference download internal" download="" href="_downloads/80274a7dedcef8a8b0c2aec4ade12932/stage2_pipeline.excalidraw"><span class="xref download myst"><code class="docutils literal notranslate"><span class="pre">stage2_pipeline.excalidraw</span></code></span></a>. It records the same dataset and pipeline route as <code class="docutils literal notranslate"><span class="pre">screenshots/stage2_manifest.json</span></code>; the exact capture time and artifact hashes remain in that validated manifest.</p>
+<p><img alt="Full-repository CPG streaming architecture" src="_images/cpg_pipeline.svg" /></p>
+<p>The diagram is an editable SVG stored with the book. It explicitly shows the
+Neo4j Kafka Connector and the independent Spark metadata route.</p>
 <section id="why-the-routes-are-separate">
 <h2>Why the routes are separate<a class="headerlink" href="#why-the-routes-are-separate" title="Link to this heading">#</a></h2>
 <p><code class="docutils literal notranslate"><span class="pre">cpg.nodes</span></code> and <code class="docutils literal notranslate"><span class="pre">cpg.edges</span></code> go directly from Kafka Connect to Neo4j. Spark is not between Kafka and Neo4j because the Neo4j sink already provides the required direct, idempotent graph upserts. Adding Spark there would create an unnecessary transformation and checkpoint layer.</p>
-<p>Only <code class="docutils literal notranslate"><span class="pre">cpg.metadata</span></code> goes through Spark Structured Streaming. Spark validates and reshapes file summaries, commits Kafka offset 5, and upserts five documents into MongoDB by <code class="docutils literal notranslate"><span class="pre">file_id</span></code>. <code class="docutils literal notranslate"><span class="pre">cpg.errors</span></code> is retained as an observable failure/evidence stream.</p>
+<p>Only <code class="docutils literal notranslate"><span class="pre">cpg.metadata</span></code> goes through Spark Structured Streaming. Spark validates
+file summaries, resumes from its checkpoint, and upserts exactly one document
+per discovered source file into MongoDB by <code class="docutils literal notranslate"><span class="pre">file_id</span></code>. <code class="docutils literal notranslate"><span class="pre">cpg.errors</span></code> is retained
+as an observable failure/evidence stream.</p>
 </section>
 <section id="services-and-local-ports">
 <h2>Services and local ports<a class="headerlink" href="#services-and-local-ports" title="Link to this heading">#</a></h2>
@@ -417,7 +421,7 @@
 <tbody>
 <tr class="row-even"><td><p>Kafka broker</p></td>
 <td><p>Four CPG topics</p></td>
-<td class="text-right"><p><code class="docutils literal notranslate"><span class="pre">9092</span></code></p></td>
+<td class="text-right"><p><code class="docutils literal notranslate"><span class="pre">29092</span></code> host / <code class="docutils literal notranslate"><span class="pre">9092</span></code> Compose</p></td>
 </tr>
 <tr class="row-odd"><td><p>Kafka Connect</p></td>
 <td><p>Neo4j sink REST API</p></td>

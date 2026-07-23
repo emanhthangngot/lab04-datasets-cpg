@@ -464,15 +464,16 @@
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;duplicate file_id groups:&#39;</span><span class="p">,</span> <span class="n">mongo</span><span class="p">[</span><span class="s1">&#39;duplicate_file_id_groups&#39;</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Spark metadata offset:&#39;</span><span class="p">,</span> <span class="n">spark</span><span class="p">[</span><span class="s1">&#39;metadata_offset&#39;</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;completed micro-batch:&#39;</span><span class="p">,</span> <span class="n">spark</span><span class="p">[</span><span class="s1">&#39;completed_batch&#39;</span><span class="p">])</span>
-<span class="k">assert</span> <span class="n">mongo</span><span class="p">[</span><span class="s1">&#39;documents&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">spark</span><span class="p">[</span><span class="s1">&#39;metadata_offset&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">5</span>
+<span class="k">assert</span> <span class="n">mongo</span><span class="p">[</span><span class="s1">&#39;documents&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">mongo</span><span class="p">[</span><span class="s1">&#39;unique_file_ids&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">mongo</span><span class="p">[</span><span class="s1">&#39;unique_file_paths&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">spark</span><span class="p">[</span><span class="s1">&#39;metadata_offset&#39;</span><span class="p">]</span>
+<span class="k">assert</span> <span class="n">mongo</span><span class="p">[</span><span class="s1">&#39;duplicate_file_id_groups&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>MongoDB documents: 5
-unique file IDs/paths: 5 / 5
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>MongoDB documents: 138
+unique file IDs/paths: 138 / 138
 duplicate file_id groups: 0
-Spark metadata offset: 5
+Spark metadata offset: 138
 completed micro-batch: 0
 </pre></div>
 </div>
@@ -526,7 +527,7 @@ completed micro-batch: 0
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Worked</p></td>
-<td><p>Spark committed offset 5 and MongoDB contained five unique metadata documents with the exact repository and dataset commit.</p></td>
+<td><p>Spark committed the full metadata offset and MongoDB contained exactly one unique document per discovered source file with the exact repository and dataset commit.</p></td>
 </tr>
 <tr class="row-odd"><td><p>Failed</p></td>
 <td><p>That clean run had MongoDB query artifacts but no dedicated Mongo Express capture.</p></td>

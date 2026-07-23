@@ -411,10 +411,10 @@
 <td><p><code class="docutils literal notranslate"><span class="pre">screenshots/stage2_manifest.json</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>Command</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">compose</span> <span class="pre">run</span> <span class="pre">--rm</span> <span class="pre">...</span> <span class="pre">parser</span> <span class="pre">python</span> <span class="pre">-m</span> <span class="pre">parser_service.main</span> <span class="pre">--repo</span> <span class="pre">data/datasets</span> <span class="pre">--mode</span> <span class="pre">sample</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">compose</span> <span class="pre">run</span> <span class="pre">--rm</span> <span class="pre">...</span> <span class="pre">parser</span> <span class="pre">python</span> <span class="pre">-m</span> <span class="pre">parser_service.main</span> <span class="pre">--repo</span> <span class="pre">data/datasets</span> <span class="pre">--mode</span> <span class="pre">full</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p>Parser scope</p></td>
-<td><p>Five-file bounded sample run.</p></td>
+<td><p>Every discovered core Python file, processed one file at a time.</p></td>
 </tr>
 <tr class="row-odd"><td><p>Stable identity</p></td>
 <td><p>Repository, commit, file identity, node location/type, and edge endpoints.</p></td>
@@ -425,7 +425,7 @@
 </div>
 <section id="approach-and-reasoning">
 <h2>Approach and reasoning<a class="headerlink" href="#approach-and-reasoning" title="Link to this heading">#</a></h2>
-<p>Command: <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">compose</span> <span class="pre">run</span> <span class="pre">--rm</span> <span class="pre">...</span> <span class="pre">parser</span> <span class="pre">python</span> <span class="pre">-m</span> <span class="pre">parser_service.main</span> <span class="pre">--repo</span> <span class="pre">data/datasets</span> <span class="pre">--mode</span> <span class="pre">sample</span></code>. The parser emits AST, CFG, DFG, and CALL records with stable IDs so downstream consumers can merge nodes and relationships deterministically. The sample is intentionally bounded for Stage 2 evidence, while the ID strategy is designed to remain stable across repeated captures.</p>
+<p>Command: <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">compose</span> <span class="pre">run</span> <span class="pre">--rm</span> <span class="pre">...</span> <span class="pre">parser</span> <span class="pre">python</span> <span class="pre">-m</span> <span class="pre">parser_service.main</span> <span class="pre">--repo</span> <span class="pre">data/datasets</span> <span class="pre">--mode</span> <span class="pre">full</span></code>. The parser emits semantic AST nodes, synthetic per-function exit nodes, CFG, DFG, and CALL records with stable IDs. Every internal edge endpoint is audited against the emitted node set, and files are processed and flushed one at a time.</p>
 </section>
 <section id="what-this-chapter-proves">
 <h2>What this chapter proves<a class="headerlink" href="#what-this-chapter-proves" title="Link to this heading">#</a></h2>
@@ -465,12 +465,12 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>AST nodes: 21415
-CFG edges: 3537
-DFG edges: 2248
-CALL edges: 2183
-total edges: 7968
-metadata events: 5 error events: 1
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>AST nodes: 133263
+CFG edges: 18097
+DFG edges: 8586
+CALL edges: 11458
+total edges: 38141
+metadata events: 138 error events: 1
 </pre></div>
 </div>
 </div>
@@ -488,13 +488,13 @@ metadata events: 5 error events: 1
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Worked</p></td>
-<td><p>Five sample files produced AST, CFG, DFG, and CALL structures plus one intentional syntax-error event.</p></td>
+<td><p>Every discovered core source file produced AST, CFG, DFG, and CALL structures; a separate controlled file produced the parser-error event.</p></td>
 </tr>
 <tr class="row-odd"><td><p>Failed</p></td>
 <td><p>A previous capture sampled fewer metadata/error records than the assignment requires.</p></td>
 </tr>
 <tr class="row-even"><td><p>Resolution</p></td>
-<td><p>Topic-specific capture limits now retain all five metadata events and the single controlled error. The parser remains intentionally bounded to five files for Stage 2; repository-wide scaling is outside this sample-run scope.</p></td>
+<td><p>The canonical run now uses <code class="docutils literal notranslate"><span class="pre">--mode</span> <span class="pre">full</span></code>, requires one metadata event and one MongoDB document per discovered file, and rejects partial-repository evidence.</p></td>
 </tr>
 </tbody>
 </table>

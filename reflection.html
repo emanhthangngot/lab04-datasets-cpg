@@ -408,12 +408,11 @@ observable and repeatable.</p>
 </section>
 <section id="failures-and-fixes">
 <h2>Failures and fixes<a class="headerlink" href="#failures-and-fixes" title="Link to this heading">#</a></h2>
-<p>Early evidence mixed stale Docker state and multiple parser invocations, which
-made counts look nearly doubled. The clean-run guard now resets only explicitly,
-records the dataset commit, and rejects mixed repository identities. The first
-replay stub also targeted a file outside the accepted five-file sample and
-treated expected Kafka replay events as duplicate failures. Stage 3 instead
-replays <code class="docutils literal notranslate"><span class="pre">src/datasets/__init__.py</span></code>, separates append-log repetition from store
+<p>Early evidence mixed stale Docker state, multiple parser invocations, and a
+five-file smoke baseline. The clean-run guard now resets only explicitly,
+records the pinned dataset commit, processes every discovered core source file,
+and rejects partial metadata/store evidence. Replay uses
+<code class="docutils literal notranslate"><span class="pre">src/datasets/__init__.py</span></code>, separates append-log repetition from store
 duplication, waits for both consumers, and validates a hashed evidence manifest.</p>
 </section>
 <section id="cpg-limitations">

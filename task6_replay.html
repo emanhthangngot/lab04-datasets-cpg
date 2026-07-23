@@ -429,7 +429,7 @@
 </div>
 <section id="approach-and-reasoning">
 <h2>Approach and reasoning<a class="headerlink" href="#approach-and-reasoning" title="Link to this heading">#</a></h2>
-<p>Command: <code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/finalize_stage3_evidence.sh</span></code>. The canonical Stage 3 workflow rebuilds the five-file baseline, restarts Spark with the existing checkpoint, modifies only <code class="docutils literal notranslate"><span class="pre">src/datasets/__init__.py</span></code>, replays that file with a new <code class="docutils literal notranslate"><span class="pre">run_id</span></code>, waits for Kafka Connect and Spark, removes stale graph entities, and validates the final stores. The notebook reads the strict replay manifest so the public book stays deterministic.</p>
+<p>Command: <code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/finalize_stage3_evidence.sh</span></code>. The canonical Stage 3 workflow rebuilds the full-repository baseline, restarts Spark with the existing checkpoint, modifies only <code class="docutils literal notranslate"><span class="pre">src/datasets/__init__.py</span></code>, replays that file with a new <code class="docutils literal notranslate"><span class="pre">run_id</span></code>, waits for Kafka Connect and Spark, removes stale graph entities, and validates the final stores. The notebook reads the strict replay manifest so the public book stays deterministic.</p>
 </section>
 <section id="what-this-chapter-proves">
 <h2>What this chapter proves<a class="headerlink" href="#what-this-chapter-proves" title="Link to this heading">#</a></h2>
@@ -467,8 +467,8 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>manifest: screenshots/replay/stage3_replay_manifest.json
-captured_at: 2026-07-17T00:20:53Z
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>manifest: screenshots\replay\stage3_replay_manifest.json
+captured_at: 2026-07-23T06:56:48Z
 </pre></div>
 </div>
 </div>
@@ -494,7 +494,7 @@ captured_at: 2026-07-17T00:20:53Z
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>target: src/datasets/__init__.py
 file_id: 6c39568a6a11c430
 content_hash: 74ab176247c9ba61e09843280c18cf3a9ac690403a5d35411a75d097db721939 -&gt; 6db67191532027fbf91190815efa70380d79c2eda9e61136a41a1d1a8a8e0735
-run_id: 2088754454f44aa2b4394aff0c565d49 -&gt; stage3-replay-20260717T002053Z
+run_id: 8c3efe458b3b43eaa1399d7740848d3f -&gt; stage3-replay-20260723T065648Z
 </pre></div>
 </div>
 </div>
@@ -507,14 +507,16 @@ run_id: 2088754454f44aa2b4394aff0c565d49 -&gt; stage3-replay-20260717T002053Z
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Kafka replay delta:&#39;</span><span class="p">,</span> <span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;kafka&#39;</span><span class="p">][</span><span class="s1">&#39;delta&#39;</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Spark metadata offsets:&#39;</span><span class="p">,</span> <span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;spark&#39;</span><span class="p">][</span><span class="s1">&#39;metadata_offset_before&#39;</span><span class="p">],</span> <span class="s1">&#39;-&gt;&#39;</span><span class="p">,</span> <span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;spark&#39;</span><span class="p">][</span><span class="s1">&#39;metadata_offset_after_restart&#39;</span><span class="p">],</span> <span class="s1">&#39;-&gt;&#39;</span><span class="p">,</span> <span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;spark&#39;</span><span class="p">][</span><span class="s1">&#39;metadata_offset_after_replay&#39;</span><span class="p">])</span>
-<span class="k">assert</span> <span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;kafka&#39;</span><span class="p">][</span><span class="s1">&#39;delta&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;cpg.nodes&#39;</span><span class="p">:</span> <span class="mi">23</span><span class="p">,</span> <span class="s1">&#39;cpg.edges&#39;</span><span class="p">:</span> <span class="mi">16</span><span class="p">,</span> <span class="s1">&#39;cpg.metadata&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;cpg.errors&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
-<span class="k">assert</span> <span class="p">[</span><span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;spark&#39;</span><span class="p">][</span><span class="s1">&#39;metadata_offset_before&#39;</span><span class="p">],</span> <span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;spark&#39;</span><span class="p">][</span><span class="s1">&#39;metadata_offset_after_restart&#39;</span><span class="p">],</span> <span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;spark&#39;</span><span class="p">][</span><span class="s1">&#39;metadata_offset_after_replay&#39;</span><span class="p">]]</span> <span class="o">==</span> <span class="p">[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">]</span>
+<span class="k">assert</span> <span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;kafka&#39;</span><span class="p">][</span><span class="s1">&#39;delta&#39;</span><span class="p">][</span><span class="s1">&#39;cpg.nodes&#39;</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;kafka&#39;</span><span class="p">][</span><span class="s1">&#39;delta&#39;</span><span class="p">][</span><span class="s1">&#39;cpg.edges&#39;</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="mi">0</span>
+<span class="k">assert</span> <span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;kafka&#39;</span><span class="p">][</span><span class="s1">&#39;delta&#39;</span><span class="p">][</span><span class="s1">&#39;cpg.metadata&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;kafka&#39;</span><span class="p">][</span><span class="s1">&#39;delta&#39;</span><span class="p">][</span><span class="s1">&#39;cpg.errors&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
+<span class="n">before</span><span class="p">,</span> <span class="n">restarted</span><span class="p">,</span> <span class="n">replayed</span> <span class="o">=</span> <span class="p">(</span><span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;spark&#39;</span><span class="p">][</span><span class="s1">&#39;metadata_offset_before&#39;</span><span class="p">],</span> <span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;spark&#39;</span><span class="p">][</span><span class="s1">&#39;metadata_offset_after_restart&#39;</span><span class="p">],</span> <span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;spark&#39;</span><span class="p">][</span><span class="s1">&#39;metadata_offset_after_replay&#39;</span><span class="p">])</span>
+<span class="k">assert</span> <span class="n">restarted</span> <span class="o">==</span> <span class="n">before</span> <span class="ow">and</span> <span class="n">replayed</span> <span class="o">==</span> <span class="n">before</span> <span class="o">+</span> <span class="mi">1</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Kafka replay delta: {&#39;cpg.edges&#39;: 16, &#39;cpg.errors&#39;: 0, &#39;cpg.metadata&#39;: 1, &#39;cpg.nodes&#39;: 23}
-Spark metadata offsets: 5 -&gt; 5 -&gt; 6
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Kafka replay delta: {&#39;cpg.edges&#39;: 16, &#39;cpg.errors&#39;: 0, &#39;cpg.metadata&#39;: 1, &#39;cpg.nodes&#39;: 61}
+Spark metadata offsets: 138 -&gt; 138 -&gt; 139
 </pre></div>
 </div>
 </div>
@@ -531,17 +533,18 @@ Spark metadata offsets: 5 -&gt; 5 -&gt; 6
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Neo4j relationships:&#39;</span><span class="p">,</span> <span class="n">neo4j</span><span class="p">[</span><span class="s1">&#39;before&#39;</span><span class="p">][</span><span class="s1">&#39;edges&#39;</span><span class="p">],</span> <span class="s1">&#39;-&gt;&#39;</span><span class="p">,</span> <span class="n">neo4j</span><span class="p">[</span><span class="s1">&#39;pre_cleanup&#39;</span><span class="p">][</span><span class="s1">&#39;edges&#39;</span><span class="p">],</span> <span class="s1">&#39;-&gt;&#39;</span><span class="p">,</span> <span class="n">neo4j</span><span class="p">[</span><span class="s1">&#39;after&#39;</span><span class="p">][</span><span class="s1">&#39;edges&#39;</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;stale deleted:&#39;</span><span class="p">,</span> <span class="n">neo4j</span><span class="p">[</span><span class="s1">&#39;stale_deleted&#39;</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;MongoDB documents:&#39;</span><span class="p">,</span> <span class="n">mongo</span><span class="p">[</span><span class="s1">&#39;documents_before&#39;</span><span class="p">],</span> <span class="s1">&#39;-&gt;&#39;</span><span class="p">,</span> <span class="n">mongo</span><span class="p">[</span><span class="s1">&#39;documents_after_replay&#39;</span><span class="p">],</span> <span class="s1">&#39;; unchanged:&#39;</span><span class="p">,</span> <span class="n">mongo</span><span class="p">[</span><span class="s1">&#39;unchanged_documents&#39;</span><span class="p">])</span>
-<span class="k">assert</span> <span class="n">neo4j</span><span class="p">[</span><span class="s1">&#39;stale_deleted&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;nodes&#39;</span><span class="p">:</span> <span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;edges&#39;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+<span class="k">assert</span> <span class="n">neo4j</span><span class="p">[</span><span class="s1">&#39;stale_deleted&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="p">{</span><span class="s1">&#39;nodes&#39;</span><span class="p">:</span> <span class="n">neo4j</span><span class="p">[</span><span class="s1">&#39;pre_cleanup&#39;</span><span class="p">][</span><span class="s1">&#39;stale_nodes&#39;</span><span class="p">],</span> <span class="s1">&#39;edges&#39;</span><span class="p">:</span> <span class="n">neo4j</span><span class="p">[</span><span class="s1">&#39;pre_cleanup&#39;</span><span class="p">][</span><span class="s1">&#39;stale_edges&#39;</span><span class="p">]}</span>
 <span class="k">assert</span> <span class="n">neo4j</span><span class="p">[</span><span class="s1">&#39;after&#39;</span><span class="p">][</span><span class="s1">&#39;duplicate_node_groups&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">neo4j</span><span class="p">[</span><span class="s1">&#39;after&#39;</span><span class="p">][</span><span class="s1">&#39;duplicate_edge_groups&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
-<span class="k">assert</span> <span class="n">mongo</span><span class="p">[</span><span class="s1">&#39;documents_after_replay&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">5</span> <span class="ow">and</span> <span class="n">mongo</span><span class="p">[</span><span class="s1">&#39;unchanged_documents&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">4</span>
+<span class="k">assert</span> <span class="n">mongo</span><span class="p">[</span><span class="s1">&#39;documents_after_replay&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">mongo</span><span class="p">[</span><span class="s1">&#39;documents_before&#39;</span><span class="p">]</span>
+<span class="k">assert</span> <span class="n">mongo</span><span class="p">[</span><span class="s1">&#39;unchanged_documents&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">mongo</span><span class="p">[</span><span class="s1">&#39;documents_before&#39;</span><span class="p">]</span> <span class="o">-</span> <span class="mi">1</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Neo4j explicit nodes: 21415 -&gt; 21422 -&gt; 21419
-Neo4j relationships: 7968 -&gt; 7971 -&gt; 7969
-stale deleted: {&#39;edges&#39;: 2, &#39;nodes&#39;: 3}
-MongoDB documents: 5 -&gt; 5 ; unchanged: 4
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Neo4j explicit nodes: 133263 -&gt; 133288 -&gt; 133267
+Neo4j relationships: 38141 -&gt; 38144 -&gt; 38142
+stale deleted: {&#39;edges&#39;: 2, &#39;nodes&#39;: 21}
+MongoDB documents: 138 -&gt; 138 ; unchanged: 137
 </pre></div>
 </div>
 </div>
@@ -591,7 +594,7 @@ MongoDB documents: 5 -&gt; 5 ; unchanged: 4
 <td><p>Deterministic file-level replay, Kafka Connect <code class="docutils literal notranslate"><span class="pre">MERGE</span></code>, MongoDB replacement by <code class="docutils literal notranslate"><span class="pre">file_id</span></code>, and the persisted Spark checkpoint form one auditable idempotency chain.</p></td>
 </tr>
 <tr class="row-odd"><td><p>Failed</p></td>
-<td><p>The original script selected <code class="docutils literal notranslate"><span class="pre">config.py</span></code>, which was absent from the five-file baseline, and treated expected Kafka replay events as invalid duplicate IDs.</p></td>
+<td><p>The original workflow used a partial baseline and treated expected Kafka replay events as invalid duplicate IDs.</p></td>
 </tr>
 <tr class="row-even"><td><p>Resolution</p></td>
 <td><p>The canonical target is now a baseline file, Kafka append-log repetition is measured separately from store duplication, and cleanup runs only after connector lag reaches zero.</p></td>

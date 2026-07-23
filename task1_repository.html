@@ -425,7 +425,7 @@
 </div>
 <section id="approach-and-reasoning">
 <h2>Approach and reasoning<a class="headerlink" href="#approach-and-reasoning" title="Link to this heading">#</a></h2>
-<p>Command: <code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/run_stage2_evidence.sh</span></code>. The runbook shallow-clones the dataset repository, resolves the real 40-character commit SHA, and records the selected Python files from <code class="docutils literal notranslate"><span class="pre">src/</span></code> and <code class="docutils literal notranslate"><span class="pre">tests/</span></code>. The notebook reads the captured manifest instead of needing a live clone during publication.</p>
+<p>Command: <code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/run_stage2_evidence.sh</span></code>. The runbook shallow-clones the dataset repository, resolves the real 40-character commit SHA, and records every selected core Python file under <code class="docutils literal notranslate"><span class="pre">src/datasets/</span></code> after the documented exclusions. The notebook reads the captured manifest instead of needing a live clone during publication.</p>
 </section>
 <section id="what-this-chapter-proves">
 <h2>What this chapter proves<a class="headerlink" href="#what-this-chapter-proves" title="Link to this heading">#</a></h2>
@@ -437,7 +437,7 @@
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Repository discovery</p></td>
-<td><p>The executed cell prints total Python files and selected <code class="docutils literal notranslate"><span class="pre">src</span></code>/<code class="docutils literal notranslate"><span class="pre">tests</span></code> files.</p></td>
+<td><p>The executed cell prints the total repository Python files and the parser-selected core file count.</p></td>
 </tr>
 <tr class="row-odd"><td><p>Dataset provenance</p></td>
 <td><p>The output includes the pinned dataset commit SHA.</p></td>
@@ -451,15 +451,17 @@
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">json</span><span class="o">,</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
 <span class="n">ROOT</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">(),</span> <span class="o">*</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">]</span> <span class="k">if</span> <span class="p">(</span><span class="n">p</span> <span class="o">/</span> <span class="s1">&#39;screenshots/stage2_manifest.json&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">())</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span><span class="p">))</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">parser_service.discover</span><span class="w"> </span><span class="kn">import</span> <span class="n">discover_python_files</span>
 <span class="n">repo</span> <span class="o">=</span> <span class="n">ROOT</span> <span class="o">/</span> <span class="s1">&#39;data/datasets&#39;</span>
 <span class="n">manifest</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">((</span><span class="n">ROOT</span> <span class="o">/</span> <span class="s1">&#39;screenshots/stage2_manifest.json&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
 <span class="n">all_python</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s1">&#39;*.py&#39;</span><span class="p">))</span>
-<span class="n">selected</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">all_python</span> <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">part</span> <span class="ow">in</span> <span class="p">{</span><span class="s1">&#39;src&#39;</span><span class="p">,</span> <span class="s1">&#39;tests&#39;</span><span class="p">}</span> <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">p</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">repo</span><span class="p">)</span><span class="o">.</span><span class="n">parts</span><span class="p">)]</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;dataset_commit:&#39;</span><span class="p">,</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">([</span><span class="s1">&#39;git&#39;</span><span class="p">,</span><span class="s1">&#39;-C&#39;</span><span class="p">,</span><span class="nb">str</span><span class="p">(</span><span class="n">repo</span><span class="p">),</span><span class="s1">&#39;rev-parse&#39;</span><span class="p">,</span><span class="s1">&#39;HEAD&#39;</span><span class="p">],</span> <span class="n">text</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+<span class="n">selected</span> <span class="o">=</span> <span class="n">discover_python_files</span><span class="p">(</span><span class="n">repo</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;dataset_commit:&#39;</span><span class="p">,</span> <span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;run&#39;</span><span class="p">][</span><span class="s1">&#39;dataset_commit&#39;</span><span class="p">])</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;all_python_files:&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_python</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;selected_src_tests_files:&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">selected</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;parser_selected_files:&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">selected</span><span class="p">))</span>
 <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;sample:&#39;</span><span class="p">,</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">repo</span><span class="p">))</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">selected</span><span class="p">[:</span><span class="mi">5</span><span class="p">]])</span>
 </pre></div>
 </div>
@@ -467,8 +469,8 @@
 <div class="cell_output docutils container">
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>dataset_commit: 41adfd0f9ee9ba3a6b4f719d5b551c5b19ae45e2
 all_python_files: 233
-selected_src_tests_files: 223
-sample: [&#39;src/datasets/__init__.py&#39;, &#39;src/datasets/arrow_dataset.py&#39;, &#39;src/datasets/arrow_reader.py&#39;, &#39;src/datasets/arrow_writer.py&#39;, &#39;src/datasets/builder.py&#39;]
+parser_selected_files: 138
+sample: [&#39;src\\datasets\\__init__.py&#39;, &#39;src\\datasets\\arrow_dataset.py&#39;, &#39;src\\datasets\\arrow_reader.py&#39;, &#39;src\\datasets\\arrow_writer.py&#39;, &#39;src\\datasets\\builder.py&#39;]
 </pre></div>
 </div>
 </div>
