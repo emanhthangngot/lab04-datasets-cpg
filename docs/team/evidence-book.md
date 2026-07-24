@@ -106,9 +106,18 @@ Final review gates:
 - [x] Confirm GitHub Pages published and live-reviewed the initial Stage 4 release.
 - [x] Publish and live-review the full-run evidence update
   (`4386a93953956fa054abbba8d55d32f8823ea40e`).
+- [ ] Publish and live-review the hybrid source-plus-evidence chapters.
 - [x] Open the root Pages URL and every chapter.
 - [x] Confirm repository links are visible from the book.
 - [x] Confirm the verified Pages root URL is the only Moodle value.
+
+Hybrid chapter contract:
+
+- Keep implementation in the repository source files.
+- Embed focused source excerpts with MyST `literalinclude`.
+- Use visible executed cells to print raw Kafka, database, checkpoint, and replay
+  evidence beside the derived assertions.
+- Never copy complete implementation files into notebooks.
 
 Done when:
 

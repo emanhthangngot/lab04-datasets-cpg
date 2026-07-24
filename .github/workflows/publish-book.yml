@@ -6,6 +6,18 @@ on:
     paths:
       - "book/**"
       - "screenshots/**"
+      - "parser_service/**"
+      - "spark_jobs/**"
+      - "scripts/**"
+      - "neo4j/**"
+      - "mongodb/**"
+      - "schemas/**"
+      - "docker-compose.yml"
+      - "tests/**"
+      - "pyproject.toml"
+      - "README.md"
+      - "docs/**"
+      - "openspec/**"
       - "requirements.txt"
       - ".github/workflows/publish-book.yml"
   workflow_dispatch:

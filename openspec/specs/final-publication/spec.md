@@ -12,13 +12,18 @@ it does not rely on Stage 1-3 specifications to define grading readiness.
 Each Task 1-6 chapter SHALL be a sequential narrative that explains the team's
 approach and reasoning, contains real executed notebook output, presents the
 evidence required for that task, and ends with a brief reflection.
+The chapter SHALL embed a focused source excerpt from the repository beside raw
+evidence without duplicating the complete implementation inside the notebook.
 
 #### Scenario: Final task-chapter audit
 
 - **WHEN** the six task chapters are reviewed before publication
 - **THEN** every chapter identifies its task and explains the approach and reasoning
+- **AND** every chapter embeds a source excerpt from the implementation it explains
 - **AND** every chapter contains real executed notebook output with meaningful
   intermediate or final results
+- **AND** raw evidence is printed or rendered by visible code cells rather than
+  being represented only by a precomputed aggregate
 - **AND** every chapter contains a relevant screenshot or embedded figure when
   visual evidence is applicable to that task
 - **AND** the database tasks contain a database UI screenshot or embedded figure
