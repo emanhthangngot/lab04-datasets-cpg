@@ -79,10 +79,10 @@ Tasks:
 
 Stage 3 adds these exact gates:
 
-- [x] Rebuild the five-file baseline with metadata offset 5.
-- [x] Restart Spark with the same checkpoint and prove the offset remains 5.
-- [x] Replay only `src/datasets/__init__.py` and prove metadata advances to 6.
-- [x] Record Kafka deltas of 23 node, 16 edge, 1 metadata, and 0 error events.
+- [x] Rebuild the full selected-file baseline with metadata offset 138.
+- [x] Restart Spark with the same checkpoint and prove the offset remains 138.
+- [x] Replay only `src/datasets/__init__.py` and prove metadata advances to 139.
+- [x] Record Kafka deltas of 61 node, 16 edge, 1 metadata, and 0 error events.
 - [x] Run the PowerShell wrapper smoke check on Windows with Docker Desktop and
   Git Bash.
 
@@ -136,19 +136,20 @@ Completed in Stage 2:
 |---|---|
 | Kafka sample messages are available for Jupyter Book | ✅ Evidence captured: [screenshots/kafka/](../../screenshots/kafka/) |
 | Connector registration evidence shows correct Neo4j class | ✅ Evidence captured: [connector_plugins.json](../../screenshots/kafka/connector_plugins.json) |
-| Spark reads cpg.metadata and writes metadata path evidence | ✅ Checkpoint offset committed and MongoDB contains 5 metadata documents |
+| Spark reads cpg.metadata and writes metadata path evidence | ✅ Checkpoint offset committed and MongoDB contains 138 metadata documents |
 | Progress and evidence links updated in this file | ✅ Updated |
 | All existing tests still pass | ✅ Full verification recorded in the Stage 2 PR |
 
 ### Latest Runtime Recheck
 
-The clean Docker run used `RESET_DOCKER_STATE=1` and verified Kafka sample
-contracts, a RUNNING Neo4j connector, Neo4j ingestion (22,628 nodes, 21,415
-non-placeholder nodes, 7,968 edges, 1,213 placeholders, no duplicate
-nodes/edges), a committed Spark checkpoint at metadata offset 5, and 5 MongoDB
-metadata documents with no duplicate `file_id`. All sampled events carry the
-real dataset commit `41adfd0f9ee9ba3a6b4f719d5b551c5b19ae45e2`; the validated
-manifest is [stage2_manifest.json](../../screenshots/stage2_manifest.json).
+The 2026-07-23 clean Docker run used `RESET_DOCKER_STATE=1` and verified Kafka
+sample contracts, a RUNNING Neo4j connector, Neo4j ingestion (135,198 total
+nodes, 133,263 non-placeholder nodes, 38,141 edges, 1,935 placeholders, no
+duplicate nodes/edges), a committed Spark checkpoint at metadata offset 138,
+and 138 MongoDB metadata documents with no duplicate `file_id`. All sampled
+events carry the real dataset commit
+`41adfd0f9ee9ba3a6b4f719d5b551c5b19ae45e2`; the validated manifest is
+[stage2_manifest.json](../../screenshots/stage2_manifest.json).
 
 ### Baseline Checks (task 1.2)
 
@@ -240,6 +241,10 @@ Acceptance status: `APPROVED` or `BLOCKED`
 Recorded acceptance status: `APPROVED`
 
 ### Acceptance Record
+
+The record below is the immutable 2026-07-17 post-merge acceptance snapshot.
+The final submission uses the superseding 2026-07-23 full-run metrics documented
+in **Latest Runtime Recheck** and the committed manifests.
 
 Date: 2026-07-17
 

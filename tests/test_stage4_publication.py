@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 from pathlib import Path
 
 
@@ -8,11 +9,21 @@ ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = ROOT / ".github" / "workflows" / "publish-book.yml"
 BOOK = ROOT / "book"
 FINAL_SPEC = ROOT / "openspec" / "specs" / "final-publication" / "spec.md"
+COMPOSE = ROOT / "docker-compose.yml"
 
 
 def _notebook_source(name: str) -> str:
     notebook = json.loads((BOOK / name).read_text(encoding="utf-8"))
     return "\n".join("".join(cell.get("source", [])) for cell in notebook["cells"])
+
+
+def _notebook_output(name: str) -> str:
+    notebook = json.loads((BOOK / name).read_text(encoding="utf-8"))
+    return "\n".join(
+        "".join(item.get("text", []))
+        for cell in notebook["cells"]
+        for item in cell.get("outputs", [])
+    )
 
 
 def test_publication_workflow_is_pinned_and_fail_fast() -> None:
@@ -104,6 +115,49 @@ def test_store_chapters_embed_real_final_state_ui_evidence() -> None:
     for image in ("neo4j_after_cleanup.png", "mongodb_after_replay.png"):
         assert image in metadata["screenshots"]
         assert f"screenshots/replay/{image}" in manifest["artifacts"]
+
+
+def test_kafka_chapter_renders_real_message_samples() -> None:
+    task3 = _notebook_source("task3_kafka.ipynb")
+    notebook = json.loads((BOOK / "task3_kafka.ipynb").read_text(encoding="utf-8"))
+    output = "\n".join(
+        "".join(item.get("text", []))
+        for cell in notebook["cells"]
+        for item in cell.get("outputs", [])
+    )
+
+    for topic, filename in {
+        "cpg.nodes": "sample_cpg_nodes.json",
+        "cpg.edges": "sample_cpg_edges.json",
+        "cpg.metadata": "sample_cpg_metadata.json",
+        "cpg.errors": "sample_cpg_errors.json",
+    }.items():
+        assert f"../screenshots/kafka/{filename}" in task3
+        assert f"{topic} sample:" in output
+
+    assert '"schema_version": "1.0"' in output
+    assert '"event_time":' in output
+
+
+def test_store_chapter_dates_match_replay_evidence() -> None:
+    metadata = json.loads(
+        (ROOT / "screenshots" / "replay" / "evidence_metadata.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    expected = f"| Run date | `{metadata['run_date']}` |"
+
+    assert expected in _notebook_source("task4_neo4j.ipynb")
+    assert expected in _notebook_source("task5_mongodb.ipynb")
+
+
+def test_neo4j_healthcheck_uses_the_configured_password() -> None:
+    compose = COMPOSE.read_text(encoding="utf-8")
+
+    assert 'LAB04_NEO4J_PASSWORD: "${NEO4J_PASSWORD:-password}"' in compose
+    assert '-p \\"$${LAB04_NEO4J_PASSWORD}\\"' in compose
+    assert '      NEO4J_PASSWORD: "${NEO4J_PASSWORD:-password}"' not in compose
+    assert "-p password 'RETURN 1'" not in compose
 
 
 def test_public_book_uses_password_placeholder() -> None:
@@ -247,3 +301,129 @@ def test_all_task_chapters_use_consistent_evidence_format() -> None:
         "task6_replay.ipynb",
     ):
         assert "```{admonition} Database UI evidence" in _notebook_source(chapter)
+
+
+def test_all_task_chapters_use_reviewable_hybrid_source_excerpts() -> None:
+    expected_sources = {
+        "task1_repository.ipynb": (
+            "../scripts/clone_repo.sh",
+            "../parser_service/discover.py",
+        ),
+        "task2_parser.ipynb": (
+            "../parser_service/parser.py",
+            "../parser_service/ids.py",
+        ),
+        "task3_kafka.ipynb": (
+            "../scripts/init_kafka_topics.sh",
+            "../parser_service/schemas.py",
+        ),
+        "task4_neo4j.ipynb": (
+            "../neo4j/sink_connector.json",
+            "../neo4j/verification.cypher",
+        ),
+        "task5_mongodb.ipynb": (
+            "../spark_jobs/metadata_stream_to_mongo.py",
+        ),
+        "task6_replay.ipynb": (
+            "../scripts/run_stage3_evidence.sh",
+            "../neo4j/cleanup_stale.cypher",
+        ),
+    }
+
+    for chapter, paths in expected_sources.items():
+        source = _notebook_source(chapter)
+        assert "## Key implementation excerpts" in source
+        for relative_path in paths:
+            directive = f"```{{literalinclude}} {relative_path}"
+            assert directive in source, f"{chapter} does not show {relative_path}"
+
+        included = re.findall(r"\{literalinclude\}\s+([^\n]+)", source)
+        for relative_path in included:
+            assert (BOOK / relative_path).resolve().is_file(), (
+                f"{chapter} includes missing source {relative_path}"
+            )
+
+
+def test_hybrid_evidence_cells_expose_raw_proof_instead_of_only_manifests() -> None:
+    expected_output = {
+        "task2_parser.ipynb": (
+            "metadata sample:",
+            "stable identity proof:",
+        ),
+        "task4_neo4j.ipynb": (
+            "connector status: RUNNING",
+            "raw Neo4j query evidence:",
+        ),
+        "task5_mongodb.ipynb": (
+            "raw MongoDB query evidence:",
+            "checkpoint offsets:",
+        ),
+        "task6_replay.ipynb": ("source patch:",),
+    }
+
+    for chapter, markers in expected_output.items():
+        output = _notebook_output(chapter)
+        for marker in markers:
+            assert marker in output, f"{chapter} output does not contain {marker}"
+
+
+def test_neo4j_chapter_shows_the_idempotent_sink_implementation() -> None:
+    source = _notebook_source("task4_neo4j.ipynb")
+
+    assert "```{literalinclude} ../neo4j/sink_connector.json" in source
+    assert ":lines: 3-14" in source
+
+
+def test_every_notebook_code_cell_is_executed_visible_and_error_free() -> None:
+    for path in sorted(BOOK.glob("task*.ipynb")):
+        notebook = json.loads(path.read_text(encoding="utf-8"))
+        code_cells = [
+            cell for cell in notebook["cells"] if cell["cell_type"] == "code"
+        ]
+        assert code_cells, f"{path.name} contains no code cells"
+
+        for cell in code_cells:
+            assert cell.get("execution_count") is not None
+            assert cell.get("outputs")
+            assert all(
+                output.get("output_type") != "error"
+                for output in cell.get("outputs", [])
+            )
+            tags = cell.get("metadata", {}).get("tags", [])
+            assert "remove-input" not in tags
+            assert "hide-input" not in tags
+
+
+def test_publication_workflow_watches_hybrid_source_and_contract_inputs() -> None:
+    source = WORKFLOW.read_text(encoding="utf-8")
+    for tracked_input in (
+        '      - "parser_service/**"',
+        '      - "spark_jobs/**"',
+        '      - "scripts/**"',
+        '      - "neo4j/**"',
+        '      - "mongodb/**"',
+        '      - "schemas/**"',
+        '      - "docker-compose.yml"',
+        '      - "tests/**"',
+        '      - "pyproject.toml"',
+        '      - "README.md"',
+        '      - "docs/**"',
+        '      - "openspec/**"',
+    ):
+        assert tracked_input in source
+
+
+def test_public_contract_requires_hybrid_source_and_raw_evidence() -> None:
+    spec = FINAL_SPEC.read_text(encoding="utf-8").lower()
+
+    assert "source excerpt" in spec
+    assert "raw evidence" in spec
+    assert "without duplicating the complete implementation" in spec
+
+
+def test_compose_documentation_describes_the_full_selected_source_run() -> None:
+    compose = COMPOSE.read_text(encoding="utf-8")
+
+    assert "full selected-source Stage 2 ingestion" in compose
+    assert "Five-file Stage 2 ingestion" not in compose
+    assert "selected-file Stage 2 ingestion" not in compose
