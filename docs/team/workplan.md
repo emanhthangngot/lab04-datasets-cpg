@@ -132,16 +132,18 @@ Stage 4 follows the single-executor checklist in
 - [x] Push the final Stage 4 contract/book update to `main`.
 - [x] Confirm GitHub Pages workflow passes.
 - [x] Open every chapter from the Pages URL.
+- [x] Confirm the hybrid chapters expose source excerpts, visible executed
+  cells, raw evidence, and the Neo4j node/edge `MERGE` implementation.
 - [ ] Submit only the Pages root URL to Moodle (manual student action).
 - [ ] Record the Moodle submission date and exact submitted root URL.
 
 Stage 4 technical publication acceptance was first recorded on 2026-07-21 and
 revalidated after the full-run evidence update on 2026-07-24:
 
-- Verified publication source commit: `4386a93953956fa054abbba8d55d32f8823ea40e`
-  (merge of the reviewed full-run evidence update).
+- Verified hybrid content source commit: `4ffd196194e8293fd293e5e249ee39c0636e2152`
+  (merge of the reviewed hybrid source-plus-evidence update).
 - Publication workflow:
-  https://github.com/emanhthangngot/lab04-datasets-cpg/actions/runs/30029374797
+  https://github.com/emanhthangngot/lab04-datasets-cpg/actions/runs/30104081101
   — conclusion `success`.
 - Pages deployment is performed by the successful publication workflow above;
   source `gh-pages` `/`.
