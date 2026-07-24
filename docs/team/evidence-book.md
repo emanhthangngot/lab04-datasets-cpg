@@ -106,7 +106,8 @@ Final review gates:
 - [x] Confirm GitHub Pages published and live-reviewed the initial Stage 4 release.
 - [x] Publish and live-review the full-run evidence update
   (`4386a93953956fa054abbba8d55d32f8823ea40e`).
-- [ ] Publish and live-review the hybrid source-plus-evidence chapters.
+- [x] Publish and live-review the hybrid source-plus-evidence chapters
+  (`4ffd196194e8293fd293e5e249ee39c0636e2152`).
 - [x] Open the root Pages URL and every chapter.
 - [x] Confirm repository links are visible from the book.
 - [x] Confirm the verified Pages root URL is the only Moodle value.
@@ -130,14 +131,14 @@ Stage 4 publication review revalidated 2026-07-24:
 - Repository link on the live book targets
   `https://github.com/emanhthangngot/lab04-datasets-cpg`.
 - Workflow run success:
-  https://github.com/emanhthangngot/lab04-datasets-cpg/actions/runs/30029374797
+  https://github.com/emanhthangngot/lab04-datasets-cpg/actions/runs/30104081101
 - The same workflow deployed the generated HTML to the `gh-pages` branch.
 - Moodle value remains exactly the Pages root URL (manual submit).
 
 ## Latest Update
 
-Status: `PUBLICATION_DEPLOYED`. Final published source
-`4386a93953956fa054abbba8d55d32f8823ea40e` was reviewed on 2026-07-24.
+Status: `PUBLICATION_DEPLOYED`. Hybrid implementation source
+`4ffd196194e8293fd293e5e249ee39c0636e2152` was reviewed on 2026-07-24.
 The current Stage 2 and Stage 3 evidence was captured on 2026-07-23.
 Whole-assignment state remains incomplete until the student submits the root
 URL to Moodle, then records the date and exact URL in `workplan.md`.
