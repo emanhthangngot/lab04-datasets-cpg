@@ -130,17 +130,17 @@ Clean-run acceptance after `RESET_DOCKER_STATE=1` reset the local
   `41adfd0f9ee9ba3a6b4f719d5b551c5b19ae45e2`; the hash-validated summary is
   `screenshots/stage2_manifest.json`.
 
-- Kafka emitted 21,415 node events with 21,415 unique IDs and 7,968 edge events
-  with 7,968 unique IDs. Every consumed graph event used
+- Kafka emitted 133,263 node events with 133,263 unique IDs and 38,141 edge
+  events with 38,141 unique IDs. Every consumed graph event used
   `repo=huggingface/datasets`.
-- Neo4j persisted 21,415 non-placeholder nodes, 1,213 placeholders, 22,628
-  total nodes, and 7,968 relationships. Duplicate node and edge groups were 0.
-- MongoDB persisted exactly 5 documents, 5 distinct `file_id` values, 5
+- Neo4j persisted 133,263 non-placeholder nodes, 1,935 placeholders, 135,198
+  total nodes, and 38,141 relationships. Duplicate node and edge groups were 0.
+- MongoDB persisted exactly 138 documents, 138 distinct `file_id` values, 138
   distinct `file_path` values, and only `huggingface/datasets`.
-- Spark clean-run checkpoint reached Kafka metadata offset 5 with numeric batch
-  commit 0.
+- Spark clean-run checkpoint reached Kafka metadata offset 138 with numeric
+  batch commit 0.
 
-Validation: 96 Python tests passed, Docker Compose config parsed, connector
+Validation: 149 Python tests passed, Docker Compose config parsed, connector
 JSON parsed, all shell scripts passed `bash -n`, and
 `scripts/run_checks.sh` passed.
 
@@ -155,11 +155,11 @@ Evidence:
 - `screenshots/kafka/sample_cpg_nodes.json`, `sample_cpg_edges.json`,
   `sample_cpg_metadata.json`, and `sample_cpg_errors.json`.
 
-Stage 3 store acceptance update (2026-07-17): the canonical replay removed 3
+Stage 3 store evidence update (2026-07-23): the canonical replay removed 21
 stale target nodes and 2 stale target edges. Final Neo4j duplicate groups are
-zero, MongoDB retains 5 unique documents with four unchanged hashes, both UI
-screenshots were inspected, and `screenshots/replay/stage3_replay_manifest.json`
-validates with status `pass`.
+zero, MongoDB retains 138 unique documents with 137 unchanged documents, both
+UI screenshots were inspected, and
+`screenshots/replay/stage3_replay_manifest.json` validates with status `pass`.
 
 ## Previous Update
 
@@ -177,9 +177,9 @@ Commands run:
 - `docker compose up -d broker neo4j mongo connect`
 - `docker compose ps`
 - `C:\Program Files\Git\bin\bash.exe scripts/check_connect_plugins.sh`
-- `docker compose exec -T neo4j cypher-shell -u neo4j -p password "RETURN 1 AS ok;"`
-- `docker compose exec -T neo4j cypher-shell -u neo4j -p password "CREATE CONSTRAINT cpg_node_id IF NOT EXISTS FOR (n:CPGNode) REQUIRE n.id IS UNIQUE;"`
-- `docker compose exec -T neo4j cypher-shell -u neo4j -p password "SHOW CONSTRAINTS;"`
+- `docker compose exec -T neo4j cypher-shell -u neo4j -p "$NEO4J_PASSWORD" "RETURN 1 AS ok;"`
+- `docker compose exec -T neo4j cypher-shell -u neo4j -p "$NEO4J_PASSWORD" "CREATE CONSTRAINT cpg_node_id IF NOT EXISTS FOR (n:CPGNode) REQUIRE n.id IS UNIQUE;"`
+- `docker compose exec -T neo4j cypher-shell -u neo4j -p "$NEO4J_PASSWORD" "SHOW CONSTRAINTS;"`
 - `docker compose exec -T neo4j printenv NEO4J_server_memory_heap_initial__size NEO4J_server_memory_heap_max__size`
 - `docker compose exec -T mongo mongosh --quiet --eval "db.runCommand({ ping: 1 })"`
 - Opened Neo4j Browser at `http://localhost:7474` and connected with
@@ -189,8 +189,8 @@ Evidence:
 
 - Baseline checks passed: Python tests `17 passed`, Docker Compose syntax passed,
   and Neo4j connector JSON config parsed successfully.
-- Docker Compose config confirms Neo4j credentials `neo4j/password` and heap
-  settings `1G` initial, `2G` max.
+- Docker Compose config confirms the `neo4j` user with a locally supplied,
+  redacted password and heap settings `1G` initial, `2G` max.
 - Running services for Stage 1: `broker`, `connect`, `mongo`, and `neo4j` are
   healthy.
 - Kafka Connect exposes Neo4j sink class
@@ -251,6 +251,10 @@ Acceptance status: `APPROVED` or `BLOCKED`
 Recorded acceptance status: `APPROVED`
 
 ### Acceptance Record
+
+The record below is the immutable 2026-07-19 post-merge acceptance snapshot.
+The final submission uses the superseding 2026-07-23 full-run metrics documented
+above and the committed manifests.
 
 Date: 2026-07-19
 

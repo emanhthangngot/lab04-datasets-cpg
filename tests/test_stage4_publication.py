@@ -8,6 +8,7 @@ ROOT = Path(__file__).resolve().parents[1]
 WORKFLOW = ROOT / ".github" / "workflows" / "publish-book.yml"
 BOOK = ROOT / "book"
 FINAL_SPEC = ROOT / "openspec" / "specs" / "final-publication" / "spec.md"
+COMPOSE = ROOT / "docker-compose.yml"
 
 
 def _notebook_source(name: str) -> str:
@@ -104,6 +105,48 @@ def test_store_chapters_embed_real_final_state_ui_evidence() -> None:
     for image in ("neo4j_after_cleanup.png", "mongodb_after_replay.png"):
         assert image in metadata["screenshots"]
         assert f"screenshots/replay/{image}" in manifest["artifacts"]
+
+
+def test_kafka_chapter_renders_real_message_samples() -> None:
+    task3 = _notebook_source("task3_kafka.ipynb")
+    notebook = json.loads((BOOK / "task3_kafka.ipynb").read_text(encoding="utf-8"))
+    output = "\n".join(
+        "".join(item.get("text", []))
+        for cell in notebook["cells"]
+        for item in cell.get("outputs", [])
+    )
+
+    for topic, filename in {
+        "cpg.nodes": "sample_cpg_nodes.json",
+        "cpg.edges": "sample_cpg_edges.json",
+        "cpg.metadata": "sample_cpg_metadata.json",
+        "cpg.errors": "sample_cpg_errors.json",
+    }.items():
+        assert f"../screenshots/kafka/{filename}" in task3
+        assert f"{topic} sample:" in output
+
+    assert '"schema_version": "1.0"' in output
+    assert '"event_time":' in output
+
+
+def test_store_chapter_dates_match_replay_evidence() -> None:
+    metadata = json.loads(
+        (ROOT / "screenshots" / "replay" / "evidence_metadata.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    expected = f"| Run date | `{metadata['run_date']}` |"
+
+    assert expected in _notebook_source("task4_neo4j.ipynb")
+    assert expected in _notebook_source("task5_mongodb.ipynb")
+
+
+def test_neo4j_healthcheck_uses_the_configured_password() -> None:
+    compose = COMPOSE.read_text(encoding="utf-8")
+
+    assert 'NEO4J_PASSWORD: "${NEO4J_PASSWORD:-password}"' in compose
+    assert '-p \\"$${NEO4J_PASSWORD}\\"' in compose
+    assert "-p password 'RETURN 1'" not in compose
 
 
 def test_public_book_uses_password_placeholder() -> None:

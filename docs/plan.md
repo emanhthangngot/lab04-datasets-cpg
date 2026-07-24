@@ -808,7 +808,8 @@ FOR ()-[r:CPG_EDGE]-() REQUIRE r.id IS UNIQUE;
 Apply:
 
 ```bash
-docker compose exec -T neo4j cypher-shell -u neo4j -p password   < neo4j/constraints.cypher
+docker compose exec -T neo4j cypher-shell -u neo4j -p "$NEO4J_PASSWORD" \
+  < neo4j/constraints.cypher
 ```
 
 ---
@@ -1083,7 +1084,10 @@ DETACH DELETE n;
 Run:
 
 ```bash
-docker compose exec neo4j cypher-shell -u neo4j -p password   -P file_id="$FILE_ID"   -P run_id="$RUN_ID"   "$(cat neo4j/cleanup_stale.cypher)"
+docker compose exec neo4j cypher-shell -u neo4j -p "$NEO4J_PASSWORD" \
+  -P file_id="$FILE_ID" \
+  -P run_id="$RUN_ID" \
+  "$(cat neo4j/cleanup_stale.cypher)"
 ```
 
 ---
@@ -1104,7 +1108,8 @@ bash scripts/init_kafka_topics.sh
 bash scripts/check_connect_plugins.sh
 
 # 5. Create Neo4j node constraint only inside Neo4j container
-docker compose exec -T neo4j cypher-shell -u neo4j -p password   < neo4j/constraints.cypher
+docker compose exec -T neo4j cypher-shell -u neo4j -p "$NEO4J_PASSWORD" \
+  < neo4j/constraints.cypher
 
 # 6. Register Neo4j sink connector
 bash scripts/register_neo4j_sink.sh

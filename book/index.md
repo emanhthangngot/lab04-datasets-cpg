@@ -26,9 +26,9 @@ https://github.com/emanhthangngot/lab04-datasets-cpg
 ## Deliverable Checklist
 
 - [x] Task 1-5 are canonical executed notebook chapters.
-- [x] Architecture is backed by an editable Excalidraw source and rendered PNG.
+- [x] Architecture is backed by an editable SVG source rendered by the book.
 - [x] Kafka, Neo4j, MongoDB, Spark, and replay screenshot folders exist.
-- [x] Task 1-5 contain real executed outputs from the 2026-07-16 clean run.
+- [x] Task 1-5 contain real executed outputs from the 2026-07-23 clean run.
 - [x] Neo4j and MongoDB chapters link real query artifacts and duplicate checks.
 - [x] Task 1-5 reflections state what worked, what failed, and what was fixed.
 - [x] Task 6 contains executed replay evidence and the final reflection is complete.

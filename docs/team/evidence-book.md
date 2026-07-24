@@ -103,9 +103,9 @@ and uses this tracker only as Stage 1-3 evidence history.
 
 Final review gates:
 
-- [x] Confirm GitHub Pages published and live-reviewed release source `7ae8a832`.
-- [x] Publish and live-review the current final contract/book update
-  (`ebf9100e266a8352d7a292fd138aeb02649f9246`).
+- [x] Confirm GitHub Pages published and live-reviewed the initial Stage 4 release.
+- [x] Publish and live-review the full-run evidence update
+  (`4386a93953956fa054abbba8d55d32f8823ea40e`).
 - [x] Open the root Pages URL and every chapter.
 - [x] Confirm repository links are visible from the book.
 - [x] Confirm the verified Pages root URL is the only Moodle value.
@@ -114,25 +114,24 @@ Done when:
 
 - Tri approves the GitHub Pages URL as the only Moodle submission value.
 
-Stage 4 publication review recorded 2026-07-21:
+Stage 4 publication review revalidated 2026-07-24:
 
 - Live site https://emanhthangngot.github.io/lab04-datasets-cpg/ returns HTTP
   200 for root, Architecture, Task 1-6, and Reflection.
 - Repository link on the live book targets
   `https://github.com/emanhthangngot/lab04-datasets-cpg`.
 - Workflow run success:
-  https://github.com/emanhthangngot/lab04-datasets-cpg/actions/runs/29794123254
-- Pages deploy success:
-  https://github.com/emanhthangngot/lab04-datasets-cpg/actions/runs/29794146923
+  https://github.com/emanhthangngot/lab04-datasets-cpg/actions/runs/30029374797
+- The same workflow deployed the generated HTML to the `gh-pages` branch.
 - Moodle value remains exactly the Pages root URL (manual submit).
 
 ## Latest Update
 
-Status: `PUBLICATION_DEPLOYED`. Final source
-`ebf9100e266a8352d7a292fd138aeb02649f9246` was published and reviewed on
-2026-07-21. Stage 3 evidence is unchanged. Whole-assignment state remains
-incomplete until the student submits the root URL to Moodle, then records the
-date and exact URL in `workplan.md`.
+Status: `PUBLICATION_DEPLOYED`. Final published source
+`4386a93953956fa054abbba8d55d32f8823ea40e` was reviewed on 2026-07-24.
+The current Stage 2 and Stage 3 evidence was captured on 2026-07-23.
+Whole-assignment state remains incomplete until the student submits the root
+URL to Moodle, then records the date and exact URL in `workplan.md`.
 
 Evidence links:
 
@@ -190,6 +189,10 @@ Acceptance status: `APPROVED` or `BLOCKED`
 Recorded acceptance status: `APPROVED`
 
 ### Acceptance run: 2026-07-20
+
+This is the immutable 2026-07-20 post-merge acceptance snapshot. The final
+submission uses the superseding 2026-07-23 full-run notebooks and manifests
+described in **Latest Update**.
 
 Branch: `review/tuan/stage3-book-acceptance`
 Started from: `dev` at commit `5fd94ed`
