@@ -317,7 +317,10 @@ def test_all_task_chapters_use_reviewable_hybrid_source_excerpts() -> None:
             "../scripts/init_kafka_topics.sh",
             "../parser_service/schemas.py",
         ),
-        "task4_neo4j.ipynb": ("../neo4j/verification.cypher",),
+        "task4_neo4j.ipynb": (
+            "../neo4j/sink_connector.json",
+            "../neo4j/verification.cypher",
+        ),
         "task5_mongodb.ipynb": (
             "../spark_jobs/metadata_stream_to_mongo.py",
         ),
@@ -362,6 +365,13 @@ def test_hybrid_evidence_cells_expose_raw_proof_instead_of_only_manifests() -> N
         output = _notebook_output(chapter)
         for marker in markers:
             assert marker in output, f"{chapter} output does not contain {marker}"
+
+
+def test_neo4j_chapter_shows_the_idempotent_sink_implementation() -> None:
+    source = _notebook_source("task4_neo4j.ipynb")
+
+    assert "```{literalinclude} ../neo4j/sink_connector.json" in source
+    assert ":lines: 3-14" in source
 
 
 def test_every_notebook_code_cell_is_executed_visible_and_error_free() -> None:
