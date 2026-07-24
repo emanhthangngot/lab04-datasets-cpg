@@ -383,6 +383,8 @@
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#approach-and-reasoning">Approach and reasoning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-implementation-excerpts">Key implementation excerpts</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#executed-evidence">Executed evidence</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-this-chapter-proves">What this chapter proves</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#final-database-ui-evidence">Final database UI evidence</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reflection">Reflection</a></li>
@@ -409,19 +411,16 @@
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Evidence source</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">screenshots/stage2_manifest.json</span></code></p></td>
+<td><p>Spark checkpoint files, Mongo query output, and Stage 3 UI</p></td>
 </tr>
-<tr class="row-odd"><td><p>Commands</p></td>
+<tr class="row-odd"><td><p>Command</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/capture_spark_evidence.sh</span></code>; <code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/capture_store_evidence.sh</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p>Stream</p></td>
-<td><p>Spark consumes only <code class="docutils literal notranslate"><span class="pre">cpg.metadata</span></code>.</p></td>
+<tr class="row-even"><td><p>Route</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">cpg.metadata</span></code> → Spark Structured Streaming → MongoDB</p></td>
 </tr>
-<tr class="row-odd"><td><p>Storage contract</p></td>
-<td><p>MongoDB upserts by <code class="docutils literal notranslate"><span class="pre">file_id</span></code> with checkpointed Kafka offsets.</p></td>
-</tr>
-<tr class="row-even"><td><p>Raw query output</p></td>
-<td><p><a class="reference download internal" download="" href="_downloads/97cbac32afb1da7c43c36619ebec3efc/metadata_evidence.txt"><span class="xref download myst"><code class="docutils literal notranslate"><span class="pre">metadata_evidence.txt</span></code></span></a></p></td>
+<tr class="row-odd"><td><p>Run date</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">2026-07-23</span></code></p></td>
 </tr>
 </tbody>
 </table>
@@ -429,91 +428,178 @@
 </div>
 <section id="approach-and-reasoning">
 <h2>Approach and reasoning<a class="headerlink" href="#approach-and-reasoning" title="Link to this heading">#</a></h2>
-<p>Commands: <code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/capture_spark_evidence.sh</span></code> and <code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/capture_store_evidence.sh</span></code>. Spark owns the metadata path only: it reads <code class="docutils literal notranslate"><span class="pre">cpg.metadata</span></code>, persists checkpoint state, and writes one MongoDB document per <code class="docutils literal notranslate"><span class="pre">file_id</span></code>. That separation keeps metadata processing independent from the Neo4j graph connector.</p>
+<p>Spark consumes only successful metadata events. Each micro-batch retains the
+latest Kafka offset per <code class="docutils literal notranslate"><span class="pre">file_id</span></code>, then performs MongoDB replace/upsert by that
+key. The persistent checkpoint resumes from committed offsets after restart.</p>
+</section>
+<section id="key-implementation-excerpts">
+<h2>Key implementation excerpts<a class="headerlink" href="#key-implementation-excerpts" title="Link to this heading">#</a></h2>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-number">Listing 9 </span><span class="caption-text">Latest-per-file MongoDB replace/upsert</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">write_batch</span><span class="p">(</span><span class="n">batch_df</span><span class="p">,</span> <span class="n">batch_id</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Write each micro-batch with replace/upsert semantics by file_id.&quot;&quot;&quot;</span>
+
+    <span class="n">batch_df</span> <span class="o">=</span> <span class="n">batch_df</span><span class="o">.</span><span class="n">persist</span><span class="p">(</span><span class="n">StorageLevel</span><span class="o">.</span><span class="n">MEMORY_AND_DISK</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">latest_per_file</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">batch_df</span><span class="o">.</span><span class="n">withColumn</span><span class="p">(</span>
+                <span class="s2">&quot;_row_number&quot;</span><span class="p">,</span>
+                <span class="n">row_number</span><span class="p">()</span><span class="o">.</span><span class="n">over</span><span class="p">(</span>
+                    <span class="n">Window</span><span class="o">.</span><span class="n">partitionBy</span><span class="p">(</span><span class="s2">&quot;file_id&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">orderBy</span><span class="p">(</span>
+                        <span class="n">col</span><span class="p">(</span><span class="s2">&quot;_kafka_offset&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">desc</span><span class="p">(),</span>
+                        <span class="n">col</span><span class="p">(</span><span class="s2">&quot;_kafka_partition&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">desc</span><span class="p">(),</span>
+                    <span class="p">)</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+            <span class="o">.</span><span class="n">filter</span><span class="p">(</span><span class="n">col</span><span class="p">(</span><span class="s2">&quot;_row_number&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">drop</span><span class="p">(</span><span class="s2">&quot;_row_number&quot;</span><span class="p">,</span> <span class="s2">&quot;_kafka_partition&quot;</span><span class="p">,</span> <span class="s2">&quot;_kafka_offset&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">row_count</span> <span class="o">=</span> <span class="n">latest_per_file</span><span class="o">.</span><span class="n">count</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">row_count</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[Batch </span><span class="si">{</span><span class="n">batch_id</span><span class="si">}</span><span class="s2">] Writing </span><span class="si">{</span><span class="n">row_count</span><span class="si">}</span><span class="s2"> metadata document(s) to MongoDB&quot;</span><span class="p">)</span>
+
+        <span class="p">(</span>
+            <span class="n">latest_per_file</span><span class="o">.</span><span class="n">write</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s2">&quot;mongodb&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">mode</span><span class="p">(</span><span class="s2">&quot;append&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;spark.mongodb.write.database&quot;</span><span class="p">,</span> <span class="n">MONGO_DATABASE</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;spark.mongodb.write.collection&quot;</span><span class="p">,</span> <span class="n">MONGO_COLLECTION</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;spark.mongodb.write.operationType&quot;</span><span class="p">,</span> <span class="s2">&quot;replace&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;spark.mongodb.write.idFieldList&quot;</span><span class="p">,</span> <span class="s2">&quot;file_id&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;spark.mongodb.write.upsertDocument&quot;</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span><span class="p">)</span>
+            <span class="o">.</span><span class="n">save</span><span class="p">()</span>
+        <span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">batch_df</span><span class="o">.</span><span class="n">unpersist</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-number">Listing 10 </span><span class="caption-text">Structured Streaming checkpoint and trigger</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># Start streaming query with processing time trigger</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="n">query</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">metadata_df</span><span class="o">.</span><span class="n">writeStream</span><span class="o">.</span><span class="n">foreachBatch</span><span class="p">(</span><span class="n">write_batch</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">option</span><span class="p">(</span><span class="s2">&quot;checkpointLocation&quot;</span><span class="p">,</span> <span class="n">CHECKPOINT_PATH</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">trigger</span><span class="p">(</span><span class="n">processingTime</span><span class="o">=</span><span class="n">TRIGGER_INTERVAL</span><span class="p">)</span>
+    <span class="o">.</span><span class="n">start</span><span class="p">()</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="executed-evidence">
+<h2>Executed evidence<a class="headerlink" href="#executed-evidence" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+<span class="n">ROOT</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span>
+    <span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">(),</span> <span class="o">*</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">]</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">p</span> <span class="o">/</span> <span class="s2">&quot;screenshots/stage2_manifest.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+<span class="p">)</span>
+<span class="n">manifest</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">((</span><span class="n">ROOT</span> <span class="o">/</span> <span class="s2">&quot;screenshots/stage2_manifest.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
+<span class="n">mongo</span> <span class="o">=</span> <span class="n">manifest</span><span class="p">[</span><span class="s2">&quot;metrics&quot;</span><span class="p">][</span><span class="s2">&quot;mongodb&quot;</span><span class="p">]</span>
+<span class="n">spark</span> <span class="o">=</span> <span class="n">manifest</span><span class="p">[</span><span class="s2">&quot;metrics&quot;</span><span class="p">][</span><span class="s2">&quot;spark&quot;</span><span class="p">]</span>
+
+<span class="n">mongo_raw</span> <span class="o">=</span> <span class="p">(</span><span class="n">ROOT</span> <span class="o">/</span> <span class="s2">&quot;screenshots/mongodb/metadata_evidence.txt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+<span class="n">offsets_raw</span> <span class="o">=</span> <span class="p">(</span><span class="n">ROOT</span> <span class="o">/</span> <span class="s2">&quot;screenshots/spark/checkpoint_offsets.txt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+<span class="n">commits_raw</span> <span class="o">=</span> <span class="p">(</span><span class="n">ROOT</span> <span class="o">/</span> <span class="s2">&quot;screenshots/spark/checkpoint_commits.txt&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;raw MongoDB query evidence:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">mongo_raw</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;checkpoint offsets:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">offsets_raw</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;checkpoint commits:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">commits_raw</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;manifest summary:&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;mongodb&quot;</span><span class="p">:</span> <span class="n">mongo</span><span class="p">,</span> <span class="s2">&quot;spark&quot;</span><span class="p">:</span> <span class="n">spark</span><span class="p">})</span>
+
+<span class="k">assert</span> <span class="n">mongo</span><span class="p">[</span><span class="s2">&quot;documents&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">mongo</span><span class="p">[</span><span class="s2">&quot;unique_file_ids&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">mongo</span><span class="p">[</span><span class="s2">&quot;unique_file_paths&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">138</span>
+<span class="k">assert</span> <span class="n">mongo</span><span class="p">[</span><span class="s2">&quot;duplicate_file_id_groups&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
+<span class="k">assert</span> <span class="n">spark</span><span class="p">[</span><span class="s2">&quot;metadata_offset&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">138</span>
+<span class="k">assert</span> <span class="s1">&#39;&quot;cpg.metadata&quot;:{&quot;0&quot;:138}&#39;</span> <span class="ow">in</span> <span class="n">offsets_raw</span>
+<span class="k">assert</span> <span class="s2">&quot;v1&quot;</span> <span class="ow">in</span> <span class="n">commits_raw</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>raw MongoDB query evidence:
+file_metadata count: 138
+unique file_id count: 138
+unique file_path count: 138
+repo values: [&quot;huggingface/datasets&quot;]
+--- sample document ---
+{
+  _id: ObjectId(&#39;6a61bba91f1048cf3efe5cc6&#39;),
+  schema_version: &#39;1.0&#39;,
+  event_time: &#39;2026-07-23T06:58:37.001Z&#39;,
+  repo: &#39;huggingface/datasets&#39;,
+  commit_sha: &#39;41adfd0f9ee9ba3a6b4f719d5b551c5b19ae45e2&#39;,
+  run_id: &#39;8c3efe458b3b43eaa1399d7740848d3f&#39;,
+  file_id: &#39;16e9e0abc22af726&#39;,
+  file_path: &#39;src/datasets/packaged_modules/text/text.py&#39;,
+  file_size: Long(&#39;6862&#39;),
+  content_hash: &#39;4f0ad7aa6bfdf82b1c7999dc7dfc9cc0a8b606b76fcdf2dbe0c29142d153b943&#39;,
+  num_ast_nodes: Long(&#39;502&#39;),
+  num_cfg_edges: Long(&#39;82&#39;),
+  num_dfg_edges: Long(&#39;42&#39;),
+  num_call_edges: Long(&#39;44&#39;),
+  num_total_edges: Long(&#39;168&#39;),
+  parse_duration_ms: Long(&#39;142&#39;),
+  status: &#39;success&#39;
+}
+--- duplicate file_id check ---
+[]
+checkpoint offsets:
+v1
+{&quot;batchWatermarkMs&quot;:0,&quot;batchTimestampMs&quot;:1784789932495,&quot;conf&quot;:{&quot;spark.sql.streaming.stateStore.providerClass&quot;:&quot;org.apache.spark.sql.execution.streaming.state.HDFSBackedStateStoreProvider&quot;,&quot;spark.sql.streaming.join.stateFormatVersion&quot;:&quot;2&quot;,&quot;spark.sql.streaming.stateStore.compression.codec&quot;:&quot;lz4&quot;,&quot;spark.sql.streaming.stateStore.rocksdb.formatVersion&quot;:&quot;5&quot;,&quot;spark.sql.streaming.statefulOperator.useStrictDistribution&quot;:&quot;true&quot;,&quot;spark.sql.streaming.flatMapGroupsWithState.stateFormatVersion&quot;:&quot;2&quot;,&quot;spark.sql.streaming.multipleWatermarkPolicy&quot;:&quot;min&quot;,&quot;spark.sql.streaming.aggregation.stateFormatVersion&quot;:&quot;2&quot;,&quot;spark.sql.shuffle.partitions&quot;:&quot;200&quot;}}
+{&quot;cpg.metadata&quot;:{&quot;0&quot;:138}}
+checkpoint commits:
+v1
+{&quot;nextBatchWatermarkMs&quot;:0}
+manifest summary: {&#39;mongodb&#39;: {&#39;documents&#39;: 138, &#39;duplicate_file_id_groups&#39;: 0, &#39;unique_file_ids&#39;: 138, &#39;unique_file_paths&#39;: 138}, &#39;spark&#39;: {&#39;completed_batch&#39;: 0, &#39;metadata_offset&#39;: 138}}
+</pre></div>
+</div>
+</div>
+</div>
 </section>
 <section id="what-this-chapter-proves">
 <h2>What this chapter proves<a class="headerlink" href="#what-this-chapter-proves" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
 <tr class="row-odd"><th class="head"><p>Requirement</p></th>
-<th class="head"><p>Evidence in this chapter</p></th>
+<th class="head"><p>Evidence</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>Spark metadata stream</p></td>
-<td><p>The executed output records Spark offset and metadata document counts.</p></td>
+<tr class="row-even"><td><p>Spark metadata route</p></td>
+<td><p>Embedded source subscribes to <code class="docutils literal notranslate"><span class="pre">cpg.metadata</span></code> only.</p></td>
 </tr>
-<tr class="row-odd"><td><p>MongoDB upsert behavior</p></td>
-<td><p>The chapter states the <code class="docutils literal notranslate"><span class="pre">file_id</span></code> replacement key and shows the final document.</p></td>
+<tr class="row-odd"><td><p>MongoDB write</p></td>
+<td><p>Raw query output shows 138 documents and one unique document per file.</p></td>
 </tr>
-<tr class="row-even"><td><p>UI-backed final state</p></td>
-<td><p>The Mongo Express screenshot shows the replay final state after replacement.</p></td>
+<tr class="row-even"><td><p>Idempotent key</p></td>
+<td><p>Duplicate <code class="docutils literal notranslate"><span class="pre">file_id</span></code> aggregation returns an empty list.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Restart support</p></td>
+<td><p>Checkpoint offset and commit files are displayed by the executed cell.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
-<span class="n">ROOT</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">(),</span> <span class="o">*</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">]</span> <span class="k">if</span> <span class="p">(</span><span class="n">p</span> <span class="o">/</span> <span class="s1">&#39;screenshots/stage2_manifest.json&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">())</span>
-<span class="n">manifest</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">((</span><span class="n">ROOT</span> <span class="o">/</span> <span class="s1">&#39;screenshots/stage2_manifest.json&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
-<span class="n">mongo</span> <span class="o">=</span> <span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;metrics&#39;</span><span class="p">][</span><span class="s1">&#39;mongodb&#39;</span><span class="p">];</span> <span class="n">spark</span> <span class="o">=</span> <span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;metrics&#39;</span><span class="p">][</span><span class="s1">&#39;spark&#39;</span><span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;MongoDB documents:&#39;</span><span class="p">,</span> <span class="n">mongo</span><span class="p">[</span><span class="s1">&#39;documents&#39;</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;unique file IDs/paths:&#39;</span><span class="p">,</span> <span class="n">mongo</span><span class="p">[</span><span class="s1">&#39;unique_file_ids&#39;</span><span class="p">],</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="n">mongo</span><span class="p">[</span><span class="s1">&#39;unique_file_paths&#39;</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;duplicate file_id groups:&#39;</span><span class="p">,</span> <span class="n">mongo</span><span class="p">[</span><span class="s1">&#39;duplicate_file_id_groups&#39;</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Spark metadata offset:&#39;</span><span class="p">,</span> <span class="n">spark</span><span class="p">[</span><span class="s1">&#39;metadata_offset&#39;</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;completed micro-batch:&#39;</span><span class="p">,</span> <span class="n">spark</span><span class="p">[</span><span class="s1">&#39;completed_batch&#39;</span><span class="p">])</span>
-<span class="k">assert</span> <span class="n">mongo</span><span class="p">[</span><span class="s1">&#39;documents&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">mongo</span><span class="p">[</span><span class="s1">&#39;unique_file_ids&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">mongo</span><span class="p">[</span><span class="s1">&#39;unique_file_paths&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="n">spark</span><span class="p">[</span><span class="s1">&#39;metadata_offset&#39;</span><span class="p">]</span>
-<span class="k">assert</span> <span class="n">mongo</span><span class="p">[</span><span class="s1">&#39;duplicate_file_id_groups&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">0</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>MongoDB documents: 138
-unique file IDs/paths: 138 / 138
-duplicate file_id groups: 0
-Spark metadata offset: 138
-completed micro-batch: 0
-</pre></div>
-</div>
-</div>
 </div>
 </section>
 <section id="final-database-ui-evidence">
 <h2>Final database UI evidence<a class="headerlink" href="#final-database-ui-evidence" title="Link to this heading">#</a></h2>
 <div class="important admonition">
 <p class="admonition-title">Database UI evidence</p>
-<div class="pst-scrollable-table-container"><table class="table">
-<thead>
-<tr class="row-odd"><th class="head"><p>Field</p></th>
-<th class="head"><p>Value</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>Tool</p></td>
-<td><p>Mongo Express</p></td>
-</tr>
-<tr class="row-odd"><td><p>Phase represented</p></td>
-<td><p>Canonical Stage 3 replay final state after metadata replacement.</p></td>
-</tr>
-<tr class="row-even"><td><p>UI action/query</p></td>
-<td><p>Filter the target <code class="docutils literal notranslate"><span class="pre">file_id</span></code>.</p></td>
-</tr>
-<tr class="row-odd"><td><p>Run date</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">2026-07-17</span></code></p></td>
-</tr>
-<tr class="row-even"><td><p>Result</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">pass</span></code></p></td>
-</tr>
-<tr class="row-odd"><td><p>Backing artifacts</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">screenshots/replay/mongodb_after_replay.json</span></code>; strict replay manifest.</p></td>
-</tr>
-</tbody>
-</table>
+<p>Mongo Express from the canonical Stage 3 replay final state on <code class="docutils literal notranslate"><span class="pre">2026-07-23</span></code>.
+The UI filters the replayed <code class="docutils literal notranslate"><span class="pre">file_id</span></code>, shows its new <code class="docutils literal notranslate"><span class="pre">run_id</span></code>, and reports 138
+documents after replacement.</p>
 </div>
-</div>
-<p><img alt="Mongo Express final document after Stage 3 replay" src="_images/mongodb_after_replay.png" /></p>
+<p><img alt="Mongo Express final document after replay" src="_images/mongodb_after_replay.png" /></p>
 </section>
 <section id="reflection">
 <h2>Reflection<a class="headerlink" href="#reflection" title="Link to this heading">#</a></h2>
@@ -527,13 +613,13 @@ completed micro-batch: 0
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Worked</p></td>
-<td><p>Spark committed the full metadata offset and MongoDB contained exactly one unique document per discovered source file with the exact repository and dataset commit.</p></td>
+<td><p>Checkpointing and replace/upsert preserved one document per file.</p></td>
 </tr>
 <tr class="row-odd"><td><p>Failed</p></td>
-<td><p>That clean run had MongoDB query artifacts but no dedicated Mongo Express capture.</p></td>
+<td><p>The first evidence set had query output but no MongoDB UI capture.</p></td>
 </tr>
 <tr class="row-even"><td><p>Resolution</p></td>
-<td><p>The canonical Stage 3 replay captured a real, hash-validated Mongo Express final-state image after replacement; it is presented above with its actual phase. Replay/idempotence remains Task 6, not a Stage 2 claim.</p></td>
+<td><p>Stage 3 added a read-only Mongo Express capture backed by the same manifest.</p></td>
 </tr>
 </tbody>
 </table>
@@ -609,6 +695,8 @@ completed micro-batch: 0
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#approach-and-reasoning">Approach and reasoning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-implementation-excerpts">Key implementation excerpts</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#executed-evidence">Executed evidence</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-this-chapter-proves">What this chapter proves</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#final-database-ui-evidence">Final database UI evidence</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reflection">Reflection</a></li>

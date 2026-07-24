@@ -383,6 +383,8 @@
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#approach-and-reasoning">Approach and reasoning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-implementation-excerpts">Key implementation excerpts</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#executed-evidence">Executed evidence</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-this-chapter-proves">What this chapter proves</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reflection">Reflection</a></li>
 </ul>
@@ -408,16 +410,16 @@
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Evidence source</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">screenshots/stage2_manifest.json</span></code></p></td>
+<td><p>Hash-validated Stage 2 manifest and Kafka samples</p></td>
 </tr>
 <tr class="row-odd"><td><p>Command</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">compose</span> <span class="pre">run</span> <span class="pre">--rm</span> <span class="pre">...</span> <span class="pre">parser</span> <span class="pre">python</span> <span class="pre">-m</span> <span class="pre">parser_service.main</span> <span class="pre">--repo</span> <span class="pre">data/datasets</span> <span class="pre">--mode</span> <span class="pre">full</span></code></p></td>
 </tr>
-<tr class="row-even"><td><p>Parser scope</p></td>
-<td><p>Every discovered core Python file, processed one file at a time.</p></td>
+<tr class="row-even"><td><p>Processing unit</p></td>
+<td><p>One source file, flushed before the next file</p></td>
 </tr>
-<tr class="row-odd"><td><p>Stable identity</p></td>
-<td><p>Repository, commit, file identity, node location/type, and edge endpoints.</p></td>
+<tr class="row-odd"><td><p>Identity</p></td>
+<td><p>Stable file, node, and edge IDs</p></td>
 </tr>
 </tbody>
 </table>
@@ -425,55 +427,189 @@
 </div>
 <section id="approach-and-reasoning">
 <h2>Approach and reasoning<a class="headerlink" href="#approach-and-reasoning" title="Link to this heading">#</a></h2>
-<p>Command: <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">compose</span> <span class="pre">run</span> <span class="pre">--rm</span> <span class="pre">...</span> <span class="pre">parser</span> <span class="pre">python</span> <span class="pre">-m</span> <span class="pre">parser_service.main</span> <span class="pre">--repo</span> <span class="pre">data/datasets</span> <span class="pre">--mode</span> <span class="pre">full</span></code>. The parser emits semantic AST nodes, synthetic per-function exit nodes, CFG, DFG, and CALL records with stable IDs. Every internal edge endpoint is audited against the emitted node set, and files are processed and flushed one at a time.</p>
+<p>Command: <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">compose</span> <span class="pre">run</span> <span class="pre">--rm</span> <span class="pre">...</span> <span class="pre">parser</span> <span class="pre">python</span> <span class="pre">-m</span> <span class="pre">parser_service.main</span> <span class="pre">--repo</span> <span class="pre">data/datasets</span> <span class="pre">--mode</span> <span class="pre">full</span></code>.</p>
+<p>The parser holds one source string and one Python AST at a time. Generator-based
+extractors emit AST nodes and CFG/DFG/CALL edges directly to Kafka; the producer
+flushes per file and the AST is released in <code class="docutils literal notranslate"><span class="pre">finally</span></code>. Structural paths make
+identical source content produce identical identifiers.</p>
+</section>
+<section id="key-implementation-excerpts">
+<h2>Key implementation excerpts<a class="headerlink" href="#key-implementation-excerpts" title="Link to this heading">#</a></h2>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-number">Listing 3 </span><span class="caption-text">Per-file parse, emit, flush, and cleanup lifecycle</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">process_file</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">producer</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Process one Python file and flush producer after that file.</span>
+
+<span class="sd">    The complete lab edge set is emitted through the CFG, DFG, and CALL</span>
+<span class="sd">    extractors before metadata is finalized.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">source</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">relative_path</span> <span class="o">=</span> <span class="n">normalize_relative_path</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="n">context</span><span class="o">.</span><span class="n">repo_root</span><span class="p">)</span>
+    <span class="n">file_id</span> <span class="o">=</span> <span class="n">make_file_id</span><span class="p">(</span><span class="n">context</span><span class="o">.</span><span class="n">repo_name</span><span class="p">,</span> <span class="n">relative_path</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">source</span> <span class="o">=</span> <span class="n">file_path</span><span class="o">.</span><span class="n">read_text</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="n">errors</span><span class="o">=</span><span class="s2">&quot;replace&quot;</span><span class="p">)</span>
+        <span class="n">tree</span> <span class="o">=</span> <span class="n">ast</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">source</span><span class="p">,</span> <span class="n">filename</span><span class="o">=</span><span class="n">relative_path</span><span class="p">)</span>
+        <span class="n">assign_parents</span><span class="p">(</span><span class="n">tree</span><span class="p">)</span>
+
+        <span class="n">node_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">cfg_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">dfg_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">call_count</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">for</span> <span class="n">node_event</span> <span class="ow">in</span> <span class="n">extract_ast_nodes_gen</span><span class="p">(</span>
+            <span class="n">tree</span><span class="o">=</span><span class="n">tree</span><span class="p">,</span> <span class="n">file_id</span><span class="o">=</span><span class="n">file_id</span><span class="p">,</span> <span class="n">file_path</span><span class="o">=</span><span class="n">relative_path</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span>
+        <span class="p">):</span>
+            <span class="n">producer</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s2">&quot;cpg.nodes&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">file_id</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">node_event</span><span class="p">)</span>
+            <span class="n">node_count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">for</span> <span class="n">edge_event</span> <span class="ow">in</span> <span class="n">iter_edge_events</span><span class="p">(</span>
+            <span class="n">tree</span><span class="o">=</span><span class="n">tree</span><span class="p">,</span> <span class="n">file_id</span><span class="o">=</span><span class="n">file_id</span><span class="p">,</span> <span class="n">file_path</span><span class="o">=</span><span class="n">relative_path</span><span class="p">,</span> <span class="n">context</span><span class="o">=</span><span class="n">context</span>
+        <span class="p">):</span>
+            <span class="n">producer</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s2">&quot;cpg.edges&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">file_id</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">edge_event</span><span class="p">)</span>
+            <span class="n">edge_type</span> <span class="o">=</span> <span class="n">edge_event</span><span class="p">[</span><span class="s2">&quot;edge_type&quot;</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">edge_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;CFG&quot;</span><span class="p">):</span>
+                <span class="n">cfg_count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">elif</span> <span class="n">edge_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;DFG&quot;</span><span class="p">):</span>
+                <span class="n">dfg_count</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">elif</span> <span class="n">edge_type</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;CALL&quot;</span><span class="p">):</span>
+                <span class="n">call_count</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">build_metadata_event</span><span class="p">(</span>
+            <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span>
+            <span class="n">file_id</span><span class="o">=</span><span class="n">file_id</span><span class="p">,</span>
+            <span class="n">file_path</span><span class="o">=</span><span class="n">relative_path</span><span class="p">,</span>
+            <span class="n">source</span><span class="o">=</span><span class="n">source</span><span class="p">,</span>
+            <span class="n">num_ast_nodes</span><span class="o">=</span><span class="n">node_count</span><span class="p">,</span>
+            <span class="n">num_cfg_edges</span><span class="o">=</span><span class="n">cfg_count</span><span class="p">,</span>
+            <span class="n">num_dfg_edges</span><span class="o">=</span><span class="n">dfg_count</span><span class="p">,</span>
+            <span class="n">num_call_edges</span><span class="o">=</span><span class="n">call_count</span><span class="p">,</span>
+            <span class="n">parse_duration_ms</span><span class="o">=</span><span class="nb">int</span><span class="p">((</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="p">)</span> <span class="o">*</span> <span class="mi">1000</span><span class="p">),</span>
+            <span class="n">status</span><span class="o">=</span><span class="s2">&quot;success&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">producer</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s2">&quot;cpg.metadata&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">file_id</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">metadata</span><span class="p">)</span>
+        <span class="n">producer</span><span class="o">.</span><span class="n">flush</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">metadata</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">error</span><span class="p">:</span>
+        <span class="n">error_event</span> <span class="o">=</span> <span class="n">build_error_event</span><span class="p">(</span>
+            <span class="n">context</span><span class="o">=</span><span class="n">context</span><span class="p">,</span> <span class="n">file_id</span><span class="o">=</span><span class="n">file_id</span><span class="p">,</span> <span class="n">file_path</span><span class="o">=</span><span class="n">relative_path</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="n">error</span>
+        <span class="p">)</span>
+        <span class="n">producer</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s2">&quot;cpg.errors&quot;</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="n">file_id</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">error_event</span><span class="p">)</span>
+        <span class="n">producer</span><span class="o">.</span><span class="n">flush</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">error_event</span>
+
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">del</span> <span class="n">tree</span>
+        <span class="n">gc</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-number">Listing 4 </span><span class="caption-text">Stable structural node identity</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">make_node_id</span><span class="p">(</span><span class="n">file_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">node</span><span class="p">:</span> <span class="n">ast</span><span class="o">.</span><span class="n">AST</span><span class="p">,</span> <span class="n">scope_path</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Create a unique, replay-stable ID from the node&#39;s structural path.&quot;&quot;&quot;</span>
+
+    <span class="n">node_type</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="n">node</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span>
+    <span class="n">structural_path</span> <span class="o">=</span> <span class="nb">getattr</span><span class="p">(</span><span class="n">node</span><span class="p">,</span> <span class="s2">&quot;_cpg_path&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">structural_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;AST structural path is missing; call assign_parents(tree) before &quot;</span>
+            <span class="s2">&quot;generating node IDs&quot;</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Keep scope_path in the public signature for extractor compatibility. The</span>
+    <span class="c1"># structural path already includes the node&#39;s exact location in the tree;</span>
+    <span class="c1"># scope remains an event property used for explanation and call resolution.</span>
+    <span class="k">del</span> <span class="n">scope_path</span>
+    <span class="n">raw</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">file_id</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">node_type</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">structural_path</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">short_hash</span><span class="p">(</span><span class="n">raw</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="executed-evidence">
+<h2>Executed evidence<a class="headerlink" href="#executed-evidence" title="Link to this heading">#</a></h2>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+<span class="n">ROOT</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span>
+    <span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">(),</span> <span class="o">*</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">]</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">p</span> <span class="o">/</span> <span class="s2">&quot;screenshots/stage2_manifest.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+<span class="p">)</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">first_json_line</span><span class="p">(</span><span class="n">relative_path</span><span class="p">):</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">ROOT</span> <span class="o">/</span> <span class="n">relative_path</span>
+    <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="nb">next</span><span class="p">(</span><span class="n">line</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">path</span><span class="o">.</span><span class="n">read_text</span><span class="p">()</span><span class="o">.</span><span class="n">splitlines</span><span class="p">()</span> <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()))</span>
+
+<span class="n">manifest</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">((</span><span class="n">ROOT</span> <span class="o">/</span> <span class="s2">&quot;screenshots/stage2_manifest.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
+<span class="n">metrics</span> <span class="o">=</span> <span class="n">manifest</span><span class="p">[</span><span class="s2">&quot;metrics&quot;</span><span class="p">][</span><span class="s2">&quot;kafka&quot;</span><span class="p">]</span>
+<span class="n">metadata</span> <span class="o">=</span> <span class="n">first_json_line</span><span class="p">(</span><span class="s2">&quot;screenshots/kafka/sample_cpg_metadata.json&quot;</span><span class="p">)</span>
+<span class="n">node</span> <span class="o">=</span> <span class="n">first_json_line</span><span class="p">(</span><span class="s2">&quot;screenshots/kafka/sample_cpg_nodes.json&quot;</span><span class="p">)</span>
+<span class="n">edge</span> <span class="o">=</span> <span class="n">first_json_line</span><span class="p">(</span><span class="s2">&quot;screenshots/kafka/sample_cpg_edges.json&quot;</span><span class="p">)</span>
+
+<span class="n">metadata_view</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">key</span><span class="p">:</span> <span class="n">metadata</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span>
+        <span class="s2">&quot;file_path&quot;</span><span class="p">,</span> <span class="s2">&quot;status&quot;</span><span class="p">,</span> <span class="s2">&quot;num_ast_nodes&quot;</span><span class="p">,</span> <span class="s2">&quot;num_cfg_edges&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;num_dfg_edges&quot;</span><span class="p">,</span> <span class="s2">&quot;num_call_edges&quot;</span><span class="p">,</span> <span class="s2">&quot;content_hash&quot;</span>
+    <span class="p">)</span>
+<span class="p">}</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;metadata sample:&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">metadata_view</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">True</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;stable identity proof:&quot;</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;node_id&quot;</span><span class="p">:</span> <span class="n">node</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">],</span> <span class="s2">&quot;edge_id&quot;</span><span class="p">:</span> <span class="n">edge</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]})</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;AST nodes:&quot;</span><span class="p">,</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;ast_nodes&quot;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;CFG/DFG/CALL edges:&quot;</span><span class="p">,</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;cfg_edges&quot;</span><span class="p">],</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;dfg_edges&quot;</span><span class="p">],</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;call_edges&quot;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;metadata/error events:&quot;</span><span class="p">,</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;metadata_events&quot;</span><span class="p">],</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;error_events&quot;</span><span class="p">])</span>
+
+<span class="k">assert</span> <span class="n">metadata</span><span class="p">[</span><span class="s2">&quot;status&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;success&quot;</span>
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">node</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">edge</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">16</span>
+<span class="k">assert</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;metadata_events&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">manifest</span><span class="p">[</span><span class="s2">&quot;run&quot;</span><span class="p">][</span><span class="s2">&quot;files_processed&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">138</span>
+<span class="k">assert</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;ast_nodes&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">133263</span>
+<span class="k">assert</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;total_edges&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="p">(</span>
+    <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;cfg_edges&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;dfg_edges&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">metrics</span><span class="p">[</span><span class="s2">&quot;call_edges&quot;</span><span class="p">]</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>metadata sample: {&quot;content_hash&quot;: &quot;74ab176247c9ba61e09843280c18cf3a9ac690403a5d35411a75d097db721939&quot;, &quot;file_path&quot;: &quot;src/datasets/__init__.py&quot;, &quot;num_ast_nodes&quot;: 57, &quot;num_call_edges&quot;: 0, &quot;num_cfg_edges&quot;: 15, &quot;num_dfg_edges&quot;: 0, &quot;status&quot;: &quot;success&quot;}
+stable identity proof: {&#39;node_id&#39;: &#39;57d761e9567d5b95&#39;, &#39;edge_id&#39;: &#39;07474daf0400bc31&#39;}
+AST nodes: 133263
+CFG/DFG/CALL edges: 18097 8586 11458
+metadata/error events: 138 1
+</pre></div>
+</div>
+</div>
+</div>
 </section>
 <section id="what-this-chapter-proves">
 <h2>What this chapter proves<a class="headerlink" href="#what-this-chapter-proves" title="Link to this heading">#</a></h2>
 <div class="pst-scrollable-table-container"><table class="table">
 <thead>
 <tr class="row-odd"><th class="head"><p>Requirement</p></th>
-<th class="head"><p>Evidence in this chapter</p></th>
+<th class="head"><p>Evidence</p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>Incremental CPG extraction</p></td>
-<td><p>Executed output reports node and edge counts from the captured run.</p></td>
+<tr class="row-even"><td><p>One-file processing</p></td>
+<td><p>The embedded implementation shows per-file parse and flush.</p></td>
 </tr>
-<tr class="row-odd"><td><p>Error handling</p></td>
-<td><p>The run preserves the intentional syntax-error event instead of dropping it.</p></td>
+<tr class="row-odd"><td><p>Complete CPG categories</p></td>
+<td><p>Executed output reports AST, CFG, DFG, and CALL totals.</p></td>
 </tr>
-<tr class="row-even"><td><p>Deterministic IDs</p></td>
-<td><p>The text explains the ID ingredients used by the parser and graph sinks.</p></td>
+<tr class="row-even"><td><p>Stable identifiers</p></td>
+<td><p>Real node and edge IDs are printed from captured Kafka events.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Error visibility</p></td>
+<td><p>The canonical run records 138 metadata events and one controlled parser error.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
-<span class="n">ROOT</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">(),</span> <span class="o">*</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">]</span> <span class="k">if</span> <span class="p">(</span><span class="n">p</span> <span class="o">/</span> <span class="s1">&#39;screenshots/stage2_manifest.json&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">())</span>
-<span class="n">manifest</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">((</span><span class="n">ROOT</span> <span class="o">/</span> <span class="s1">&#39;screenshots/stage2_manifest.json&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
-<span class="n">m</span> <span class="o">=</span> <span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;metrics&#39;</span><span class="p">][</span><span class="s1">&#39;kafka&#39;</span><span class="p">]</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;AST nodes:&#39;</span><span class="p">,</span> <span class="n">m</span><span class="p">[</span><span class="s1">&#39;ast_nodes&#39;</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;CFG edges:&#39;</span><span class="p">,</span> <span class="n">m</span><span class="p">[</span><span class="s1">&#39;cfg_edges&#39;</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;DFG edges:&#39;</span><span class="p">,</span> <span class="n">m</span><span class="p">[</span><span class="s1">&#39;dfg_edges&#39;</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;CALL edges:&#39;</span><span class="p">,</span> <span class="n">m</span><span class="p">[</span><span class="s1">&#39;call_edges&#39;</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;total edges:&#39;</span><span class="p">,</span> <span class="n">m</span><span class="p">[</span><span class="s1">&#39;total_edges&#39;</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;metadata events:&#39;</span><span class="p">,</span> <span class="n">m</span><span class="p">[</span><span class="s1">&#39;metadata_events&#39;</span><span class="p">],</span> <span class="s1">&#39;error events:&#39;</span><span class="p">,</span> <span class="n">m</span><span class="p">[</span><span class="s1">&#39;error_events&#39;</span><span class="p">])</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>AST nodes: 133263
-CFG edges: 18097
-DFG edges: 8586
-CALL edges: 11458
-total edges: 38141
-metadata events: 138 error events: 1
-</pre></div>
-</div>
-</div>
 </div>
 </section>
 <section id="reflection">
@@ -488,13 +624,13 @@ metadata events: 138 error events: 1
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Worked</p></td>
-<td><p>Every discovered core source file produced AST, CFG, DFG, and CALL structures; a separate controlled file produced the parser-error event.</p></td>
+<td><p>Generator extractors and per-file cleanup bounded parser memory.</p></td>
 </tr>
 <tr class="row-odd"><td><p>Failed</p></td>
-<td><p>A previous capture sampled fewer metadata/error records than the assignment requires.</p></td>
+<td><p>A previous sample run covered only part of the repository.</p></td>
 </tr>
 <tr class="row-even"><td><p>Resolution</p></td>
-<td><p>The canonical run now uses <code class="docutils literal notranslate"><span class="pre">--mode</span> <span class="pre">full</span></code>, requires one metadata event and one MongoDB document per discovered file, and rejects partial-repository evidence.</p></td>
+<td><p>The canonical run uses full mode and rejects evidence missing any selected file.</p></td>
 </tr>
 </tbody>
 </table>
@@ -570,6 +706,8 @@ metadata events: 138 error events: 1
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#approach-and-reasoning">Approach and reasoning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-implementation-excerpts">Key implementation excerpts</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#executed-evidence">Executed evidence</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-this-chapter-proves">What this chapter proves</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reflection">Reflection</a></li>
 </ul>

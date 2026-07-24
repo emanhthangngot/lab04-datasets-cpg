@@ -383,6 +383,8 @@
             <nav aria-label="Page">
                 <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#approach-and-reasoning">Approach and reasoning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-implementation-excerpts">Key implementation excerpts</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#executed-evidence">Executed evidence</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-this-chapter-proves">What this chapter proves</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reflection">Reflection</a></li>
 </ul>
@@ -408,16 +410,16 @@
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Evidence source</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">screenshots/stage2_manifest.json</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">screenshots/stage2_manifest.json</span></code> and the pinned local clone</p></td>
 </tr>
 <tr class="row-odd"><td><p>Command</p></td>
-<td><p><code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/run_stage2_evidence.sh</span></code></p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/clone_repo.sh</span></code>; <code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/run_stage2_evidence.sh</span></code></p></td>
 </tr>
 <tr class="row-even"><td><p>Dataset commit</p></td>
 <td><p><code class="docutils literal notranslate"><span class="pre">41adfd0f9ee9ba3a6b4f719d5b551c5b19ae45e2</span></code></p></td>
 </tr>
 <tr class="row-odd"><td><p>Build behavior</p></td>
-<td><p>Offline; the public book renders captured notebook output.</p></td>
+<td><p>Offline; Pages renders this committed executed output.</p></td>
 </tr>
 </tbody>
 </table>
@@ -425,44 +427,99 @@
 </div>
 <section id="approach-and-reasoning">
 <h2>Approach and reasoning<a class="headerlink" href="#approach-and-reasoning" title="Link to this heading">#</a></h2>
-<p>Command: <code class="docutils literal notranslate"><span class="pre">bash</span> <span class="pre">scripts/run_stage2_evidence.sh</span></code>. The runbook shallow-clones the dataset repository, resolves the real 40-character commit SHA, and records every selected core Python file under <code class="docutils literal notranslate"><span class="pre">src/datasets/</span></code> after the documented exclusions. The notebook reads the captured manifest instead of needing a live clone during publication.</p>
+<p>The clone command uses <code class="docutils literal notranslate"><span class="pre">--depth</span> <span class="pre">1</span></code> to minimize download size, then pins the
+Moodle-selected <code class="docutils literal notranslate"><span class="pre">huggingface/datasets</span></code> revision. Discovery records both every
+<code class="docutils literal notranslate"><span class="pre">.py</span></code> file and the parser-selected production files, so exclusions remain
+auditable rather than silently changing the reported total.</p>
 </section>
-<section id="what-this-chapter-proves">
-<h2>What this chapter proves<a class="headerlink" href="#what-this-chapter-proves" title="Link to this heading">#</a></h2>
-<div class="pst-scrollable-table-container"><table class="table">
-<thead>
-<tr class="row-odd"><th class="head"><p>Requirement</p></th>
-<th class="head"><p>Evidence in this chapter</p></th>
-</tr>
-</thead>
-<tbody>
-<tr class="row-even"><td><p>Repository discovery</p></td>
-<td><p>The executed cell prints the total repository Python files and the parser-selected core file count.</p></td>
-</tr>
-<tr class="row-odd"><td><p>Dataset provenance</p></td>
-<td><p>The output includes the pinned dataset commit SHA.</p></td>
-</tr>
-<tr class="row-even"><td><p>Reproducible publication</p></td>
-<td><p>The Jupyter Book build can render the saved output without network or service access.</p></td>
-</tr>
-</tbody>
-</table>
+<section id="key-implementation-excerpts">
+<h2>Key implementation excerpts<a class="headerlink" href="#key-implementation-excerpts" title="Link to this heading">#</a></h2>
+<p>The book embeds the real source-of-truth files; it does not duplicate them.</p>
+<div class="literal-block-wrapper docutils container" id="id1">
+<div class="code-block-caption"><span class="caption-number">Listing 1 </span><span class="caption-text">Shallow clone and pinned revision</span><a class="headerlink" href="#id1" title="Link to this code">#</a></div>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="ch">#!/usr/bin/env bash</span>
+<span class="nb">set</span><span class="w"> </span>-euo<span class="w"> </span>pipefail
+
+<span class="c1"># Clone the selected public repository for Lab04 evidence.</span>
+<span class="c1"># The caller records the printed commit SHA in the Task 1 evidence chapter.</span>
+
+<span class="nv">REPO_URL</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">REPO_URL</span><span class="k">:-</span><span class="nv">https</span><span class="p">://github.com/huggingface/datasets.git</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="nv">REPO_DIR</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">REPO_DIR</span><span class="k">:-</span><span class="nv">data</span><span class="p">/datasets</span><span class="si">}</span><span class="s2">&quot;</span>
+<span class="nv">DATASET_COMMIT</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">${</span><span class="nv">DATASET_COMMIT</span><span class="k">:-</span><span class="nv">41adfd0f9ee9ba3a6b4f719d5b551c5b19ae45e2</span><span class="si">}</span><span class="s2">&quot;</span>
+
+mkdir<span class="w"> </span>-p<span class="w"> </span><span class="s2">&quot;</span><span class="k">$(</span>dirname<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$REPO_DIR</span><span class="s2">&quot;</span><span class="k">)</span><span class="s2">&quot;</span>
+
+<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>!<span class="w"> </span>-d<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$REPO_DIR</span><span class="s2">/.git&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span>git<span class="w"> </span>clone<span class="w"> </span>--depth<span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$REPO_URL</span><span class="s2">&quot;</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$REPO_DIR</span><span class="s2">&quot;</span>
+<span class="k">else</span>
+<span class="w">  </span><span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Repository already cloned: </span><span class="nv">$REPO_DIR</span><span class="s2">&quot;</span>
+<span class="k">fi</span>
+
+<span class="nb">cd</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$REPO_DIR</span><span class="s2">&quot;</span>
+<span class="nv">CURRENT_COMMIT</span><span class="o">=</span><span class="s2">&quot;</span><span class="k">$(</span>git<span class="w"> </span>rev-parse<span class="w"> </span>HEAD<span class="k">)</span><span class="s2">&quot;</span>
+<span class="k">if</span><span class="w"> </span><span class="o">[</span><span class="w"> </span>-n<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$DATASET_COMMIT</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="o">[</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$CURRENT_COMMIT</span><span class="s2">&quot;</span><span class="w"> </span>!<span class="o">=</span><span class="w"> </span><span class="s2">&quot;</span><span class="nv">$DATASET_COMMIT</span><span class="s2">&quot;</span><span class="w"> </span><span class="o">]</span><span class="p">;</span><span class="w"> </span><span class="k">then</span>
+<span class="w">  </span>git<span class="w"> </span>fetch<span class="w"> </span>--depth<span class="w"> </span><span class="m">1</span><span class="w"> </span>origin<span class="w"> </span><span class="s2">&quot;</span><span class="nv">$DATASET_COMMIT</span><span class="s2">&quot;</span>
+<span class="w">  </span>git<span class="w"> </span>checkout<span class="w"> </span>--detach<span class="w"> </span>FETCH_HEAD
+<span class="k">fi</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">&quot;Commit SHA:&quot;</span>
+git<span class="w"> </span>rev-parse<span class="w"> </span>HEAD
+</pre></div>
 </div>
+</div>
+<div class="literal-block-wrapper docutils container" id="id2">
+<div class="code-block-caption"><span class="caption-number">Listing 2 </span><span class="caption-text">Deterministic Python file discovery</span><a class="headerlink" href="#id2" title="Link to this code">#</a></div>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">discover_python_files</span><span class="p">(</span><span class="n">repo_root</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Return sorted `src/datasets/**/*.py` files, excluding non-core folders.</span>
+
+<span class="sd">    Task 1 records the total discovered and selected counts. Do not exclude</span>
+<span class="sd">    `src/datasets/utils`; it is core library code.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">source_root</span> <span class="o">=</span> <span class="n">repo_root</span> <span class="o">/</span> <span class="s2">&quot;src&quot;</span> <span class="o">/</span> <span class="s2">&quot;datasets&quot;</span>
+    <span class="n">selected_files</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">repo_root</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">&quot;*.py&quot;</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;setup.py&quot;</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">part</span> <span class="ow">in</span> <span class="n">EXCLUDED_PARTS</span> <span class="k">for</span> <span class="n">part</span> <span class="ow">in</span> <span class="n">path</span><span class="o">.</span><span class="n">parts</span><span class="p">):</span>
+            <span class="k">continue</span>
+        <span class="k">if</span> <span class="n">source_root</span> <span class="ow">in</span> <span class="n">path</span><span class="o">.</span><span class="n">parents</span> <span class="ow">or</span> <span class="n">path</span> <span class="o">==</span> <span class="n">source_root</span><span class="p">:</span>
+            <span class="n">selected_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">selected_files</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="executed-evidence">
+<h2>Executed evidence<a class="headerlink" href="#executed-evidence" title="Link to this heading">#</a></h2>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span><span class="o">,</span><span class="w"> </span><span class="nn">sys</span>
-<span class="n">ROOT</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">(),</span> <span class="o">*</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">]</span> <span class="k">if</span> <span class="p">(</span><span class="n">p</span> <span class="o">/</span> <span class="s1">&#39;screenshots/stage2_manifest.json&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">())</span>
+
+<span class="n">ROOT</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span>
+    <span class="n">p</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="p">[</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">(),</span> <span class="o">*</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span><span class="o">.</span><span class="n">parents</span><span class="p">]</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">p</span> <span class="o">/</span> <span class="s2">&quot;screenshots/stage2_manifest.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+<span class="p">)</span>
 <span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ROOT</span><span class="p">))</span>
+
 <span class="kn">from</span><span class="w"> </span><span class="nn">parser_service.discover</span><span class="w"> </span><span class="kn">import</span> <span class="n">discover_python_files</span>
-<span class="n">repo</span> <span class="o">=</span> <span class="n">ROOT</span> <span class="o">/</span> <span class="s1">&#39;data/datasets&#39;</span>
-<span class="n">manifest</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">((</span><span class="n">ROOT</span> <span class="o">/</span> <span class="s1">&#39;screenshots/stage2_manifest.json&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
-<span class="n">all_python</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s1">&#39;*.py&#39;</span><span class="p">))</span>
+
+<span class="n">repo</span> <span class="o">=</span> <span class="n">ROOT</span> <span class="o">/</span> <span class="s2">&quot;data/datasets&quot;</span>
+<span class="n">manifest</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">((</span><span class="n">ROOT</span> <span class="o">/</span> <span class="s2">&quot;screenshots/stage2_manifest.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">read_text</span><span class="p">())</span>
+<span class="n">all_python</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">repo</span><span class="o">.</span><span class="n">rglob</span><span class="p">(</span><span class="s2">&quot;*.py&quot;</span><span class="p">))</span>
 <span class="n">selected</span> <span class="o">=</span> <span class="n">discover_python_files</span><span class="p">(</span><span class="n">repo</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;dataset_commit:&#39;</span><span class="p">,</span> <span class="n">manifest</span><span class="p">[</span><span class="s1">&#39;run&#39;</span><span class="p">][</span><span class="s1">&#39;dataset_commit&#39;</span><span class="p">])</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;all_python_files:&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_python</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;parser_selected_files:&#39;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">selected</span><span class="p">))</span>
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;sample:&#39;</span><span class="p">,</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">repo</span><span class="p">))</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">selected</span><span class="p">[:</span><span class="mi">5</span><span class="p">]])</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;dataset_commit:&quot;</span><span class="p">,</span> <span class="n">manifest</span><span class="p">[</span><span class="s2">&quot;run&quot;</span><span class="p">][</span><span class="s2">&quot;dataset_commit&quot;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;all_python_files:&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_python</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;parser_selected_files:&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">selected</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;excluded_or_out_of_scope:&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_python</span><span class="p">)</span> <span class="o">-</span> <span class="nb">len</span><span class="p">(</span><span class="n">selected</span><span class="p">))</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;sample:&quot;</span><span class="p">,</span> <span class="p">[</span><span class="n">p</span><span class="o">.</span><span class="n">relative_to</span><span class="p">(</span><span class="n">repo</span><span class="p">)</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">selected</span><span class="p">[:</span><span class="mi">5</span><span class="p">]])</span>
+
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">manifest</span><span class="p">[</span><span class="s2">&quot;run&quot;</span><span class="p">][</span><span class="s2">&quot;dataset_commit&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="mi">40</span>
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">selected</span><span class="p">)</span> <span class="o">==</span> <span class="n">manifest</span><span class="p">[</span><span class="s2">&quot;run&quot;</span><span class="p">][</span><span class="s2">&quot;files_processed&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">138</span>
+<span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_python</span><span class="p">)</span> <span class="o">==</span> <span class="mi">233</span>
 </pre></div>
 </div>
 </div>
@@ -470,10 +527,33 @@
 <div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>dataset_commit: 41adfd0f9ee9ba3a6b4f719d5b551c5b19ae45e2
 all_python_files: 233
 parser_selected_files: 138
-sample: [&#39;src\\datasets\\__init__.py&#39;, &#39;src\\datasets\\arrow_dataset.py&#39;, &#39;src\\datasets\\arrow_reader.py&#39;, &#39;src\\datasets\\arrow_writer.py&#39;, &#39;src\\datasets\\builder.py&#39;]
+excluded_or_out_of_scope: 95
+sample: [&#39;src/datasets/__init__.py&#39;, &#39;src/datasets/arrow_dataset.py&#39;, &#39;src/datasets/arrow_reader.py&#39;, &#39;src/datasets/arrow_writer.py&#39;, &#39;src/datasets/builder.py&#39;]
 </pre></div>
 </div>
 </div>
+</div>
+</section>
+<section id="what-this-chapter-proves">
+<h2>What this chapter proves<a class="headerlink" href="#what-this-chapter-proves" title="Link to this heading">#</a></h2>
+<div class="pst-scrollable-table-container"><table class="table">
+<thead>
+<tr class="row-odd"><th class="head"><p>Requirement</p></th>
+<th class="head"><p>Evidence</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Shallow clone</p></td>
+<td><p>The embedded command uses <code class="docutils literal notranslate"><span class="pre">git</span> <span class="pre">clone</span> <span class="pre">--depth</span> <span class="pre">1</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>File discovery</p></td>
+<td><p>The executed cell reports 233 total Python files and 138 selected files.</p></td>
+</tr>
+<tr class="row-even"><td><p>Provenance</p></td>
+<td><p>The exact 40-character dataset commit is printed and asserted.</p></td>
+</tr>
+</tbody>
+</table>
 </div>
 </section>
 <section id="reflection">
@@ -488,13 +568,13 @@ sample: [&#39;src\\datasets\\__init__.py&#39;, &#39;src\\datasets\\arrow_dataset
 </thead>
 <tbody>
 <tr class="row-even"><td><p>Worked</p></td>
-<td><p>The runbook reused a shallow clone and resolved its real 40-character commit SHA before parsing.</p></td>
+<td><p>Shallow clone plus deterministic discovery kept the input reproducible.</p></td>
 </tr>
 <tr class="row-odd"><td><p>Failed</p></td>
-<td><p>Earlier evidence used <code class="docutils literal notranslate"><span class="pre">commit_sha=unknown</span></code>, so it could not prove dataset provenance.</p></td>
+<td><p>Earlier evidence recorded <code class="docutils literal notranslate"><span class="pre">commit_sha=unknown</span></code>.</p></td>
 </tr>
 <tr class="row-even"><td><p>Resolution</p></td>
-<td><p>Both parser invocations now receive the resolved SHA, and evidence validation rejects unknown or mixed commits.</p></td>
+<td><p>The runbook now resolves and validates the pinned commit before parsing.</p></td>
 </tr>
 </tbody>
 </table>
@@ -570,6 +650,8 @@ sample: [&#39;src\\datasets\\__init__.py&#39;, &#39;src\\datasets\\arrow_dataset
   <nav id="pst-page-toc-nav" class="page-toc" aria-labelledby="pst-page-navigation-heading-2">
     <ul class="pst-show_toc_level nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#approach-and-reasoning">Approach and reasoning</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#key-implementation-excerpts">Key implementation excerpts</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#executed-evidence">Executed evidence</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#what-this-chapter-proves">What this chapter proves</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reflection">Reflection</a></li>
 </ul>
